@@ -62,3 +62,11 @@ memorias-invisíveis/
 ├── mobile/             # Aplicativo React Native
 ├── docs/              # Documentação
 └── assets/            # Recursos de design
+
+----
+
+## 📬Contact
+
+Project developed by Marcus Guedes
+📧 Email: mclguedes@gmail.com
+📱 LinkedIn: https://www.linkedin.com/in/marcusguedes
