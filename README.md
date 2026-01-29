@@ -1,3 +1,5 @@
+![Memórias Invisíveis](https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80)
+
 # Memórias Invisíveis - Preservando Histórias Antes que se Apaguem
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
