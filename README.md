@@ -1,4 +1,4 @@
-![Paisagem Desaparecendo](https://images.unsplash.com/photo-1505506874110-6a7a69069a08?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=500)
+![Paisagem Desaparecendo](https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80)
 
 # Memórias Invisíveis - Preservando Histórias Antes que se Apaguem
 
