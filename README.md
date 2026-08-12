@@ -1,6 +1,6 @@
 # 📖 Memórias Invisíveis
 
-
+<img width="1536" height="1024" alt="memorias-invisiveis-banner" src="https://github.com/user-attachments/assets/e219846a-6925-4863-b494-dec6e8e9196c" />
 
 *Preservando Histórias Antes que se Apaguem*
 
