@@ -1,7 +1,10 @@
 # 📖 Memórias Invisíveis
 
-![Paisagem Desaparecendo](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80)
-
+<p align="center">
+  <img src="assets/memorias-invisiveis-banner.png"
+       alt="Memórias Invisíveis — Preservando histórias antes que se apaguem"
+       width="850">
+</p>
 
 *Preservando Histórias Antes que se Apaguem*
 
@@ -146,9 +149,12 @@ representar uma plataforma completa de preservação digital.
 ## 📂 Estrutura do Projeto
 
 ```text
-Memorias-Invisiveis/
+Memorias-Invisiveis-Preservando-Historias-Antes-Que-Se-Apaguem/
 │
-├── Landing Page Memórias Invisíveis.html
+├── assets/
+│   └── memorias-invisiveis-banner.png
+│
+├── index.html
 ├── style.css
 ├── script.js
 ├── server.js
