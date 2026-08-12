@@ -2,6 +2,7 @@
 
 ![Paisagem Desaparecendo](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80)
 
+
 *Preservando Histórias Antes que se Apaguem*
 
 ![HTML5](https://img.shields.io/badge/HTML5-Frontend-E34F26?logo=html5&logoColor=white)
