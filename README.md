@@ -1,6 +1,6 @@
 # 📖 Memórias Invisíveis
 
-<img src="assets/memorias-invisiveis-banner.png" width="750">
+![Uploading memorias-invisiveis-banner.png…]()
 
 *Preservando Histórias Antes que se Apaguem*
 
