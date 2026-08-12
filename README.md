@@ -1,31 +1,35 @@
+# 📖 Memórias Invisíveis
+
 ![Paisagem Desaparecendo](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80)
 
-# Memórias Invisíveis - Preservando Histórias Antes que se Apaguem
+*Preservando Histórias Antes que se Apaguem*
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JSON](https://img.shields.io/badge/json-5E5C5C?style=for-the-badge&logo=json&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![HTML5](https://img.shields.io/badge/HTML5-Frontend-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-Responsive-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=nodedotjs&logoColor=white)
+![UX](https://img.shields.io/badge/UX-Product%20Design-7952B3)
+![Status](https://img.shields.io/badge/Status-Protótipo-blue)
+
 
 ----
 
 ##🌟 Sobre o Projeto
 
-É uma iniciativa urgente e humanizada para capturar e preservar as histórias familiares que estão silenciosamente desaparecendo.
+**Memórias Invisíveis** é um projeto de produto digital criado para explorar 
+como a tecnologia pode contribuir para a preservação de histórias, experiências 
+e memórias familiares entre diferentes gerações.
 
-O problema que enfrentamos:
+A proposta parte de uma ideia simples :
 
-- 90% das famílias não registram as histórias de seus idosos
-- O Alzheimer e outras condições apagam não apenas nomes e datas, mas histórias de amor, lições de vida e tradições familiares
-- Cada esquecimento é uma porta que se fecha para sempre
-- Quando nos damos conta, já é tarde demais
+> Muitas das histórias mais importantes de uma família nunca foram registradas.
 
-O que perdemos:
+Experiências de infância, histórias de trabalho, receitas, tradições, viagens, 
+conselhos e acontecimentos familiares podem existir apenas na memória e na 
+transmissão oral.
 
-- A receita especial da avó
-- A história de como os avós se conheceram
-- Os conselhos que só a experiência pode dar
-- Tradições que são a essência de quem somos como família
+O projeto propõe uma experiência digital para incentivar o registro e a 
+organização desse patrimônio afetivo. 
 
 ----
 
