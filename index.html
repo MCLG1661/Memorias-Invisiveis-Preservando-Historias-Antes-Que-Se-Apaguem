@@ -7,7 +7,7 @@
 
     <meta
         name="description"
-        content="Memórias Invisíveis — protótipo de produto digital para preservação de histórias, experiências e memórias familiares entre gerações."
+        content="Memórias Invisíveis — protótipo interativo de produto digital para registro, organização e preservação de histórias e memórias familiares entre gerações."
     >
 
     <title>Memórias Invisíveis — Preservando Histórias</title>
@@ -28,7 +28,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
     <!-- ======================================================
@@ -40,23 +39,19 @@
         <div class="container nav-container">
 
             <a href="#inicio" class="logo">
-
                 <i class="fas fa-book-open"></i>
-
                 Memórias<span>Invisíveis</span>
-
             </a>
-
 
             <button
                 class="mobile-menu-btn"
                 id="mobileMenuBtn"
                 type="button"
                 aria-label="Abrir menu"
+                aria-expanded="false"
             >
                 <i class="fas fa-bars"></i>
             </button>
-
 
             <nav class="nav-links">
 
@@ -72,19 +67,19 @@
                     A Jornada
                 </a>
 
-                <a href="#roadmap">
-                    Roadmap
+                <a href="#registrar">
+                    Registrar
                 </a>
 
-                <a href="#about">
-                    Sobre
+                <a href="#acervo">
+                    Acervo
                 </a>
 
                 <a
-                    href="#experience"
+                    href="#registrar"
                     class="cta-button"
                 >
-                    Explorar Projeto
+                    Preservar uma Memória
                 </a>
 
             </nav>
@@ -111,24 +106,17 @@
                     Antes que as histórias se tornem invisíveis
                 </h1>
 
-
                 <p>
-
                     Muitas das histórias mais importantes de uma
                     família nunca chegam a ser registradas.
-
                 </p>
 
-
                 <p>
-
                     Experiências de infância, trabalho, viagens,
                     receitas, tradições, acontecimentos e aprendizados
                     podem permanecer apenas na memória e na
                     transmissão oral.
-
                 </p>
-
 
                 <p>
 
@@ -143,21 +131,19 @@
 
                 </p>
 
-
                 <div style="margin-top: 40px;">
 
                     <a
-                        href="#solution"
+                        href="#registrar"
                         class="cta-button"
                         style="margin-right: 15px;"
                     >
-                        <i class="fas fa-book-open"></i>
-                        Conhecer o Conceito
+                        <i class="fas fa-pen"></i>
+                        Registrar uma Memória
                     </a>
 
-
                     <a
-                        href="#roadmap"
+                        href="#solution"
                         class="cta-button"
                         style="
                             background: transparent;
@@ -165,12 +151,11 @@
                             color: var(--accent);
                         "
                     >
-                        <i class="fas fa-route"></i>
-                        Ver Roadmap
+                        <i class="fas fa-book-open"></i>
+                        Conhecer o Conceito
                     </a>
 
                 </div>
-
 
                 <p
                     style="
@@ -182,8 +167,9 @@
                         Protótipo educacional e de portfólio.
                     </strong>
 
-                    A plataforma completa de preservação ainda faz
-                    parte da visão de evolução do projeto.
+                    Esta versão permite experimentar um fluxo
+                    inicial de registro e organização de memórias
+                    diretamente no navegador.
                 </p>
 
             </div>
@@ -225,7 +211,6 @@
 
             </div>
 
-
             <div class="stat-item">
 
                 <div class="stat-number">
@@ -237,7 +222,6 @@
                 </div>
 
             </div>
-
 
             <div class="stat-item">
 
@@ -271,60 +255,44 @@
                 O que pode desaparecer quando uma história não é registrada?
             </h2>
 
-
             <div class="problem-content">
 
                 <div class="problem-text">
 
                     <p>
-
                         Parte importante da história de uma família
                         não está necessariamente registrada em
                         documentos, fotografias ou arquivos digitais.
-
                     </p>
 
-
                     <p style="margin-top: 20px;">
-
                         A receita especial de uma avó, a história de
                         como duas pessoas se conheceram, uma experiência
                         profissional marcante, uma viagem, uma tradição
                         ou um conselho podem existir apenas na lembrança
                         de quem viveu aquele momento.
-
                     </p>
 
-
                     <p style="margin-top: 20px;">
-
                         Quando essas experiências deixam de ser
                         transmitidas, perde-se também parte do
                         patrimônio afetivo e da identidade daquela
                         família.
-
                     </p>
-
 
                     <p style="margin-top: 20px;">
-
                         O desafio que originou o projeto é:
-
                     </p>
-
 
                     <p style="margin-top: 15px;">
 
                         <span class="highlight">
-
                             Como utilizar tecnologia para tornar o
                             registro dessas histórias mais simples,
                             acessível e significativo?
-
                         </span>
 
                     </p>
-
 
                     <div style="margin-top: 30px;">
 
@@ -374,27 +342,13 @@
                 Memórias Invisíveis: preservando o que importa
             </h2>
 
-
-            <p
-                style="
-                    text-align: center;
-                    max-width: 800px;
-                    margin: 0 auto 50px;
-                    font-size: 1.1rem;
-                    color: var(--gray);
-                "
-            >
-
+            <p class="section-intro">
                 O projeto propõe uma experiência digital para
                 incentivar conversas entre gerações e transformar
                 histórias pessoais em um acervo familiar organizado.
-
             </p>
 
-
             <div class="solution-cards">
-
-                <!-- CAPTURAR -->
 
                 <div class="card">
 
@@ -407,18 +361,14 @@
                     </h3>
 
                     <p>
-
                         Utilizar perguntas e temas como ponto de
                         partida para conversas sobre infância,
                         família, trabalho, viagens, tradições,
                         acontecimentos e aprendizados.
-
                     </p>
 
                 </div>
 
-
-                <!-- ORGANIZAR -->
 
                 <div class="card">
 
@@ -431,17 +381,13 @@
                     </h3>
 
                     <p>
-
                         Estruturar as histórias por pessoas, temas,
                         datas, períodos e acontecimentos para tornar
                         o acervo mais fácil de navegar e compreender.
-
                     </p>
 
                 </div>
 
-
-                <!-- PRESERVAR -->
 
                 <div class="card">
 
@@ -454,11 +400,9 @@
                     </h3>
 
                     <p>
-
                         Criar um acervo digital capaz de manter
                         histórias e experiências acessíveis às
                         futuras gerações.
-
                     </p>
 
                 </div>
@@ -484,7 +428,6 @@
             <h2 class="section-title">
                 Uma Jornada entre Gerações
             </h2>
-
 
             <div
                 class="solution-cards"
@@ -538,8 +481,8 @@
                     </h3>
 
                     <p>
-                        Transformar a conversa em texto, áudio,
-                        fotografia ou vídeo em uma futura versão.
+                        Transformar a lembrança em um registro que
+                        possa ser organizado e preservado.
                     </p>
 
                 </div>
@@ -574,9 +517,9 @@
                     </h3>
 
                     <p>
-                        Tornar o acervo acessível à família de
-                        acordo com futuras regras de privacidade
-                        e compartilhamento.
+                        Em uma evolução futura, permitir que o
+                        acervo seja compartilhado entre familiares
+                        com regras de privacidade.
                     </p>
 
                 </div>
@@ -607,6 +550,496 @@
 
 
     <!-- ======================================================
+         MVP — REGISTRAR UMA MEMÓRIA
+    ======================================================= -->
+
+    <section
+        class="memory-experience"
+        id="registrar"
+    >
+
+        <div class="container">
+
+            <h2 class="section-title">
+                Registre uma Memória
+            </h2>
+
+            <p class="section-intro">
+                Experimente o conceito do Memórias Invisíveis.
+                Escolha uma lembrança, conte a história e transforme
+                esse momento em parte de um pequeno acervo digital.
+            </p>
+
+
+            <div class="memory-layout">
+
+                <!-- FORMULÁRIO -->
+
+                <div class="memory-panel">
+
+                    <div class="memory-panel-header">
+
+                        <h3>
+                            <i class="fas fa-pen-nib"></i>
+                            Conte uma história
+                        </h3>
+
+                        <p>
+                            Não precisa escrever tudo de uma vez.
+                            Comece pelo que você mais gostaria que
+                            alguém da sua família pudesse conhecer
+                            no futuro.
+                        </p>
+
+                    </div>
+
+
+                    <form
+                        class="memory-form"
+                        id="memoryForm"
+                    >
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label for="memoryPerson">
+                                    Pessoa relacionada à memória *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="memoryPerson"
+                                    class="form-control"
+                                    placeholder="Ex.: Minha avó Maria"
+                                    maxlength="80"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="memoryPeriod">
+                                    Período ou ano
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="memoryPeriod"
+                                    class="form-control"
+                                    placeholder="Ex.: 1975 ou Anos 80"
+                                    maxlength="40"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group full-width">
+
+                                <label for="memoryTitle">
+                                    Título da memória *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="memoryTitle"
+                                    class="form-control"
+                                    placeholder="Ex.: Os almoços de domingo"
+                                    maxlength="100"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group full-width">
+
+                                <label for="memoryCategory">
+                                    Categoria *
+                                </label>
+
+                                <select
+                                    id="memoryCategory"
+                                    class="form-control"
+                                    required
+                                >
+                                    <option value="">
+                                        Selecione uma categoria
+                                    </option>
+
+                                    <option value="Infância">
+                                        Infância
+                                    </option>
+
+                                    <option value="Família">
+                                        Família
+                                    </option>
+
+                                    <option value="Trabalho">
+                                        Trabalho
+                                    </option>
+
+                                    <option value="Viagens">
+                                        Viagens
+                                    </option>
+
+                                    <option value="Tradições">
+                                        Tradições
+                                    </option>
+
+                                    <option value="Receitas">
+                                        Receitas
+                                    </option>
+
+                                    <option value="Relacionamentos">
+                                        Relacionamentos
+                                    </option>
+
+                                    <option value="Acontecimentos">
+                                        Acontecimentos
+                                    </option>
+
+                                    <option value="Aprendizados">
+                                        Aprendizados
+                                    </option>
+
+                                    <option value="Outras">
+                                        Outras
+                                    </option>
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group full-width">
+
+                                <label for="memoryStory">
+                                    Conte a memória *
+                                </label>
+
+                                <textarea
+                                    id="memoryStory"
+                                    class="form-control"
+                                    placeholder="Escreva aqui a história que você gostaria de preservar..."
+                                    maxlength="3000"
+                                    required
+                                ></textarea>
+
+                                <small>
+                                    A história ficará armazenada somente
+                                    neste navegador nesta versão do protótipo.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                type="submit"
+                                class="cta-button"
+                            >
+                                <i class="fas fa-bookmark"></i>
+                                Preservar esta Memória
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="clearFormButton"
+                            >
+                                Limpar
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="form-message"
+                            id="formMessage"
+                            role="status"
+                            aria-live="polite"
+                        ></div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- INSPIRAÇÃO -->
+
+                <div class="memory-panel">
+
+                    <div class="memory-panel-header">
+
+                        <h3>
+                            <i class="fas fa-lightbulb"></i>
+                            Precisa de inspiração?
+                        </h3>
+
+                        <p>
+                            Às vezes uma boa pergunta é suficiente
+                            para trazer de volta uma história inteira.
+                        </p>
+
+                    </div>
+
+
+                    <div class="prompt-box">
+
+                        <span class="prompt-label">
+                            Pergunta para começar
+                        </span>
+
+                        <p
+                            class="prompt-text"
+                            id="promptText"
+                        >
+                            Qual lembrança da sua infância você nunca
+                            gostaria de esquecer?
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="newPromptButton"
+                    >
+                        <i class="fas fa-rotate"></i>
+                        Outra pergunta
+                    </button>
+
+
+                    <div
+                        class="memory-helper"
+                        style="margin-top: 30px;"
+                    >
+
+                        <div class="helper-card">
+
+                            <div class="helper-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Pense em uma pessoa
+                                </h4>
+
+                                <p>
+                                    Quem aparece primeiro quando você
+                                    pensa nas histórias da sua família?
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="helper-card">
+
+                            <div class="helper-icon">
+                                <i class="fas fa-calendar-days"></i>
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Volte a um período
+                                </h4>
+
+                                <p>
+                                    Infância, escola, primeiro emprego,
+                                    casamento, viagens ou mudanças podem
+                                    despertar lembranças.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="helper-card">
+
+                            <div class="helper-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Preserve o significado
+                                </h4>
+
+                                <p>
+                                    Mais importante que lembrar cada
+                                    detalhe é registrar por que aquela
+                                    história merece continuar existindo.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
+         MVP — ACERVO
+    ======================================================= -->
+
+    <section
+        class="memory-archive"
+        id="acervo"
+    >
+
+        <div class="container">
+
+            <h2 class="section-title">
+                Meu Acervo de Memórias
+            </h2>
+
+            <p class="section-intro">
+                As histórias registradas nesta demonstração são
+                organizadas em um acervo local e permanecem apenas
+                no navegador utilizado.
+            </p>
+
+
+            <div class="archive-toolbar">
+
+                <div class="search-wrapper">
+
+                    <i class="fas fa-magnifying-glass"></i>
+
+                    <input
+                        type="search"
+                        id="memorySearch"
+                        class="form-control"
+                        placeholder="Buscar por pessoa, título ou palavra..."
+                        aria-label="Buscar memórias"
+                    >
+
+                </div>
+
+
+                <select
+                    id="categoryFilter"
+                    class="form-control"
+                    aria-label="Filtrar memórias por categoria"
+                >
+                    <option value="all">
+                        Todas as categorias
+                    </option>
+
+                    <option value="Infância">
+                        Infância
+                    </option>
+
+                    <option value="Família">
+                        Família
+                    </option>
+
+                    <option value="Trabalho">
+                        Trabalho
+                    </option>
+
+                    <option value="Viagens">
+                        Viagens
+                    </option>
+
+                    <option value="Tradições">
+                        Tradições
+                    </option>
+
+                    <option value="Receitas">
+                        Receitas
+                    </option>
+
+                    <option value="Relacionamentos">
+                        Relacionamentos
+                    </option>
+
+                    <option value="Acontecimentos">
+                        Acontecimentos
+                    </option>
+
+                    <option value="Aprendizados">
+                        Aprendizados
+                    </option>
+
+                    <option value="Outras">
+                        Outras
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="archive-summary">
+
+                <p>
+                    <span
+                        class="memory-count"
+                        id="memoryCount"
+                    >
+                        0 memórias
+                    </span>
+                    preservadas neste navegador.
+                </p>
+
+                <p>
+                    <i class="fas fa-lock"></i>
+                    Armazenamento local demonstrativo
+                </p>
+
+            </div>
+
+
+            <div
+                class="archive-grid"
+                id="memoryArchive"
+                aria-live="polite"
+            >
+
+                <div class="empty-state">
+
+                    <i class="fas fa-book-open"></i>
+
+                    <h3>
+                        Seu acervo começa com uma história
+                    </h3>
+
+                    <p>
+                        Registre uma memória acima e ela aparecerá
+                        aqui.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================================================
          EXPERIÊNCIA ATUAL
     ======================================================= -->
 
@@ -621,21 +1054,10 @@
                 O que esta versão demonstra
             </h2>
 
-
-            <p
-                style="
-                    text-align: center;
-                    max-width: 800px;
-                    margin: 0 auto 50px;
-                    color: var(--gray);
-                    font-size: 1.1rem;
-                "
-            >
-
-                A versão atual é um protótipo web criado para
-                comunicar a proposta de valor e explorar a
-                experiência de um possível produto digital.
-
+            <p class="section-intro">
+                Esta versão combina a apresentação do conceito com
+                uma experiência funcional de registro e organização
+                local de memórias.
             </p>
 
 
@@ -652,8 +1074,27 @@
                     </h3>
 
                     <p>
-                        Landing page responsiva desenvolvida com
-                        HTML, CSS e JavaScript.
+                        Interface responsiva desenvolvida com HTML,
+                        CSS e JavaScript, preparada para desktop e
+                        dispositivos móveis.
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+                        <i class="fas fa-book-bookmark"></i>
+                    </div>
+
+                    <h3>
+                        MVP Interativo
+                    </h3>
+
+                    <p>
+                        Registro, organização, busca e filtragem de
+                        memórias com persistência local no navegador.
                     </p>
 
                 </div>
@@ -671,26 +1112,8 @@
 
                     <p>
                         Estruturação do problema, proposta de valor,
-                        jornada do usuário e visão de evolução.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-
-                    <h3>
-                        Storytelling
-                    </h3>
-
-                    <p>
-                        Uso de narrativa e experiência digital para
-                        comunicar um problema humano e uma possível
-                        solução tecnológica.
+                        jornada do usuário, experimentação e visão
+                        de evolução.
                     </p>
 
                 </div>
@@ -717,20 +1140,10 @@
                 Visão de Evolução
             </h2>
 
-
-            <p
-                style="
-                    text-align: center;
-                    max-width: 850px;
-                    margin: 0 auto 50px;
-                    color: var(--gray);
-                    font-size: 1.1rem;
-                "
-            >
-
+            <p class="section-intro">
+                O MVP demonstra uma parte da experiência.
                 As funcionalidades abaixo representam possibilidades
-                futuras e <strong>não estão implementadas na versão atual</strong>.
-
+                futuras e ainda não estão implementadas.
             </p>
 
 
@@ -747,8 +1160,8 @@
                     </h3>
 
                     <p>
-                        Perfis familiares, histórias, fotografias,
-                        áudio, vídeo e linha do tempo.
+                        Perfis familiares, fotografias, áudio, vídeo,
+                        relações entre pessoas e linha do tempo.
                     </p>
 
                 </div>
@@ -766,7 +1179,8 @@
 
                     <p>
                         Autenticação, banco de dados, armazenamento
-                        em nuvem, busca e controle de privacidade.
+                        em nuvem, sincronização, compartilhamento
+                        e controle de privacidade.
                     </p>
 
                 </div>
@@ -783,9 +1197,9 @@
                     </h3>
 
                     <p>
-                        Transcrição, identificação de pessoas,
-                        datas e lugares, classificação por temas
-                        e busca semântica.
+                        Transcrição, resumo, identificação de pessoas,
+                        datas e lugares, classificação por temas,
+                        geração de tags e busca semântica.
                     </p>
 
                 </div>
@@ -833,21 +1247,20 @@
                         Memórias Invisíveis
                     </span>
 
-                    é um projeto conceitual de produto digital que
-                    explora a relação entre tecnologia, memória,
-                    storytelling e experiência do usuário.
+                    é um projeto de produto digital que explora a
+                    relação entre tecnologia, memória, storytelling,
+                    experiência do usuário e preservação entre
+                    gerações.
 
                 </p>
 
 
                 <p style="margin-bottom: 40px;">
-
                     O objetivo desta versão é demonstrar como um
                     problema humano pode ser estruturado como uma
                     oportunidade de produto, traduzido em uma
-                    proposta de valor e comunicado por meio de
-                    uma experiência digital.
-
+                    proposta de valor e transformado progressivamente
+                    em uma experiência digital funcional.
                 </p>
 
 
@@ -916,8 +1329,8 @@
                         </h4>
 
                         <p style="font-size: 0.9rem;">
-                            Explorar como tecnologia pode apoiar
-                            o registro e a preservação de memórias.
+                            Tornar o registro e a organização de
+                            memórias mais simples e significativo.
                         </p>
 
                     </div>
@@ -947,8 +1360,8 @@
                         </h4>
 
                         <p style="font-size: 0.9rem;">
-                            HTML, CSS, JavaScript e uma visão futura
-                            de plataforma e Inteligência Artificial.
+                            HTML, CSS, JavaScript, armazenamento local
+                            e uma visão futura de plataforma e IA.
                         </p>
 
                     </div>
@@ -974,29 +1387,22 @@
                 Toda família tem histórias que merecem ser preservadas
             </h2>
 
-
             <p>
-
-                Memórias Invisíveis transforma essa reflexão em
-                uma proposta de produto digital: capturar,
-                organizar e preservar histórias antes que elas
-                deixem de ser transmitidas.
-
+                Uma memória registrada hoje pode se transformar
+                em uma conexão entre gerações amanhã.
             </p>
-
 
             <div style="margin-top: 50px;">
 
                 <a
-                    href="#inicio"
+                    href="#registrar"
                     class="cta-button"
                 >
-                    <i class="fas fa-arrow-up"></i>
-                    Voltar ao Início
+                    <i class="fas fa-pen"></i>
+                    Registrar uma Memória
                 </a>
 
             </div>
-
 
             <p
                 style="
@@ -1005,11 +1411,10 @@
                     opacity: 0.75;
                 "
             >
-
                 Protótipo educacional e demonstrativo.
-                Não há cadastro, armazenamento de histórias ou
-                processamento de dados pessoais nesta versão.
-
+                Nesta versão, as memórias são armazenadas somente
+                no navegador do usuário e não são enviadas para
+                um servidor.
             </p>
 
         </div>
@@ -1036,7 +1441,6 @@
                         MemóriasInvisíveis
                     </a>
 
-
                     <p
                         style="
                             max-width: 350px;
@@ -1044,11 +1448,9 @@
                             line-height: 1.7;
                         "
                     >
-
-                        Projeto conceitual de produto digital para
-                        preservação de histórias e memórias familiares
-                        entre gerações.
-
+                        Projeto de produto digital para registro,
+                        organização e preservação de histórias e
+                        memórias familiares entre gerações.
                     </p>
 
                 </div>
@@ -1080,12 +1482,29 @@
                     <div class="footer-column">
 
                         <h4>
-                            Produto
+                            Experiência
                         </h4>
 
-                        <a href="#experience">
-                            Protótipo Atual
+                        <a href="#registrar">
+                            Registrar Memória
                         </a>
+
+                        <a href="#acervo">
+                            Meu Acervo
+                        </a>
+
+                        <a href="#experience">
+                            MVP Atual
+                        </a>
+
+                    </div>
+
+
+                    <div class="footer-column">
+
+                        <h4>
+                            Evolução
+                        </h4>
 
                         <a href="#roadmap">
                             Roadmap
@@ -1095,25 +1514,8 @@
                             Sobre
                         </a>
 
-                    </div>
-
-
-                    <div class="footer-column">
-
-                        <h4>
-                            Tecnologias
-                        </h4>
-
-                        <a href="#experience">
-                            HTML5
-                        </a>
-
-                        <a href="#experience">
-                            CSS3
-                        </a>
-
-                        <a href="#experience">
-                            JavaScript
+                        <a href="#inicio">
+                            Voltar ao Início
                         </a>
 
                     </div>
