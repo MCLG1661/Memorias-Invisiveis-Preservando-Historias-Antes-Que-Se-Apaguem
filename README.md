@@ -8,7 +8,6 @@
 ![CSS3](https://img.shields.io/badge/CSS3-Responsive-1572B6?logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
 ![LocalStorage](https://img.shields.io/badge/LocalStorage-Persistência-4285F4?logo=googlechrome&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-Experimental-339933?logo=nodedotjs&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?logo=vercel&logoColor=white)
 ![Product Thinking](https://img.shields.io/badge/Product-Thinking-7952B3)
 ![Status](https://img.shields.io/badge/Status-MVP%20Funcional-success)
@@ -198,7 +197,7 @@ O acervo pode ser explorado utilizando:
 
 ### Busca textual
 
-A pesquisa considera informações como:
+A pesquisa considera:
 
 - pessoa;
 - título;
@@ -216,15 +215,13 @@ O usuário pode visualizar apenas memórias pertencentes a uma determinada categ
 
 Memórias registradas podem ser removidas do acervo.
 
-Antes da exclusão, o sistema solicita uma confirmação para evitar remoções acidentais.
+Antes da exclusão, o sistema solicita confirmação para evitar remoções acidentais.
 
 ---
 
 ## 💾 Persistência com LocalStorage
 
 O MVP utiliza a API `localStorage` do navegador para manter as memórias registradas.
-
-Fluxo:
 
 ```text
 Formulário
@@ -242,7 +239,7 @@ Acervo
 
 Isso permite que as memórias permaneçam disponíveis mesmo depois que a página é atualizada ou o navegador é fechado e aberto novamente.
 
-### Limitação atual
+### Limitações atuais
 
 Os dados permanecem apenas no navegador e dispositivo utilizados.
 
@@ -252,9 +249,10 @@ Nesta versão:
 - não existe autenticação;
 - não existe conta de usuário;
 - não existe banco de dados remoto;
+- não existe armazenamento em nuvem;
 - as memórias não são enviadas para um servidor.
 
-Essa decisão mantém o MVP simples e permite validar primeiro a **experiência central do produto**.
+Essa arquitetura mantém o MVP simples e permite validar primeiro a **experiência central do produto**.
 
 ---
 
@@ -286,7 +284,7 @@ A primeira versão validava principalmente a comunicação do conceito.
 
 O MVP atual adiciona uma etapa importante:
 
-> **o visitante deixa de apenas conhecer a ideia e passa a experimentar parte do produto.**
+> **O visitante deixa de apenas conhecer a ideia e passa a experimentar parte do produto.**
 
 ---
 
@@ -352,7 +350,6 @@ Memorias-Invisiveis-Preservando-Historias-Antes-Que-Se-Apaguem/
 ├── README.md
 ├── index.html
 ├── script.js
-├── server.js
 └── style.css
 ```
 
@@ -370,9 +367,6 @@ Identidade visual, componentes, formulário, cards, responsividade e experiênci
 **script.js**  
 Interações da interface e lógica do MVP, incluindo registro, `localStorage`, renderização do acervo, busca, filtros e exclusão.
 
-**server.js**  
-Estrutura experimental criada para exploração de uma possível camada de backend. O MVP público atual funciona como aplicação front-end e não depende desse servidor.
-
 ---
 
 ## 🛠️ Tecnologias
@@ -384,7 +378,6 @@ Estrutura experimental criada para exploração de uma possível camada de backe
 | JavaScript | Lógica e interatividade |
 | LocalStorage | Persistência local |
 | JSON | Estruturação dos registros |
-| Node.js / Express | Backend experimental |
 | Git | Versionamento |
 | GitHub | Repositório e documentação |
 | Vercel | Deploy público |
@@ -438,6 +431,8 @@ Com o MVP funcional, as próximas evoluções podem ser divididas em três camad
 
 ### ☁️ Plataforma
 
+Uma futura evolução poderá introduzir uma camada de backend:
+
 ```text
 Front-end
     ↓
@@ -454,12 +449,14 @@ Possibilidades:
 
 - autenticação;
 - banco de dados;
-- API REST;
+- API;
 - armazenamento de mídia;
 - sincronização entre dispositivos;
 - controle de acesso;
 - histórico e versionamento;
 - backup.
+
+> A camada de backend ainda não está implementada no MVP atual.
 
 ### 🤖 Inteligência Artificial
 
@@ -476,8 +473,8 @@ Possibilidades:
 - geração de tags;
 - relacionamento entre histórias;
 - busca semântica;
-- sugestões de perguntas;
-- organização inteligente do acervo.
+- sugestões inteligentes de perguntas;
+- organização automática do acervo.
 
 ---
 
@@ -545,7 +542,7 @@ Seria preservar **contexto, histórias, relações e significado**.
 
 **Memórias Invisíveis** é atualmente um MVP experimental, educacional e de portfólio.
 
-O projeto demonstra uma experiência funcional de registro e organização de memórias no navegador.
+O projeto demonstra uma experiência funcional de registro, persistência local, organização, busca, filtragem e exclusão de memórias diretamente no navegador.
 
 As funcionalidades apresentadas no roadmap representam possibilidades futuras e não devem ser interpretadas como funcionalidades já disponíveis.
 
@@ -559,7 +556,7 @@ O MVP está publicado na Vercel:
 
 ### 🔗 https://memorias-invisiveis.vercel.app/
 
-O deploy está conectado ao projeto hospedado a partir do repositório GitHub.
+O deploy público utiliza a versão do projeto mantida no GitHub.
 
 ---
 
