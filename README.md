@@ -918,7 +918,7 @@ O deploy público utiliza a versão do produto mantida no GitHub.
 
 Marketing | Data Science | Inteligência Artificial | Gestão de Projetos
 
-GitHub: **MCLG1661**
+GitHub: **https://github.com/MCLG1661**
 
 Linkedin: **https://www.linkedin.com/in/marcusguedes/** 
 
