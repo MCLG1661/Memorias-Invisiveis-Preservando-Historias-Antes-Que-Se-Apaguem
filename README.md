@@ -10,7 +10,7 @@
 ![LocalStorage](https://img.shields.io/badge/LocalStorage-Persistência-4285F4?logo=googlechrome&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?logo=vercel&logoColor=white)
 ![Product Thinking](https://img.shields.io/badge/Product-Thinking-7952B3)
-![Status](https://img.shields.io/badge/Status-MVP%20Funcional-success)
+![Status](https://img.shields.io/badge/Status-MVP%20em%20Validação-success)
 
 ---
 
@@ -24,9 +24,9 @@ O MVP está publicado e pode ser experimentado diretamente no navegador:
 
 ---
 
-## 🌟 Sobre o Projeto
+## 🌟 Sobre o Produto
 
-**Memórias Invisíveis** é um produto digital experimental criado para explorar como tecnologia, storytelling e experiência do usuário podem ajudar famílias a registrar, organizar e preservar histórias que muitas vezes existem apenas na memória e na transmissão oral.
+**Memórias Invisíveis** é uma plataforma digital em desenvolvimento criada para ajudar famílias a registrar, organizar e preservar histórias que muitas vezes existem apenas na memória e na transmissão oral.
 
 A proposta parte de uma ideia simples:
 
@@ -34,7 +34,7 @@ A proposta parte de uma ideia simples:
 
 Experiências de infância, trabalho, viagens, receitas, tradições, acontecimentos, relacionamentos, conselhos e aprendizados podem desaparecer quando deixam de ser transmitidos entre gerações.
 
-O projeto transforma esse problema humano em uma experiência digital orientada por **Product Thinking**, evoluindo de um conceito inicial para um **MVP web funcional**.
+O produto transforma esse problema humano em uma experiência digital orientada por **Product Thinking**, evoluindo de um conceito inicial para um **MVP web funcional em validação**.
 
 ---
 
@@ -43,6 +43,8 @@ O projeto transforma esse problema humano em uma experiência digital orientada 
 Parte importante da história de uma família não está necessariamente registrada em documentos, fotografias ou arquivos digitais.
 
 Ela permanece nas lembranças das pessoas.
+
+Mesmo quando fotografias, vídeos e documentos são preservados, parte de seu significado pode desaparecer quando deixam de existir as pessoas capazes de explicar quem estava presente, onde aquilo aconteceu, qual era o contexto ou por que aquele momento era importante.
 
 Com o passar do tempo, histórias relacionadas a:
 
@@ -59,7 +61,7 @@ Com o passar do tempo, histórias relacionadas a:
 
 podem deixar de ser transmitidas.
 
-O desafio que originou o projeto é:
+O desafio que originou o produto é:
 
 > **Como utilizar tecnologia para tornar o registro dessas histórias mais simples, acessível e significativo?**
 
@@ -67,25 +69,25 @@ O desafio que originou o projeto é:
 
 ## 🎯 Objetivo
 
-Explorar um produto digital capaz de incentivar famílias a **capturar, organizar e preservar** suas histórias para as próximas gerações.
+Desenvolver um produto digital capaz de incentivar famílias a **capturar, organizar e preservar** suas histórias para as próximas gerações.
 
 A proposta combina:
 
 **Tecnologia + Memória + Storytelling + UX + Product Thinking**
 
+Mais do que armazenar arquivos, o objetivo é preservar também o **contexto, as relações e o significado** existentes por trás deles.
+
 ---
 
-## 🧩 Conceito da Solução
+## 🧩 A Solução
 
 A experiência foi estruturada em três pilares:
 
-```text
-Capturar
-   ↓
-Organizar
-   ↓
-Preservar
-```
+    Capturar
+       ↓
+    Organizar
+       ↓
+    Preservar
 
 ### 🎙️ Capturar
 
@@ -95,6 +97,16 @@ Utilizar perguntas e temas como ponto de partida para recuperar histórias sobre
 
 Relacionar as histórias a pessoas, categorias e períodos, permitindo que as memórias sejam estruturadas em um acervo digital.
 
+    Pessoa
+       ↓
+    História
+       ↓
+    Período
+       ↓
+    Categoria
+       ↓
+    Contexto
+
 ### 💾 Preservar
 
 Transformar lembranças em registros digitais capazes de permanecer acessíveis e, futuramente, ser compartilhados entre gerações.
@@ -103,33 +115,35 @@ Transformar lembranças em registros digitais capazes de permanecer acessíveis 
 
 ## 🔄 Jornada do Usuário
 
-```text
-Pessoa / Família
-      ↓
-Escolher uma lembrança
-      ↓
-Perguntas e estímulos
-      ↓
-Registrar a história
-      ↓
-Categorizar
-      ↓
-Salvar
-      ↓
-Acervo de memórias
-      ↓
-Buscar e explorar
-      ↓
-Preservar
-```
+    Pessoa / Família
+          ↓
+    Escolher uma lembrança
+          ↓
+    Perguntas e estímulos
+          ↓
+    Registrar a história
+          ↓
+    Categorizar
+          ↓
+    Salvar
+          ↓
+    Acervo de memórias
+          ↓
+    Buscar e explorar
+          ↓
+    Preservar
 
 ---
 
 # 🚀 MVP Interativo
 
-O projeto evoluiu de uma landing page conceitual para um **MVP funcional publicado na web**.
+O produto evoluiu de uma landing page conceitual para um **MVP funcional publicado na web**.
 
-Nesta versão, o usuário já consegue experimentar parte da proposta de produto.
+Nesta versão, o usuário já consegue experimentar parte da proposta de valor e da jornada central do produto.
+
+O objetivo desta etapa é validar a experiência antes da introdução de infraestrutura, armazenamento em nuvem, colaboração familiar e funcionalidades mais avançadas.
+
+---
 
 ## ✍️ Registrar uma Memória
 
@@ -172,6 +186,8 @@ Exemplos:
 
 O usuário pode solicitar novas perguntas durante a experiência.
 
+Em uma evolução futura, esse mecanismo poderá se tornar uma experiência de entrevista guiada, adaptando perguntas ao contexto das histórias já registradas.
+
 ---
 
 ## 📚 Meu Acervo de Memórias
@@ -188,6 +204,8 @@ O card apresenta:
 - data de registro.
 
 O sistema também apresenta um **contador de memórias preservadas**.
+
+À medida que novas histórias são adicionadas, registros individuais começam a formar progressivamente um acervo familiar.
 
 ---
 
@@ -223,19 +241,17 @@ Antes da exclusão, o sistema solicita confirmação para evitar remoções acid
 
 O MVP utiliza a API `localStorage` do navegador para manter as memórias registradas.
 
-```text
-Formulário
-    ↓
-JavaScript
-    ↓
-Objeto de Memória
-    ↓
-JSON
-    ↓
-LocalStorage
-    ↓
-Acervo
-```
+    Formulário
+        ↓
+    JavaScript
+        ↓
+    Objeto de Memória
+        ↓
+    JSON
+        ↓
+    LocalStorage
+        ↓
+    Acervo
 
 Isso permite que as memórias permaneçam disponíveis mesmo depois que a página é atualizada ou o navegador é fechado e aberto novamente.
 
@@ -250,41 +266,48 @@ Nesta versão:
 - não existe conta de usuário;
 - não existe banco de dados remoto;
 - não existe armazenamento em nuvem;
+- não existe backup remoto;
+- não existe compartilhamento entre familiares;
+- não existe upload de fotografias;
+- não existe armazenamento de áudio ou vídeo;
+- não existe Inteligência Artificial implementada;
 - as memórias não são enviadas para um servidor.
 
 Essa arquitetura mantém o MVP simples e permite validar primeiro a **experiência central do produto**.
+
+> A versão atual não deve ser utilizada como solução definitiva de backup ou preservação permanente de informações importantes.
 
 ---
 
 ## 🧠 Product Thinking
 
-O desenvolvimento do projeto parte do problema antes da tecnologia.
+O desenvolvimento do produto parte do problema antes da tecnologia.
 
-```text
-Problema Humano
-      ↓
-Hipótese de Produto
-      ↓
-Proposta de Valor
-      ↓
-Jornada do Usuário
-      ↓
-Protótipo
-      ↓
-MVP
-      ↓
-Experimentação
-      ↓
-Aprendizado
-      ↓
-Evolução do Produto
-```
+    Problema Humano
+          ↓
+    Hipótese de Produto
+          ↓
+    Proposta de Valor
+          ↓
+    Jornada do Usuário
+          ↓
+    Protótipo
+          ↓
+    MVP
+          ↓
+    Experimentação
+          ↓
+    Aprendizado
+          ↓
+    Evolução do Produto
 
 A primeira versão validava principalmente a comunicação do conceito.
 
 O MVP atual adiciona uma etapa importante:
 
 > **O visitante deixa de apenas conhecer a ideia e passa a experimentar parte do produto.**
+
+A partir desta etapa, a evolução pode ser orientada progressivamente por hipóteses, comportamento dos usuários e aprendizado obtido durante a validação.
 
 ---
 
@@ -295,9 +318,12 @@ O MVP atual adiciona uma etapa importante:
 - identificação de um problema;
 - definição de proposta de valor;
 - Product Thinking;
+- Product Discovery;
 - jornada do usuário;
 - evolução incremental;
 - definição de MVP;
+- experimentação;
+- formulação de hipóteses;
 - separação entre funcionalidades atuais e roadmap.
 
 ### Front-end
@@ -342,21 +368,64 @@ O MVP atual adiciona uma etapa importante:
 
 ---
 
+## 🧪 Hipóteses de Validação
+
+O MVP permite começar a testar algumas questões centrais do produto:
+
+- as pessoas percebem valor em registrar suas histórias?
+- quais tipos de histórias são registrados primeiro?
+- perguntas inspiradoras ajudam a iniciar o processo?
+- usuários retornam para registrar novas memórias?
+- um acervo crescente aumenta o valor percebido?
+- usuários desejariam convidar familiares?
+- quais funcionalidades seriam consideradas mais importantes em uma evolução?
+- existe disposição para pagar por armazenamento, colaboração, mídia ou funcionalidades inteligentes?
+
+Essas respostas serão importantes para orientar decisões de produto e priorização do roadmap.
+
+---
+
+## 📊 Indicadores de Validação
+
+Entre os indicadores que poderão ser acompanhados estão:
+
+- visitantes do MVP;
+- usuários que iniciam um registro;
+- registros concluídos;
+- quantidade de memórias registradas;
+- categorias mais utilizadas;
+- utilização das perguntas inspiradoras;
+- buscas realizadas;
+- retorno ao acervo;
+- intenção de registrar novas histórias;
+- interesse em convidar familiares.
+
+Em versões futuras poderão ser analisados também:
+
+- ativação;
+- retenção;
+- usuários por família;
+- colaboração entre familiares;
+- crescimento do acervo;
+- utilização de áudio;
+- utilização de fotografias e vídeos;
+- conversão para planos pagos.
+
+---
+
 ## 📂 Estrutura Atual do Projeto
 
-```text
-Memorias-Invisiveis-Preservando-Historias-Antes-Que-Se-Apaguem/
-│
-├── README.md
-├── index.html
-├── script.js
-└── style.css
-```
+    Memorias-Invisiveis-Preservando-Historias-Antes-Que-Se-Apaguem/
+    │
+    ├── README.md
+    ├── index.html
+    ├── script.js
+    └── style.css
 
 ### Arquivos
 
 **README.md**  
-Documentação, visão do produto, funcionalidades, arquitetura atual e roadmap.
+Documentação, visão do produto, funcionalidades, arquitetura atual, validação e roadmap.
 
 **index.html**  
 Estrutura da interface, narrativa do produto, jornada, formulário de registro e acervo.
@@ -386,27 +455,25 @@ Interações da interface e lógica do MVP, incluindo registro, `localStorage`, 
 
 ## 🏗️ Arquitetura Atual
 
-```text
-Usuário
-   ↓
-Interface Web
-   ↓
-HTML + CSS
-   ↓
-JavaScript
-   ↓
-Registro da Memória
-   ↓
-Objeto JavaScript
-   ↓
-JSON
-   ↓
-LocalStorage
-   ↓
-Acervo
-   ↓
-Busca / Filtro / Exclusão
-```
+    Usuário
+       ↓
+    Interface Web
+       ↓
+    HTML + CSS
+       ↓
+    JavaScript
+       ↓
+    Registro da Memória
+       ↓
+    Objeto JavaScript
+       ↓
+    JSON
+       ↓
+    LocalStorage
+       ↓
+    Acervo
+       ↓
+    Busca / Filtro / Exclusão
 
 A arquitetura foi mantida propositalmente simples para validar a experiência antes da introdução de infraestrutura adicional.
 
@@ -429,21 +496,33 @@ Com o MVP funcional, as próximas evoluções podem ser divididas em três camad
 - compartilhamento entre familiares;
 - configurações de privacidade.
 
+Uma evolução importante será permitir que diferentes gerações colaborem na construção do mesmo acervo:
+
+    Avós
+      ↓
+    Pais
+      ↓
+    Filhos
+      ↓
+    Netos
+      ↓
+    Acervo Familiar
+
+---
+
 ### ☁️ Plataforma
 
 Uma futura evolução poderá introduzir uma camada de backend:
 
-```text
-Front-end
-    ↓
-API
-    ↓
-Backend
-    ↓
-Banco de Dados
-    ↓
-Armazenamento em Nuvem
-```
+    Front-end
+        ↓
+    API
+        ↓
+    Backend
+        ↓
+    Banco de Dados
+        ↓
+    Armazenamento em Nuvem
 
 Possibilidades:
 
@@ -457,6 +536,8 @@ Possibilidades:
 - backup.
 
 > A camada de backend ainda não está implementada no MVP atual.
+
+---
 
 ### 🤖 Inteligência Artificial
 
@@ -476,35 +557,116 @@ Possibilidades:
 - sugestões inteligentes de perguntas;
 - organização automática do acervo.
 
+> A Inteligência Artificial não está implementada na versão atual.
+
 ---
 
 ## 🤖 Visão de Evolução com IA
 
-```text
-Áudio / Texto / Fotos
-        ↓
-Processamento
-        ↓
-Transcrição
-        ↓
-Extração de entidades
-        ↓
-Pessoas / Datas / Lugares
-        ↓
-Classificação
-        ↓
-Resumo + Tags
-        ↓
-Embeddings
-        ↓
-Busca Semântica
-        ↓
-Acervo Familiar Inteligente
-```
+    Áudio / Texto / Fotos
+            ↓
+    Processamento
+            ↓
+    Transcrição
+            ↓
+    Extração de entidades
+            ↓
+    Pessoas / Datas / Lugares
+            ↓
+    Classificação
+            ↓
+    Resumo + Tags
+            ↓
+    Embeddings
+            ↓
+    Busca Semântica
+            ↓
+    Acervo Familiar Inteligente
 
 > **A versão atual não implementa modelos de Inteligência Artificial.**
 
 A IA permanece como uma possibilidade de evolução e não é apresentada como funcionalidade existente.
+
+Sua função futura seria reduzir o esforço necessário para capturar, organizar e recuperar histórias — não substituir o protagonismo das pessoas.
+
+---
+
+## 🎙️ Registro por Voz
+
+Uma das possibilidades de evolução é permitir que uma pessoa conte uma história em vez de precisar digitá-la.
+
+    Pessoa conta a história
+            ↓
+    Áudio
+            ↓
+    Transcrição
+            ↓
+    Identificação de contexto
+            ↓
+    Pessoas / Datas / Lugares
+            ↓
+    Organização
+            ↓
+    Acervo
+
+Isso poderá reduzir a barreira de utilização principalmente para pessoas que possuem muitas histórias para contar, mas pouca familiaridade ou disposição para registrá-las por escrito.
+
+---
+
+## 🔎 Busca Semântica
+
+Uma futura camada de busca poderá permitir que o usuário encontre histórias pelo significado, e não apenas por palavras exatas.
+
+Exemplos:
+
+> Quais histórias falam sobre a infância da minha mãe?
+
+> Quando meu avô mudou de cidade?
+
+> Quais memórias mencionam viagens em família?
+
+> Que histórias falam sobre os almoços de domingo?
+
+A visão é permitir que o usuário possa progressivamente **conversar com o próprio acervo familiar**.
+
+---
+
+## 🌳 Relações entre Memórias
+
+Uma memória pode estar relacionada a diferentes elementos:
+
+    Pessoa
+       ↓
+    História
+       ↓
+    Data
+       ↓
+    Lugar
+       ↓
+    Relacionamento
+       ↓
+    Acontecimento
+       ↓
+    Mídia
+       ↓
+    Contexto
+
+Ao conectar essas informações, o acervo poderá evoluir para uma estrutura semelhante a um **grafo de memória familiar**.
+
+    Pessoa ───── História
+      │            │
+      │            ├── Data
+      │            ├── Lugar
+      │            ├── Evento
+      │            └── Mídia
+      │
+      └──── Relacionamento ─── Pessoa
+
+Uma árvore genealógica ajuda a explicar **quem pertence à família**.
+
+O Memórias Invisíveis poderá acrescentar outra dimensão:
+
+> **o que essas pessoas viveram.**
 
 ---
 
@@ -512,25 +674,23 @@ A IA permanece como uma possibilidade de evolução e não é apresentada como f
 
 Uma evolução futura poderia transformar o Memórias Invisíveis em uma plataforma onde diferentes gerações colaboram na construção de um acervo familiar.
 
-```text
-Avós
-  ↓
-Pais
-  ↓
-Filhos
-  ↓
-Netos
-  ↓
-Histórias
-  ↓
-Fotos + Áudio + Vídeo
-  ↓
-Linha do Tempo
-  ↓
-Acervo Familiar
-  ↓
-Memória entre Gerações
-```
+    Avós
+      ↓
+    Pais
+      ↓
+    Filhos
+      ↓
+    Netos
+      ↓
+    Histórias
+      ↓
+    Fotos + Áudio + Vídeo
+      ↓
+    Linha do Tempo
+      ↓
+    Acervo Familiar
+      ↓
+    Memória entre Gerações
 
 O objetivo não seria apenas armazenar arquivos.
 
@@ -538,15 +698,137 @@ Seria preservar **contexto, histórias, relações e significado**.
 
 ---
 
+## 📦 Possibilidades de Evolução do Acervo
+
+Com histórias suficientemente estruturadas, o próprio acervo poderá permitir novas experiências.
+
+Possibilidades futuras:
+
+- livros de memórias;
+- biografias familiares;
+- álbuns narrativos;
+- linhas do tempo;
+- cápsulas do tempo;
+- homenagens;
+- documentários familiares;
+- coleções temáticas;
+- experiências audiovisuais.
+
+Essas possibilidades fazem parte da visão futura e ainda não estão implementadas.
+
+---
+
+## 💼 Possibilidades de Modelo de Negócio
+
+O modelo comercial ainda precisa ser validado.
+
+Entre as hipóteses possíveis:
+
+### Freemium
+
+Acesso gratuito às funcionalidades essenciais, com limites de armazenamento ou recursos.
+
+### Assinatura Familiar
+
+Plano recorrente que poderá incluir:
+
+- múltiplos usuários;
+- colaboração familiar;
+- armazenamento em nuvem;
+- maior capacidade de mídia;
+- backup;
+- recursos avançados.
+
+### Recursos Premium
+
+Possibilidades:
+
+- transcrição;
+- organização inteligente;
+- busca semântica;
+- maior armazenamento;
+- geração de livros;
+- experiências de legado.
+
+### Produtos e Serviços Derivados
+
+Possibilidades futuras:
+
+- livros impressos;
+- biografias;
+- digitalização de acervos;
+- entrevistas;
+- documentários;
+- cápsulas do tempo.
+
+Todas essas alternativas representam **hipóteses comerciais a serem validadas**.
+
+---
+
+## 🏢 Possibilidades Futuras de Aplicação
+
+A família representa o ponto inicial do produto.
+
+Entretanto, a lógica de captura, organização e preservação de histórias poderá futuramente encontrar aplicações em outros contextos, como:
+
+- instituições de longa permanência;
+- projetos de história oral;
+- museus;
+- fundações;
+- associações;
+- comunidades;
+- cidades;
+- empresas familiares;
+- memória corporativa;
+- preservação de conhecimento institucional.
+
+Essas possibilidades não fazem parte do escopo comercial atual do MVP.
+
+---
+
+## 🔐 Privacidade e Governança
+
+Memórias familiares podem conter informações pessoais, relatos privados e dados sobre terceiros.
+
+Uma futura plataforma com contas, colaboração e armazenamento em nuvem deverá considerar:
+
+- consentimento;
+- propriedade dos registros;
+- direito de exclusão;
+- controle de compartilhamento;
+- níveis de acesso;
+- proteção de dados;
+- autenticação;
+- segurança;
+- criptografia;
+- backup;
+- políticas de retenção;
+- recuperação de conta;
+- governança das informações.
+
+Privacidade e proteção dos dados deverão fazer parte da arquitetura do produto desde sua evolução para uma plataforma multiusuário.
+
+---
+
 ## ⚠️ Escopo Atual
 
-**Memórias Invisíveis** é atualmente um MVP experimental, educacional e de portfólio.
+**Memórias Invisíveis** está atualmente em estágio de **MVP funcional em validação**.
 
-O projeto demonstra uma experiência funcional de registro, persistência local, organização, busca, filtragem e exclusão de memórias diretamente no navegador.
+O produto oferece uma experiência funcional de registro, persistência local, organização, busca, filtragem e exclusão de memórias diretamente no navegador.
 
 As funcionalidades apresentadas no roadmap representam possibilidades futuras e não devem ser interpretadas como funcionalidades já disponíveis.
 
-O projeto não oferece atualmente armazenamento permanente em nuvem ou garantias de preservação dos registros.
+A versão atual não oferece:
+
+- armazenamento permanente em nuvem;
+- sincronização entre dispositivos;
+- contas de usuário;
+- colaboração entre familiares;
+- armazenamento de mídia;
+- Inteligência Artificial;
+- garantias de preservação permanente dos registros.
+
+O MVP existe para validar a proposta de valor e a experiência central antes da construção das próximas camadas da plataforma.
 
 ---
 
@@ -556,7 +838,50 @@ O MVP está publicado na Vercel:
 
 ### 🔗 https://memorias-invisiveis.vercel.app/
 
-O deploy público utiliza a versão do projeto mantida no GitHub.
+O deploy público utiliza a versão do produto mantida no GitHub.
+
+---
+
+## 📌 Status Atual
+
+### Disponível
+
+- ✅ MVP web funcional
+- ✅ interface responsiva
+- ✅ registro de memórias
+- ✅ associação a pessoas
+- ✅ período ou ano
+- ✅ categorização
+- ✅ perguntas inspiradoras
+- ✅ armazenamento local
+- ✅ acervo
+- ✅ contador de memórias
+- ✅ busca textual
+- ✅ filtros
+- ✅ exclusão
+- ✅ deploy público
+
+### Roadmap
+
+- ⬜ autenticação
+- ⬜ contas de usuário
+- ⬜ backend
+- ⬜ API
+- ⬜ banco de dados
+- ⬜ armazenamento em nuvem
+- ⬜ sincronização
+- ⬜ backup
+- ⬜ compartilhamento familiar
+- ⬜ perfis familiares
+- ⬜ fotografias
+- ⬜ áudio
+- ⬜ vídeo
+- ⬜ linha do tempo
+- ⬜ relações entre pessoas
+- ⬜ grafo de memórias
+- ⬜ Inteligência Artificial
+- ⬜ transcrição
+- ⬜ busca semântica
 
 ---
 
@@ -595,6 +920,8 @@ Marketing | Data Science | Inteligência Artificial | Gestão de Projetos
 
 GitHub: **MCLG1661**
 
+Linkedin: **https://www.linkedin.com/in/marcusguedes/** 
+
 ---
 
 ## 📖 Memórias Invisíveis
@@ -602,3 +929,5 @@ GitHub: **MCLG1661**
 **Toda família tem histórias que merecem ser preservadas.**
 
 De uma lembrança contada hoje pode nascer uma conexão entre gerações amanhã.
+
+> **Uma história não registrada pode desaparecer. Uma história preservada pode atravessar gerações.**
