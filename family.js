@@ -5,7 +5,8 @@
 // Responsabilidades:
 // - Listar pessoas do acervo familiar
 // - Cadastrar novos familiares
-// - Preparar seleção de pessoas nas memórias
+// - Disponibilizar familiares no formulário de memórias
+// - Atualizar automaticamente a lista de pessoas
 // ==========================================================
 
 
@@ -43,12 +44,14 @@ function getFamilyCurrentUser() {
     const auth =
         getFamilyAuthController();
 
+
     if (
         !auth ||
         typeof auth.getUser !== 'function'
     ) {
         return null;
     }
+
 
     return auth.getUser();
 }
@@ -58,12 +61,14 @@ function getFamilyActiveFamily() {
     const auth =
         getFamilyAuthController();
 
+
     if (
         !auth ||
         typeof auth.getActiveFamily !== 'function'
     ) {
         return null;
     }
+
 
     return auth.getActiveFamily();
 }
@@ -72,6 +77,7 @@ function getFamilyActiveFamily() {
 function getFamilyActiveFamilyId() {
     const family =
         getFamilyActiveFamily();
+
 
     return (
         family?.family_id ||
@@ -84,6 +90,7 @@ function getFamilyActiveFamilyId() {
 function getFamilyActiveFamilyName() {
     const family =
         getFamilyActiveFamily();
+
 
     return (
         family?.families?.name ||
@@ -98,10 +105,14 @@ function getFamilyActiveFamilyName() {
 
 function familyEscapeHTML(value) {
     const div =
-        document.createElement('div');
+        document.createElement(
+            'div'
+        );
+
 
     div.textContent =
         value ?? '';
+
 
     return div.innerHTML;
 }
@@ -116,10 +127,12 @@ function familyFormatDate(value) {
         return '';
     }
 
+
     const date =
         new Date(
             `${value}T12:00:00`
         );
+
 
     if (
         Number.isNaN(
@@ -129,6 +142,7 @@ function familyFormatDate(value) {
         return value;
     }
 
+
     return new Intl.DateTimeFormat(
         'pt-BR'
     ).format(date);
@@ -136,7 +150,7 @@ function familyFormatDate(value) {
 
 
 // ==========================================================
-// NOME COMPLETO
+// NOME DA PESSOA
 // ==========================================================
 
 function familyDisplayName(person) {
@@ -144,24 +158,29 @@ function familyDisplayName(person) {
         return '';
     }
 
+
     const preferred =
         String(
             person.preferred_name || ''
         ).trim();
 
+
     if (preferred) {
         return preferred;
     }
+
 
     const first =
         String(
             person.first_name || ''
         ).trim();
 
+
     const last =
         String(
             person.last_name || ''
         ).trim();
+
 
     return (
         [first, last]
@@ -170,6 +189,28 @@ function familyDisplayName(person) {
             .trim()
         ||
         first
+    );
+}
+
+
+// ==========================================================
+// NOME COMPLETO
+// ==========================================================
+
+function familyFullName(person) {
+    if (!person) {
+        return '';
+    }
+
+
+    return (
+        [
+            person.first_name,
+            person.last_name
+        ]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
     );
 }
 
@@ -201,276 +242,446 @@ function injectFamilyStyles() {
     style.textContent = `
 
         .mi-family-section {
-            background: #ffffff;
+
+            background:
+                #ffffff;
+
         }
 
 
         .mi-family-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                20px;
+
+            margin-bottom:
+                30px;
+
+            flex-wrap:
+                wrap;
+
         }
 
 
         .mi-family-summary {
-            color: var(--gray);
-            font-size: 0.95rem;
+
+            color:
+                var(--gray);
+
+            font-size:
+                0.95rem;
+
         }
 
 
         .mi-family-add-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
 
-            border: 0;
+            display:
+                inline-flex;
 
-            border-radius: 999px;
+            align-items:
+                center;
 
-            padding: 12px 18px;
+            justify-content:
+                center;
 
-            background: var(--accent);
+            gap:
+                8px;
 
-            color: #ffffff;
+            border:
+                0;
 
-            font: inherit;
+            border-radius:
+                999px;
 
-            font-weight: 700;
+            padding:
+                12px 18px;
 
-            cursor: pointer;
+            background:
+                var(--accent);
+
+            color:
+                #ffffff;
+
+            font:
+                inherit;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
+            transition:
+                var(--transition);
+
         }
 
 
         .mi-family-add-button:hover {
-            filter: brightness(0.96);
+
+            background:
+                var(--accent-light);
+
+            transform:
+                translateY(-2px);
+
         }
 
 
         .mi-family-grid {
-            display: grid;
+
+            display:
+                grid;
+
             grid-template-columns:
                 repeat(
                     auto-fit,
                     minmax(230px, 1fr)
                 );
 
-            gap: 20px;
+            gap:
+                20px;
+
         }
 
 
         .mi-person-card {
-            background: var(--light);
+
+            background:
+                var(--light);
 
             border:
                 1px solid
                 rgba(0, 0, 0, 0.08);
 
-            border-radius: 18px;
+            border-radius:
+                18px;
 
-            padding: 22px;
+            padding:
+                22px;
 
             box-shadow:
                 0 10px 30px
                 rgba(0, 0, 0, 0.05);
+
+            transition:
+                var(--transition);
+
+        }
+
+
+        .mi-person-card:hover {
+
+            transform:
+                translateY(-4px);
+
+            box-shadow:
+                var(--shadow);
+
         }
 
 
         .mi-person-avatar {
-            width: 56px;
-            height: 56px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width:
+                56px;
 
-            border-radius: 50%;
+            height:
+                56px;
 
-            background: var(--secondary);
+            display:
+                flex;
 
-            color: var(--primary);
+            align-items:
+                center;
 
-            font-size: 1.25rem;
+            justify-content:
+                center;
 
-            margin-bottom: 16px;
+            border-radius:
+                50%;
+
+            background:
+                var(--secondary);
+
+            color:
+                var(--primary);
+
+            font-size:
+                1.25rem;
+
+            margin-bottom:
+                16px;
+
         }
 
 
         .mi-person-card h3 {
-            margin: 0 0 6px;
 
-            color: var(--primary);
+            margin:
+                0 0 6px;
+
+            color:
+                var(--primary);
 
             font-family:
                 'Playfair Display',
                 serif;
+
         }
 
 
         .mi-person-preferred {
-            color: var(--accent);
 
-            font-size: 0.9rem;
+            color:
+                var(--accent);
 
-            font-weight: 600;
+            font-size:
+                0.9rem;
 
-            margin-bottom: 12px;
+            font-weight:
+                600;
+
+            margin-bottom:
+                12px;
+
         }
 
 
         .mi-person-meta {
-            display: grid;
 
-            gap: 7px;
+            display:
+                grid;
 
-            color: var(--gray);
+            gap:
+                7px;
 
-            font-size: 0.88rem;
+            color:
+                var(--gray);
 
-            line-height: 1.45;
+            font-size:
+                0.88rem;
+
+            line-height:
+                1.45;
+
         }
 
 
         .mi-family-empty {
-            grid-column: 1 / -1;
 
-            padding: 45px 30px;
+            grid-column:
+                1 / -1;
 
-            text-align: center;
+            padding:
+                45px 30px;
+
+            text-align:
+                center;
 
             border:
                 1px dashed
                 rgba(0, 0, 0, 0.18);
 
-            border-radius: 18px;
+            border-radius:
+                18px;
 
-            color: var(--gray);
+            color:
+                var(--gray);
+
         }
 
 
         .mi-family-empty i {
-            font-size: 2rem;
 
-            margin-bottom: 15px;
+            font-size:
+                2rem;
 
-            color: var(--secondary);
+            margin-bottom:
+                15px;
+
+            color:
+                var(--secondary);
+
         }
 
 
         .mi-family-loading {
-            grid-column: 1 / -1;
 
-            padding: 40px;
+            grid-column:
+                1 / -1;
 
-            text-align: center;
+            padding:
+                40px;
 
-            color: var(--gray);
+            text-align:
+                center;
+
+            color:
+                var(--gray);
+
         }
 
 
         .mi-family-backdrop {
-            position: fixed;
 
-            inset: 0;
+            position:
+                fixed;
 
-            z-index: 10000;
+            inset:
+                0;
 
-            display: none;
+            z-index:
+                10000;
 
-            align-items: center;
+            display:
+                none;
 
-            justify-content: center;
+            align-items:
+                center;
 
-            padding: 20px;
+            justify-content:
+                center;
+
+            padding:
+                20px;
 
             background:
                 rgba(0, 0, 0, 0.55);
+
         }
 
 
         .mi-family-backdrop.is-open {
-            display: flex;
+
+            display:
+                flex;
+
         }
 
 
         .mi-family-modal {
+
             width:
                 min(
                     100%,
                     560px
                 );
 
-            max-height: 90vh;
+            max-height:
+                90vh;
 
-            overflow-y: auto;
+            overflow-y:
+                auto;
 
-            background: #ffffff;
+            background:
+                #ffffff;
 
-            border-radius: 20px;
+            border-radius:
+                20px;
 
-            padding: 28px;
+            padding:
+                28px;
 
-            position: relative;
+            position:
+                relative;
 
             box-shadow:
                 0 24px 70px
                 rgba(0, 0, 0, 0.25);
+
         }
 
 
         .mi-family-modal h2 {
-            margin: 0 0 8px;
 
-            color: var(--primary);
+            margin:
+                0 0 8px;
+
+            color:
+                var(--primary);
 
             font-family:
                 'Playfair Display',
                 serif;
+
         }
 
 
         .mi-family-modal-intro {
-            margin: 0 0 22px;
 
-            color: var(--gray);
+            margin:
+                0 0 22px;
 
-            line-height: 1.6;
+            color:
+                var(--gray);
+
+            line-height:
+                1.6;
+
         }
 
 
         .mi-family-close {
-            position: absolute;
 
-            top: 14px;
-            right: 14px;
+            position:
+                absolute;
 
-            width: 38px;
-            height: 38px;
+            top:
+                14px;
 
-            border: 0;
+            right:
+                14px;
 
-            border-radius: 50%;
+            width:
+                38px;
 
-            background: var(--secondary);
+            height:
+                38px;
 
-            color: var(--primary);
+            border:
+                0;
 
-            cursor: pointer;
+            border-radius:
+                50%;
+
+            background:
+                var(--secondary);
+
+            color:
+                var(--primary);
+
+            cursor:
+                pointer;
+
         }
 
 
         .mi-family-form {
-            display: grid;
 
-            gap: 16px;
+            display:
+                grid;
+
+            gap:
+                16px;
+
         }
 
 
         .mi-family-form-grid {
-            display: grid;
+
+            display:
+                grid;
 
             grid-template-columns:
                 repeat(
@@ -478,126 +689,276 @@ function injectFamilyStyles() {
                     minmax(0, 1fr)
                 );
 
-            gap: 14px;
+            gap:
+                14px;
+
         }
 
 
         .mi-family-field {
-            display: grid;
 
-            gap: 6px;
+            display:
+                grid;
+
+            gap:
+                6px;
+
         }
 
 
         .mi-family-field.full {
-            grid-column: 1 / -1;
+
+            grid-column:
+                1 / -1;
+
         }
 
 
         .mi-family-field label {
-            color: var(--primary);
 
-            font-size: 0.9rem;
+            color:
+                var(--primary);
 
-            font-weight: 600;
+            font-size:
+                0.9rem;
+
+            font-weight:
+                600;
+
         }
 
 
         .mi-family-field input,
         .mi-family-field textarea {
-            width: 100%;
+
+            width:
+                100%;
 
             border:
                 1px solid
                 rgba(0, 0, 0, 0.16);
 
-            border-radius: 10px;
+            border-radius:
+                10px;
 
-            padding: 12px 14px;
+            padding:
+                12px 14px;
 
-            font: inherit;
+            font:
+                inherit;
+
         }
 
 
         .mi-family-field textarea {
-            min-height: 110px;
 
-            resize: vertical;
+            min-height:
+                110px;
+
+            resize:
+                vertical;
+
         }
 
 
         .mi-family-submit {
-            border: 0;
 
-            border-radius: 10px;
+            border:
+                0;
 
-            padding: 13px 18px;
+            border-radius:
+                10px;
 
-            background: var(--accent);
+            padding:
+                13px 18px;
 
-            color: #ffffff;
+            background:
+                var(--accent);
 
-            font: inherit;
+            color:
+                #ffffff;
 
-            font-weight: 700;
+            font:
+                inherit;
 
-            cursor: pointer;
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
         }
 
 
         .mi-family-submit:disabled {
-            opacity: 0.65;
 
-            cursor: wait;
+            opacity:
+                0.65;
+
+            cursor:
+                wait;
+
         }
 
 
         .mi-family-message {
-            display: none;
 
-            padding: 10px 12px;
+            display:
+                none;
 
-            border-radius: 10px;
+            padding:
+                10px 12px;
 
-            font-size: 0.88rem;
+            border-radius:
+                10px;
 
-            line-height: 1.5;
+            font-size:
+                0.88rem;
+
+            line-height:
+                1.5;
+
         }
 
 
         .mi-family-message.is-visible {
-            display: block;
+
+            display:
+                block;
+
         }
 
 
         .mi-family-message.success {
-            background: #effaf2;
 
-            color: #236b37;
+            background:
+                #effaf2;
+
+            color:
+                #236b37;
+
         }
 
 
         .mi-family-message.error {
-            background: #fff1f1;
 
-            color: #9d2020;
+            background:
+                #fff1f1;
+
+            color:
+                #9d2020;
+
+        }
+
+
+        .mi-memory-person-help {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                12px;
+
+            flex-wrap:
+                wrap;
+
+            margin-top:
+                6px;
+
+        }
+
+
+        .mi-memory-person-help span {
+
+            color:
+                var(--gray);
+
+            font-size:
+                0.78rem;
+
+            line-height:
+                1.4;
+
+        }
+
+
+        .mi-memory-person-add {
+
+            border:
+                0;
+
+            background:
+                transparent;
+
+            color:
+                var(--accent);
+
+            font:
+                inherit;
+
+            font-size:
+                0.78rem;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
+            padding:
+                0;
+
+        }
+
+
+        .mi-memory-person-add:hover {
+
+            text-decoration:
+                underline;
+
         }
 
 
         @media (max-width: 768px) {
 
             .mi-family-form-grid {
-                grid-template-columns: 1fr;
+
+                grid-template-columns:
+                    1fr;
+
             }
 
 
             .mi-family-field.full {
-                grid-column: auto;
+
+                grid-column:
+                    auto;
+
             }
 
 
             .mi-family-add-button {
-                width: 100%;
+
+                width:
+                    100%;
+
+            }
+
+
+            .mi-memory-person-help {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
             }
 
         }
@@ -641,8 +1002,10 @@ function injectFamilyNavLink() {
     link.id =
         'miFamilyNavLink';
 
+
     link.href =
         '#familia';
+
 
     link.textContent =
         'Minha Família';
@@ -650,32 +1013,43 @@ function injectFamilyNavLink() {
 
     const archiveLink =
         Array.from(
-            nav.querySelectorAll('a')
+            nav.querySelectorAll(
+                'a'
+            )
         ).find(
             function (item) {
+
                 return (
                     item.getAttribute(
                         'href'
                     ) ===
                     '#acervo'
                 );
+
             }
         );
 
 
     if (archiveLink) {
-        archiveLink.insertAdjacentElement(
-            'afterend',
+
+        archiveLink
+            .insertAdjacentElement(
+                'afterend',
+                link
+            );
+
+    } else {
+
+        nav.appendChild(
             link
         );
-    } else {
-        nav.appendChild(link);
+
     }
 }
 
 
 // ==========================================================
-// SEÇÃO
+// SEÇÃO MINHA FAMÍLIA
 // ==========================================================
 
 function injectFamilySection() {
@@ -708,6 +1082,7 @@ function injectFamilySection() {
     section.id =
         'familia';
 
+
     section.className =
         'mi-family-section';
 
@@ -717,7 +1092,9 @@ function injectFamilySection() {
         <div class="container">
 
             <h2 class="section-title">
+
                 Minha Família
+
             </h2>
 
 
@@ -725,7 +1102,10 @@ function injectFamilySection() {
                 class="section-intro"
                 id="miFamilyIntro"
             >
-                Pessoas que fazem parte do seu acervo familiar.
+
+                Pessoas que fazem parte
+                do seu acervo familiar.
+
             </p>
 
 
@@ -735,7 +1115,9 @@ function injectFamilySection() {
                     class="mi-family-summary"
                     id="miFamilySummary"
                 >
+
                     Carregando pessoas...
+
                 </div>
 
 
@@ -765,10 +1147,11 @@ function injectFamilySection() {
     `;
 
 
-    archiveSection.insertAdjacentElement(
-        'afterend',
-        section
-    );
+    archiveSection
+        .insertAdjacentElement(
+            'afterend',
+            section
+        );
 }
 
 
@@ -795,8 +1178,10 @@ function injectFamilyModal() {
     backdrop.id =
         'miFamilyBackdrop';
 
+
     backdrop.className =
         'mi-family-backdrop';
+
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -826,13 +1211,18 @@ function injectFamilyModal() {
 
 
             <h2 id="miFamilyModalTitle">
+
                 Adicionar familiar
+
             </h2>
 
 
             <p class="mi-family-modal-intro">
-                Cadastre uma pessoa para começar a organizar
-                as histórias do seu acervo familiar.
+
+                Cadastre uma pessoa para
+                começar a organizar as histórias
+                do seu acervo familiar.
+
             </p>
 
 
@@ -847,7 +1237,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field">
 
                         <label for="miPersonFirstName">
+
                             Nome *
+
                         </label>
 
                         <input
@@ -863,7 +1255,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field">
 
                         <label for="miPersonLastName">
+
                             Sobrenome
+
                         </label>
 
                         <input
@@ -878,7 +1272,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field">
 
                         <label for="miPersonPreferredName">
+
                             Nome pelo qual era conhecido(a)
+
                         </label>
 
                         <input
@@ -893,7 +1289,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field">
 
                         <label for="miPersonBirthDate">
+
                             Data de nascimento
+
                         </label>
 
                         <input
@@ -907,7 +1305,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field full">
 
                         <label for="miPersonBirthPlace">
+
                             Local de nascimento
+
                         </label>
 
                         <input
@@ -923,7 +1323,9 @@ function injectFamilyModal() {
                     <div class="mi-family-field full">
 
                         <label for="miPersonBiography">
+
                             Breve descrição
+
                         </label>
 
                         <textarea
@@ -949,7 +1351,9 @@ function injectFamilyModal() {
                     class="mi-family-submit"
                     id="miFamilySubmit"
                 >
+
                     Adicionar ao acervo
+
                 </button>
 
             </form>
@@ -971,6 +1375,7 @@ function injectFamilyModal() {
 
 function getFamilyElements() {
     return {
+
         grid:
             document.getElementById(
                 'miFamilyGrid'
@@ -1045,6 +1450,7 @@ function getFamilyElements() {
             document.getElementById(
                 'miFamilySubmit'
             )
+
     };
 }
 
@@ -1070,17 +1476,21 @@ function openFamilyModal() {
         !getFamilyCurrentUser() ||
         !getFamilyActiveFamilyId()
     ) {
+
         window.alert(
             'Entre em sua conta para gerenciar sua família.'
         );
 
         return;
+
     }
 
 
-    backdrop.classList.add(
-        'is-open'
-    );
+    backdrop
+        .classList
+        .add(
+            'is-open'
+        );
 
 
     backdrop.setAttribute(
@@ -1091,7 +1501,9 @@ function openFamilyModal() {
 
     setTimeout(
         function () {
+
             firstName?.focus();
+
         },
         50
     );
@@ -1112,9 +1524,11 @@ function closeFamilyModal() {
     }
 
 
-    backdrop.classList.remove(
-        'is-open'
-    );
+    backdrop
+        .classList
+        .remove(
+            'is-open'
+        );
 
 
     backdrop.setAttribute(
@@ -1127,10 +1541,14 @@ function closeFamilyModal() {
 
 
     if (message) {
-        message.textContent = '';
+
+        message.textContent =
+            '';
+
 
         message.className =
             'mi-family-message';
+
     }
 }
 
@@ -1164,6 +1582,254 @@ function showFamilyMessage(
 
 
 // ==========================================================
+// AUTOCOMPLETE DO FORMULÁRIO DE MEMÓRIA
+// ==========================================================
+
+function ensureMemoryPersonAutocomplete() {
+    const memoryPerson =
+        document.getElementById(
+            'memoryPerson'
+        );
+
+
+    if (!memoryPerson) {
+        return;
+    }
+
+
+    let dataList =
+        document.getElementById(
+            'miFamilyPeopleList'
+        );
+
+
+    if (!dataList) {
+
+        dataList =
+            document.createElement(
+                'datalist'
+            );
+
+
+        dataList.id =
+            'miFamilyPeopleList';
+
+
+        document.body.appendChild(
+            dataList
+        );
+
+    }
+
+
+    memoryPerson.setAttribute(
+        'list',
+        'miFamilyPeopleList'
+    );
+
+
+    memoryPerson.setAttribute(
+        'autocomplete',
+        'off'
+    );
+
+
+    memoryPerson.setAttribute(
+        'placeholder',
+        familyPeople.length > 0
+            ? 'Selecione ou digite o nome de um familiar'
+            : 'Digite o nome da pessoa'
+    );
+
+
+    dataList.innerHTML =
+        '';
+
+
+    familyPeople.forEach(
+        function (person) {
+
+            const name =
+                familyFullName(person)
+                ||
+                familyDisplayName(person);
+
+
+            if (!name) {
+                return;
+            }
+
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                name;
+
+
+            if (
+                person.preferred_name
+            ) {
+
+                option.label =
+                    `Conhecido(a) como ${person.preferred_name}`;
+
+            }
+
+
+            dataList.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    ensureMemoryPersonHelp();
+}
+
+
+// ==========================================================
+// AJUDA ABAIXO DO CAMPO PESSOA
+// ==========================================================
+
+function ensureMemoryPersonHelp() {
+    const memoryPerson =
+        document.getElementById(
+            'memoryPerson'
+        );
+
+
+    if (!memoryPerson) {
+        return;
+    }
+
+
+    const formGroup =
+        memoryPerson.closest(
+            '.form-group'
+        );
+
+
+    if (
+        !formGroup ||
+        document.getElementById(
+            'miMemoryPersonHelp'
+        )
+    ) {
+        return;
+    }
+
+
+    const helper =
+        document.createElement(
+            'div'
+        );
+
+
+    helper.id =
+        'miMemoryPersonHelp';
+
+
+    helper.className =
+        'mi-memory-person-help';
+
+
+    helper.innerHTML = `
+
+        <span id="miMemoryPersonHint">
+
+            Selecione um familiar já cadastrado
+            ou digite um novo nome.
+
+        </span>
+
+
+        <button
+            type="button"
+            class="mi-memory-person-add"
+            id="miMemoryPersonAdd"
+        >
+
+            <i class="fas fa-user-plus"></i>
+
+            Cadastrar familiar
+
+        </button>
+
+    `;
+
+
+    formGroup.appendChild(
+        helper
+    );
+
+
+    document
+        .getElementById(
+            'miMemoryPersonAdd'
+        )
+        ?.addEventListener(
+            'click',
+            openFamilyModal
+        );
+}
+
+
+// ==========================================================
+// ATUALIZAR AUTOCOMPLETE
+// ==========================================================
+
+function refreshMemoryPersonAutocomplete() {
+    ensureMemoryPersonAutocomplete();
+
+
+    const hint =
+        document.getElementById(
+            'miMemoryPersonHint'
+        );
+
+
+    if (!hint) {
+        return;
+    }
+
+
+    if (
+        !getFamilyCurrentUser()
+    ) {
+
+        hint.textContent =
+            'Entre em sua conta para selecionar pessoas do acervo familiar.';
+
+        return;
+
+    }
+
+
+    if (
+        familyPeople.length === 0
+    ) {
+
+        hint.textContent =
+            'Nenhum familiar cadastrado ainda. Você pode digitar um nome ou cadastrar uma pessoa.';
+
+        return;
+
+    }
+
+
+    hint.textContent =
+        familyPeople.length === 1
+            ? '1 familiar disponível para seleção. Você também pode digitar um novo nome.'
+            : `${familyPeople.length} familiares disponíveis para seleção. Você também pode digitar um novo nome.`;
+}
+
+
+// ==========================================================
 // CARREGAR PESSOAS
 // ==========================================================
 
@@ -1171,8 +1837,10 @@ async function loadFamilyPeople() {
     const supabase =
         getFamilySupabase();
 
+
     const user =
         getFamilyCurrentUser();
+
 
     const familyId =
         getFamilyActiveFamilyId();
@@ -1199,23 +1867,34 @@ async function loadFamilyPeople() {
         !user ||
         !familyId
     ) {
-        familyPeople = [];
+
+        familyPeople =
+            [];
+
 
         summary.textContent =
             'Entre em sua conta para acessar sua família.';
 
+
         if (intro) {
+
             intro.textContent =
                 'Cadastre e organize as pessoas que fazem parte das suas histórias.';
+
         }
 
+
         renderFamilyPeople();
+
+        refreshMemoryPersonAutocomplete();
 
         return;
     }
 
 
-    familyLoading = true;
+    familyLoading =
+        true;
+
 
     renderFamilyPeople();
 
@@ -1225,8 +1904,13 @@ async function loadFamilyPeople() {
         error
     } =
         await supabase
-            .from('people')
-            .select(`
+
+            .from(
+                'people'
+            )
+
+            .select(
+                `
                 id,
                 family_id,
                 first_name,
@@ -1239,32 +1923,42 @@ async function loadFamilyPeople() {
                 created_by,
                 created_at,
                 updated_at
-            `)
+                `
+            )
+
             .eq(
                 'family_id',
                 familyId
             )
+
             .order(
                 'first_name',
                 {
-                    ascending: true
+                    ascending:
+                        true
                 }
             );
 
 
-    familyLoading = false;
+    familyLoading =
+        false;
 
 
     if (error) {
+
         console.error(
             'Erro ao carregar pessoas:',
             error
         );
 
+
         summary.textContent =
             'Não foi possível carregar os familiares.';
 
+
         renderFamilyPeople();
+
+        refreshMemoryPersonAutocomplete();
 
         return;
     }
@@ -1275,8 +1969,10 @@ async function loadFamilyPeople() {
 
 
     if (intro) {
+
         intro.textContent =
             `Pessoas cadastradas no acervo ${getFamilyActiveFamilyName()}.`;
+
     }
 
 
@@ -1288,14 +1984,18 @@ async function loadFamilyPeople() {
 
     renderFamilyPeople();
 
+    refreshMemoryPersonAutocomplete();
+
 
     window.dispatchEvent(
         new CustomEvent(
             'memorias-invisiveis:people-change',
             {
                 detail: {
+
                     people:
                         familyPeople
+
                 }
             }
         )
@@ -1320,6 +2020,7 @@ function renderFamilyPeople() {
 
 
     if (familyLoading) {
+
         grid.innerHTML = `
 
             <div class="mi-family-loading">
@@ -1339,6 +2040,7 @@ function renderFamilyPeople() {
     if (
         familyPeople.length === 0
     ) {
+
         grid.innerHTML = `
 
             <div class="mi-family-empty">
@@ -1346,12 +2048,17 @@ function renderFamilyPeople() {
                 <i class="fas fa-users"></i>
 
                 <h3>
+
                     Sua família começa aqui
+
                 </h3>
 
                 <p>
-                    Cadastre a primeira pessoa do acervo
-                    para começar a organizar suas histórias.
+
+                    Cadastre a primeira pessoa
+                    do acervo para começar
+                    a organizar suas histórias.
+
                 </p>
 
             </div>
@@ -1362,11 +2069,13 @@ function renderFamilyPeople() {
     }
 
 
-    grid.innerHTML = '';
+    grid.innerHTML =
+        '';
 
 
     familyPeople.forEach(
         function (person) {
+
             const card =
                 document.createElement(
                     'article'
@@ -1384,13 +2093,9 @@ function renderFamilyPeople() {
 
 
             const fullName =
-                [
-                    person.first_name,
-                    person.last_name
-                ]
-                    .filter(Boolean)
-                    .join(' ')
-                    .trim();
+                familyFullName(
+                    person
+                );
 
 
             const preferredLine =
@@ -1398,68 +2103,96 @@ function renderFamilyPeople() {
                 person.preferred_name !==
                     fullName
                     ? `
+
                         <div class="mi-person-preferred">
+
                             ${familyEscapeHTML(
                                 person.preferred_name
                             )}
+
                         </div>
+
                     `
-                    : '';
+                    :
+                    '';
 
 
             const birthLine =
                 person.birth_date
                     ? `
+
                         <div>
+
                             <i class="fas fa-cake-candles"></i>
+
                             Nascimento:
+
                             ${familyEscapeHTML(
                                 familyFormatDate(
                                     person.birth_date
                                 )
                             )}
+
                         </div>
+
                     `
-                    : '';
+                    :
+                    '';
 
 
             const placeLine =
                 person.birth_place
                     ? `
+
                         <div>
+
                             <i class="fas fa-location-dot"></i>
+
                             ${familyEscapeHTML(
                                 person.birth_place
                             )}
+
                         </div>
+
                     `
-                    : '';
+                    :
+                    '';
 
 
             const biographyLine =
                 person.biography
                     ? `
+
                         <div>
+
                             <i class="fas fa-book-open"></i>
+
                             ${familyEscapeHTML(
                                 person.biography
                             )}
+
                         </div>
+
                     `
-                    : '';
+                    :
+                    '';
 
 
             card.innerHTML = `
 
                 <div class="mi-person-avatar">
+
                     <i class="fas fa-user"></i>
+
                 </div>
 
 
                 <h3>
+
                     ${familyEscapeHTML(
                         displayName
                     )}
+
                 </h3>
 
 
@@ -1473,13 +2206,18 @@ function renderFamilyPeople() {
                         displayName !==
                             fullName
                             ? `
+
                                 <div>
+
                                     ${familyEscapeHTML(
                                         fullName
                                     )}
+
                                 </div>
+
                             `
-                            : ''
+                            :
+                            ''
                     }
 
                     ${birthLine}
@@ -1496,26 +2234,36 @@ function renderFamilyPeople() {
             grid.appendChild(
                 card
             );
+
         }
     );
 }
 
 
 // ==========================================================
-// DUPLICIDADE
+// NORMALIZAÇÃO PARA DUPLICIDADE
 // ==========================================================
 
 function normalizeFamilyPersonName(
     value
 ) {
-    return String(value || '')
+    return String(
+        value || ''
+    )
         .trim()
-        .replace(/\s+/g, ' ')
+        .replace(
+            /\s+/g,
+            ' '
+        )
         .toLocaleLowerCase(
             'pt-BR'
         );
 }
 
+
+// ==========================================================
+// VERIFICAR DUPLICIDADE
+// ==========================================================
 
 function familyPersonExists(
     firstName,
@@ -1523,7 +2271,10 @@ function familyPersonExists(
 ) {
     const target =
         normalizeFamilyPersonName(
-            [firstName, lastName]
+            [
+                firstName,
+                lastName
+            ]
                 .filter(Boolean)
                 .join(' ')
         );
@@ -1531,14 +2282,12 @@ function familyPersonExists(
 
     return familyPeople.some(
         function (person) {
+
             const existing =
                 normalizeFamilyPersonName(
-                    [
-                        person.first_name,
-                        person.last_name
-                    ]
-                        .filter(Boolean)
-                        .join(' ')
+                    familyFullName(
+                        person
+                    )
                 );
 
 
@@ -1546,6 +2295,7 @@ function familyPersonExists(
                 existing ===
                 target
             );
+
         }
     );
 }
@@ -1564,8 +2314,10 @@ async function handleFamilySubmit(
     const supabase =
         getFamilySupabase();
 
+
     const user =
         getFamilyCurrentUser();
+
 
     const familyId =
         getFamilyActiveFamilyId();
@@ -1588,6 +2340,7 @@ async function handleFamilySubmit(
         !user ||
         !familyId
     ) {
+
         showFamilyMessage(
             'Não foi possível identificar seu acervo familiar.'
         );
@@ -1597,41 +2350,54 @@ async function handleFamilySubmit(
 
 
     const first =
-        firstName?.value
-            .trim() ||
+        firstName
+            ?.value
+            .trim()
+        ||
         '';
 
 
     const last =
-        lastName?.value
-            .trim() ||
+        lastName
+            ?.value
+            .trim()
+        ||
         '';
 
 
     const preferred =
-        preferredName?.value
-            .trim() ||
+        preferredName
+            ?.value
+            .trim()
+        ||
         '';
 
 
     const birth =
-        birthDate?.value ||
+        birthDate
+            ?.value
+        ||
         null;
 
 
     const place =
-        birthPlace?.value
-            .trim() ||
+        birthPlace
+            ?.value
+            .trim()
+        ||
         '';
 
 
     const bio =
-        biography?.value
-            .trim() ||
+        biography
+            ?.value
+            .trim()
+        ||
         '';
 
 
     if (!first) {
+
         showFamilyMessage(
             'Informe o nome da pessoa.'
         );
@@ -1646,6 +2412,7 @@ async function handleFamilySubmit(
             last
         )
     ) {
+
         showFamilyMessage(
             'Já existe uma pessoa com esse nome neste acervo.'
         );
@@ -1655,18 +2422,27 @@ async function handleFamilySubmit(
 
 
     if (submit) {
+
         submit.disabled =
             true;
+
     }
 
 
     try {
+
         const {
+            data,
             error
         } =
             await supabase
-                .from('people')
+
+                .from(
+                    'people'
+                )
+
                 .insert({
+
                     family_id:
                         familyId,
 
@@ -1694,7 +2470,27 @@ async function handleFamilySubmit(
 
                     created_by:
                         user.id
-                });
+
+                })
+
+                .select(
+                    `
+                    id,
+                    family_id,
+                    first_name,
+                    last_name,
+                    preferred_name,
+                    birth_date,
+                    death_date,
+                    birth_place,
+                    biography,
+                    created_by,
+                    created_at,
+                    updated_at
+                    `
+                )
+
+                .single();
 
 
         if (error) {
@@ -1711,12 +2507,42 @@ async function handleFamilySubmit(
         await loadFamilyPeople();
 
 
+        /*
+         * Se o cadastro tiver sido aberto
+         * a partir do formulário de memória,
+         * já preenchemos o campo com a pessoa criada.
+         */
+
+        const memoryPerson =
+            document.getElementById(
+                'memoryPerson'
+            );
+
+
+        if (
+            memoryPerson &&
+            data
+        ) {
+
+            memoryPerson.value =
+                familyFullName(
+                    data
+                )
+                ||
+                familyDisplayName(
+                    data
+                );
+
+        }
+
+
         setTimeout(
             closeFamilyModal,
             700
         );
 
     } catch (error) {
+
         console.error(
             'Erro ao cadastrar familiar:',
             error
@@ -1728,10 +2554,14 @@ async function handleFamilySubmit(
         );
 
     } finally {
+
         if (submit) {
+
             submit.disabled =
                 false;
+
         }
+
     }
 }
 
@@ -1750,46 +2580,58 @@ function bindFamilyEvents() {
         getFamilyElements();
 
 
-    addButton?.addEventListener(
-        'click',
-        openFamilyModal
-    );
+    addButton
+        ?.addEventListener(
+            'click',
+            openFamilyModal
+        );
 
 
-    close?.addEventListener(
-        'click',
-        closeFamilyModal
-    );
+    close
+        ?.addEventListener(
+            'click',
+            closeFamilyModal
+        );
 
 
-    form?.addEventListener(
-        'submit',
-        handleFamilySubmit
-    );
+    form
+        ?.addEventListener(
+            'submit',
+            handleFamilySubmit
+        );
 
 
-    backdrop?.addEventListener(
-        'click',
-        function (event) {
-            if (
-                event.target ===
-                backdrop
-            ) {
-                closeFamilyModal();
+    backdrop
+        ?.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    event.target ===
+                    backdrop
+                ) {
+
+                    closeFamilyModal();
+
+                }
+
             }
-        }
-    );
+        );
 
 
     document.addEventListener(
         'keydown',
         function (event) {
+
             if (
                 event.key ===
                 'Escape'
             ) {
+
                 closeFamilyModal();
+
             }
+
         }
     );
 }
@@ -1819,6 +2661,8 @@ async function initializeFamilyModule() {
 
     injectFamilyModal();
 
+    ensureMemoryPersonAutocomplete();
+
     bindFamilyEvents();
 
 
@@ -1826,11 +2670,14 @@ async function initializeFamilyModule() {
 
 
     window.MemoriasInvisiveisFamily = {
+
         getPeople:
             function () {
+
                 return [
                     ...familyPeople
                 ];
+
             },
 
         refresh:
@@ -1838,6 +2685,7 @@ async function initializeFamilyModule() {
 
         openAddPerson:
             openFamilyModal
+
     };
 }
 
@@ -1849,9 +2697,11 @@ async function initializeFamilyModule() {
 window.addEventListener(
     'memorias-invisiveis:auth-ready',
     async function () {
+
         await initializeFamilyModule();
 
         await loadFamilyPeople();
+
     }
 );
 
@@ -1859,15 +2709,20 @@ window.addEventListener(
 window.addEventListener(
     'memorias-invisiveis:auth-change',
     async function () {
+
         if (
             !familyModuleInitialized
         ) {
+
             await initializeFamilyModule();
 
             return;
+
         }
 
+
         await loadFamilyPeople();
+
     }
 );
 
@@ -1880,15 +2735,21 @@ if (
     document.readyState ===
     'loading'
 ) {
+
     document.addEventListener(
         'DOMContentLoaded',
         async function () {
+
             await initializeFamilyModule();
+
         },
         {
             once: true
         }
     );
+
 } else {
+
     initializeFamilyModule();
+
 }
