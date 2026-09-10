@@ -1,23 +1,35 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL = 'https://mtqjsmcfsouxhfxrjrkx.supabase.co';
+
+// ==========================================================
+// SUPABASE
+// ==========================================================
+
+const SUPABASE_URL =
+    'https://mtqjsmcfsouxhfxrjrkx.supabase.co';
+
 
 const SUPABASE_PUBLISHABLE_KEY =
     'sb_publishable_YA8jN2YWu30ofygmwnzEDg_4z1eZcOT';
 
 
-const supabase = createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY,
-    {
-        auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
+const supabase =
+    createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
         }
-    }
-);
+    );
 
+
+// ==========================================================
+// ESTADO
+// ==========================================================
 
 let currentUser = null;
 let activeFamily = null;
@@ -29,13 +41,19 @@ let activeFamily = null;
 
 function injectAuthStyles() {
 
-    if (document.getElementById('mi-auth-styles')) {
+    if (
+        document.getElementById(
+            'mi-auth-styles'
+        )
+    ) {
         return;
     }
 
 
     const style =
-        document.createElement('style');
+        document.createElement(
+            'style'
+        );
 
 
     style.id =
@@ -48,7 +66,9 @@ function injectAuthStyles() {
         .mi-auth-logout {
 
             border: 0;
+
             cursor: pointer;
+
             font: inherit;
 
         }
@@ -57,7 +77,9 @@ function injectAuthStyles() {
         .mi-auth-trigger {
 
             display: inline-flex;
+
             align-items: center;
+
             justify-content: center;
 
             gap: 8px;
@@ -96,9 +118,32 @@ function injectAuthStyles() {
 
             align-items: center;
 
-            gap: 10px;
+            gap: 8px;
 
-            font-size: 0.9rem;
+            color:
+                var(--primary);
+
+        }
+
+
+        .mi-auth-user-icon {
+
+            width: 34px;
+
+            height: 34px;
+
+            flex: 0 0 34px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                var(--secondary);
 
             color:
                 var(--primary);
@@ -112,7 +157,35 @@ function injectAuthStyles() {
 
             flex-direction: column;
 
-            line-height: 1.2;
+            line-height: 1.15;
+
+            min-width: 0;
+
+        }
+
+
+        .mi-auth-user-text strong {
+
+            color:
+                var(--primary);
+
+            font-size:
+                0.82rem;
+
+            font-weight:
+                700;
+
+            max-width:
+                150px;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
 
         }
 
@@ -122,16 +195,31 @@ function injectAuthStyles() {
             color:
                 var(--gray);
 
-            font-size: 0.72rem;
+            font-size:
+                0.65rem;
+
+            max-width:
+                150px;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
 
         }
 
 
         .mi-auth-logout {
 
-            padding: 8px 12px;
+            padding:
+                7px 11px;
 
-            border-radius: 999px;
+            border-radius:
+                999px;
 
             background:
                 var(--secondary);
@@ -139,7 +227,22 @@ function injectAuthStyles() {
             color:
                 var(--primary);
 
-            font-weight: 600;
+            font-size:
+                0.76rem;
+
+            font-weight:
+                600;
+
+            transition:
+                var(--transition);
+
+        }
+
+
+        .mi-auth-logout:hover {
+
+            background:
+                #dfc5a6;
 
         }
 
@@ -176,7 +279,10 @@ function injectAuthStyles() {
         .mi-auth-modal {
 
             width:
-                min(100%, 460px);
+                min(
+                    100%,
+                    460px
+                );
 
             background:
                 #ffffff;
@@ -476,11 +582,31 @@ function injectAuthStyles() {
 
             .mi-auth-user {
 
+                width:
+                    100%;
+
                 align-items:
                     flex-start;
 
-                flex-direction:
-                    column;
+                flex-wrap:
+                    wrap;
+
+            }
+
+
+            .mi-auth-user-text {
+
+                flex:
+                    1;
+
+            }
+
+
+            .mi-auth-user-text strong,
+            .mi-auth-user-text small {
+
+                max-width:
+                    100%;
 
             }
 
@@ -737,6 +863,7 @@ function injectAuthUI() {
                     type="submit"
                     class="mi-auth-submit"
                     id="miAuthSubmit"
+                    data-mode="login"
                 >
 
                     Entrar
@@ -869,9 +996,7 @@ function openAuthModal() {
     setTimeout(
         function () {
 
-            if (email) {
-                email.focus();
-            }
+            email?.focus();
 
         },
         50
@@ -950,7 +1075,7 @@ function showAuthMessage(
 
 
 // ==========================================================
-// MODO LOGIN / CADASTRO
+// LOGIN / CADASTRO
 // ==========================================================
 
 function setAuthMode(
@@ -958,13 +1083,11 @@ function setAuthMode(
 ) {
 
     const {
-
         tabs,
         nameField,
         password,
         submit,
         intro
-
     } =
         getAuthElements();
 
@@ -1041,7 +1164,6 @@ async function loadActiveFamily() {
 
         activeFamily =
             null;
-
 
         return null;
 
@@ -1138,6 +1260,82 @@ function escapeForAuth(
 
 
 // ==========================================================
+// NOME DO USUÁRIO
+// ==========================================================
+
+function getCurrentUserDisplayName() {
+
+    if (!currentUser) {
+        return 'Usuário';
+    }
+
+
+    const metadataName =
+        String(
+            currentUser
+                ?.user_metadata
+                ?.full_name
+            ||
+            ''
+        ).trim();
+
+
+    if (metadataName) {
+        return metadataName;
+    }
+
+
+    const metadataNameAlternative =
+        String(
+            currentUser
+                ?.user_metadata
+                ?.name
+            ||
+            ''
+        ).trim();
+
+
+    if (metadataNameAlternative) {
+        return metadataNameAlternative;
+    }
+
+
+    /*
+     * Fallback de privacidade:
+     *
+     * Não exibimos o endereço completo de e-mail
+     * no cabeçalho.
+     */
+
+    const email =
+        String(
+            currentUser.email || ''
+        );
+
+
+    if (email.includes('@')) {
+
+        const firstPart =
+            email
+                .split('@')[0]
+                .trim();
+
+
+        if (firstPart) {
+
+            return firstPart;
+
+        }
+
+    }
+
+
+    return 'Usuário';
+
+}
+
+
+// ==========================================================
 // ESTADO DO USUÁRIO
 // ==========================================================
 
@@ -1173,20 +1371,14 @@ function renderAuthState() {
         `;
 
 
-        const button =
-            document.getElementById(
+        document
+            .getElementById(
                 'miAuthOpen'
-            );
-
-
-        if (button) {
-
-            button.addEventListener(
+            )
+            ?.addEventListener(
                 'click',
                 openAuthModal
             );
-
-        }
 
 
         return;
@@ -1195,41 +1387,47 @@ function renderAuthState() {
 
 
     const familyName =
-
         activeFamily
             ?.families
             ?.name
-
         ||
+        'Acervo familiar';
 
-        'Acervo ainda não selecionado';
 
-
-    const email =
-
-        currentUser.email
-
-        ||
-
-        'Usuário autenticado';
+    const displayName =
+        getCurrentUserDisplayName();
 
 
     slot.innerHTML = `
 
         <div class="mi-auth-user">
 
+            <div
+                class="mi-auth-user-icon"
+                aria-hidden="true"
+            >
+
+                <i class="fas fa-user"></i>
+
+            </div>
+
+
             <div class="mi-auth-user-text">
 
                 <strong>
 
-                    ${escapeForAuth(email)}
+                    ${escapeForAuth(
+                        displayName
+                    )}
 
                 </strong>
 
 
                 <small>
 
-                    ${escapeForAuth(familyName)}
+                    ${escapeForAuth(
+                        familyName
+                    )}
 
                 </small>
 
@@ -1251,32 +1449,39 @@ function renderAuthState() {
     `;
 
 
-    const logoutButton =
-        document.getElementById(
+    document
+        .getElementById(
             'miAuthLogout'
-        );
-
-
-    if (logoutButton) {
-
-        logoutButton.addEventListener(
+        )
+        ?.addEventListener(
             'click',
             async function () {
 
-                await supabase
-                    .auth
-                    .signOut();
+                const {
+                    error
+                } =
+                    await supabase
+                        .auth
+                        .signOut();
+
+
+                if (error) {
+
+                    console.error(
+                        'Erro ao sair:',
+                        error
+                    );
+
+                }
 
             }
         );
-
-    }
 
 }
 
 
 // ==========================================================
-// ERROS
+// MENSAGENS DE ERRO
 // ==========================================================
 
 function authErrorMessage(
@@ -1286,8 +1491,7 @@ function authErrorMessage(
     const message =
         String(
             error?.message || ''
-        )
-            .toLowerCase();
+        ).toLowerCase();
 
 
     if (
@@ -1361,45 +1565,34 @@ async function handleAuthSubmit(
 
 
     const {
-
         name,
         email,
         password,
         submit
-
     } =
         getAuthElements();
 
 
     const mode =
-
         submit
             ?.dataset
-            .mode
-
+            ?.mode
         ||
-
         'login';
 
 
     const emailValue =
-
         email
             ?.value
             .trim()
-
         ||
-
         '';
 
 
     const passwordValue =
-
         password
             ?.value
-
         ||
-
         '';
 
 
@@ -1411,7 +1604,6 @@ async function handleAuthSubmit(
         showAuthMessage(
             'Informe e-mail e senha.'
         );
-
 
         return;
 
@@ -1428,20 +1620,32 @@ async function handleAuthSubmit(
 
     try {
 
+        // ==================================================
+        // CADASTRO
+        // ==================================================
+
         if (
             mode ===
             'signup'
         ) {
 
             const fullName =
-
                 name
                     ?.value
                     .trim()
-
                 ||
-
                 '';
+
+
+            if (!fullName) {
+
+                showAuthMessage(
+                    'Informe seu nome.'
+                );
+
+                return;
+
+            }
 
 
             const {
@@ -1504,41 +1708,47 @@ async function handleAuthSubmit(
 
             }
 
-        } else {
 
-            const {
-                error
-            } =
-                await supabase
-                    .auth
-                    .signInWithPassword({
-
-                        email:
-                            emailValue,
-
-                        password:
-                            passwordValue
-
-                    });
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            showAuthMessage(
-                'Login realizado com sucesso.',
-                'success'
-            );
-
-
-            setTimeout(
-                closeAuthModal,
-                500
-            );
+            return;
 
         }
+
+
+        // ==================================================
+        // LOGIN
+        // ==================================================
+
+        const {
+            error
+        } =
+            await supabase
+                .auth
+                .signInWithPassword({
+
+                    email:
+                        emailValue,
+
+                    password:
+                        passwordValue
+
+                });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        showAuthMessage(
+            'Login realizado com sucesso.',
+            'success'
+        );
+
+
+        setTimeout(
+            closeAuthModal,
+            500
+        );
 
     } catch (error) {
 
@@ -1575,66 +1785,48 @@ async function handleAuthSubmit(
 function bindAuthEvents() {
 
     const {
-
         open,
         close,
         backdrop,
         form,
         tabs
-
     } =
         getAuthElements();
 
 
-    if (open) {
-
-        open.addEventListener(
-            'click',
-            openAuthModal
-        );
-
-    }
+    open?.addEventListener(
+        'click',
+        openAuthModal
+    );
 
 
-    if (close) {
-
-        close.addEventListener(
-            'click',
-            closeAuthModal
-        );
-
-    }
+    close?.addEventListener(
+        'click',
+        closeAuthModal
+    );
 
 
-    if (form) {
-
-        form.addEventListener(
-            'submit',
-            handleAuthSubmit
-        );
-
-    }
+    form?.addEventListener(
+        'submit',
+        handleAuthSubmit
+    );
 
 
-    if (backdrop) {
+    backdrop?.addEventListener(
+        'click',
+        function (event) {
 
-        backdrop.addEventListener(
-            'click',
-            function (event) {
+            if (
+                event.target ===
+                backdrop
+            ) {
 
-                if (
-                    event.target ===
-                    backdrop
-                ) {
-
-                    closeAuthModal();
-
-                }
+                closeAuthModal();
 
             }
-        );
 
-    }
+        }
+    );
 
 
     document.addEventListener(
@@ -1662,8 +1854,9 @@ function bindAuthEvents() {
                 function () {
 
                     setAuthMode(
-                        tab.dataset.authMode
-                            ||
+                        tab.dataset
+                            .authMode
+                        ||
                         'login'
                     );
 
@@ -1706,9 +1899,7 @@ async function initializeAuth() {
         data
             ?.session
             ?.user
-
         ||
-
         null;
 
 
@@ -1733,12 +1924,9 @@ async function initializeAuth() {
             ) {
 
                 currentUser =
-
                     session
                         ?.user
-
                     ||
-
                     null;
 
 
