@@ -1,20 +1,14 @@
 // ==========================================================
 // MEMÓRIAS INVISÍVEIS
-// FASE 7 — PERFIS FAMILIARES
+// FASE 7 — PERFIS FAMILIARES + MEMÓRIAS DA PESSOA
 //
 // Responsabilidades:
 // - Listar pessoas do acervo familiar
-// - Cadastrar familiares
-// - Editar familiares
+// - Cadastrar e editar familiares
 // - Impedir duplicidades simples
-// - Exibir perfil individual do familiar
+// - Exibir perfil individual
+// - Exibir memórias vinculadas à pessoa
 // - Disponibilizar familiares no formulário de memórias
-// - Atualizar automaticamente a lista de pessoas
-// ==========================================================
-
-
-// ==========================================================
-// ESTADO
 // ==========================================================
 
 let familyPeople = [];
@@ -25,46 +19,32 @@ let viewingPersonId = null;
 
 
 // ==========================================================
-// HELPERS AUTH
+// AUTH / SUPABASE
 // ==========================================================
 
 function getFamilyAuthController() {
     return window.MemoriasInvisiveisAuth || null;
 }
 
-
 function getFamilySupabase() {
     return getFamilyAuthController()?.supabase || null;
 }
 
-
 function getFamilyCurrentUser() {
     const auth = getFamilyAuthController();
 
-    if (
-        !auth ||
-        typeof auth.getUser !== 'function'
-    ) {
-        return null;
-    }
-
-    return auth.getUser();
+    return auth && typeof auth.getUser === 'function'
+        ? auth.getUser()
+        : null;
 }
-
 
 function getFamilyActiveFamily() {
     const auth = getFamilyAuthController();
 
-    if (
-        !auth ||
-        typeof auth.getActiveFamily !== 'function'
-    ) {
-        return null;
-    }
-
-    return auth.getActiveFamily();
+    return auth && typeof auth.getActiveFamily === 'function'
+        ? auth.getActiveFamily()
+        : null;
 }
-
 
 function getFamilyActiveFamilyId() {
     const family = getFamilyActiveFamily();
@@ -75,7 +55,6 @@ function getFamilyActiveFamilyId() {
         null
     );
 }
-
 
 function getFamilyActiveFamilyName() {
     const family = getFamilyActiveFamily();
@@ -88,69 +67,49 @@ function getFamilyActiveFamilyName() {
 
 
 // ==========================================================
-// ESCAPE
+// HELPERS
 // ==========================================================
 
 function familyEscapeHTML(value) {
-    const div =
-        document.createElement('div');
-
-    div.textContent =
-        value ?? '';
-
+    const div = document.createElement('div');
+    div.textContent = value ?? '';
     return div.innerHTML;
 }
-
-
-// ==========================================================
-// DATA
-// ==========================================================
 
 function familyFormatDate(value) {
     if (!value) {
         return '';
     }
 
-    const date =
-        new Date(
-            `${value}T12:00:00`
-        );
+    const date = new Date(`${value}T12:00:00`);
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
+    if (Number.isNaN(date.getTime())) {
         return value;
     }
 
-    return new Intl.DateTimeFormat(
-        'pt-BR'
-    ).format(date);
+    return new Intl.DateTimeFormat('pt-BR').format(date);
 }
 
-
-// ==========================================================
-// NOME DA PESSOA
-// ==========================================================
-
-function familyDisplayName(person) {
-    if (!person) {
+function familyFormatDateTime(value) {
+    if (!value) {
         return '';
     }
 
-    const preferred =
-        String(
-            person.preferred_name || ''
-        ).trim();
+    const date = new Date(value);
 
-    if (preferred) {
-        return preferred;
+    if (Number.isNaN(date.getTime())) {
+        return '';
     }
 
-    return familyFullName(person);
+    return new Intl.DateTimeFormat(
+        'pt-BR',
+        {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }
+    ).format(date);
 }
-
 
 function familyFullName(person) {
     if (!person) {
@@ -166,10 +125,18 @@ function familyFullName(person) {
         .trim();
 }
 
+function familyDisplayName(person) {
+    if (!person) {
+        return '';
+    }
 
-// ==========================================================
-// NORMALIZAÇÃO
-// ==========================================================
+    const preferred =
+        String(
+            person.preferred_name || ''
+        ).trim();
+
+    return preferred || familyFullName(person);
+}
 
 function normalizeFamilyPersonName(value) {
     return String(value || '')
@@ -180,11 +147,6 @@ function normalizeFamilyPersonName(value) {
         .toLocaleLowerCase('pt-BR');
 }
 
-
-// ==========================================================
-// DUPLICIDADE
-// ==========================================================
-
 function familyPersonExists(
     firstName,
     lastName,
@@ -192,10 +154,7 @@ function familyPersonExists(
 ) {
     const target =
         normalizeFamilyPersonName(
-            [
-                firstName,
-                lastName
-            ]
+            [firstName, lastName]
                 .filter(Boolean)
                 .join(' ')
         );
@@ -209,16 +168,35 @@ function familyPersonExists(
                 return false;
             }
 
-            const existing =
+            return (
                 normalizeFamilyPersonName(
                     familyFullName(person)
-                );
-
-            return (
-                existing === target
+                ) === target
             );
         }
     );
+}
+
+function setProfileValue(element, value) {
+    if (!element) {
+        return;
+    }
+
+    if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ''
+    ) {
+        element.innerHTML = `
+            <span class="mi-profile-empty-value">
+                Não informado
+            </span>
+        `;
+
+        return;
+    }
+
+    element.textContent = value;
 }
 
 
@@ -227,28 +205,17 @@ function familyPersonExists(
 // ==========================================================
 
 function injectFamilyStyles() {
-    if (
-        document.getElementById(
-            'mi-family-styles'
-        )
-    ) {
+    if (document.getElementById('mi-family-styles')) {
         return;
     }
 
-    const style =
-        document.createElement(
-            'style'
-        );
-
-    style.id =
-        'mi-family-styles';
+    const style = document.createElement('style');
+    style.id = 'mi-family-styles';
 
     style.textContent = `
-
         .mi-family-section {
             background: #ffffff;
         }
-
 
         .mi-family-toolbar {
             display: flex;
@@ -259,146 +226,99 @@ function injectFamilyStyles() {
             flex-wrap: wrap;
         }
 
-
         .mi-family-summary {
             color: var(--gray);
             font-size: 0.95rem;
         }
-
 
         .mi-family-add-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-
             border: 0;
             border-radius: 999px;
-
             padding: 12px 18px;
-
             background: var(--accent);
             color: #ffffff;
-
             font: inherit;
             font-weight: 700;
-
             cursor: pointer;
             transition: var(--transition);
         }
-
 
         .mi-family-add-button:hover {
             background: var(--accent-light);
             transform: translateY(-2px);
         }
 
-
         .mi-family-grid {
             display: grid;
-
             grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(230px, 1fr)
-                );
-
+                repeat(auto-fit, minmax(230px, 1fr));
             gap: 20px;
         }
 
-
         .mi-person-card {
             background: var(--light);
-
-            border:
-                1px solid
-                rgba(0, 0, 0, 0.08);
-
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 18px;
-
             padding: 22px;
-
             box-shadow:
-                0 10px 30px
-                rgba(0, 0, 0, 0.05);
-
+                0 10px 30px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
-
             display: flex;
             flex-direction: column;
         }
-
 
         .mi-person-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow);
         }
 
-
         .mi-person-avatar {
             width: 56px;
             height: 56px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 50%;
-
             background: var(--secondary);
             color: var(--primary);
-
             font-size: 1.25rem;
-
             margin-bottom: 16px;
         }
 
-
         .mi-person-card h3 {
             margin: 0 0 6px;
-
             color: var(--primary);
-
-            font-family:
-                'Playfair Display',
-                serif;
+            font-family: 'Playfair Display', serif;
         }
-
 
         .mi-person-preferred {
             color: var(--accent);
-
             font-size: 0.9rem;
             font-weight: 600;
-
             margin-bottom: 12px;
         }
-
 
         .mi-person-meta {
             display: grid;
             gap: 7px;
-
             color: var(--gray);
-
             font-size: 0.88rem;
             line-height: 1.45;
         }
-
 
         .mi-person-actions {
             display: flex;
             justify-content: flex-end;
             gap: 16px;
-
             margin-top: 20px;
             padding-top: 14px;
-
             border-top:
-                1px solid
-                rgba(45, 90, 122, 0.1);
+                1px solid rgba(45, 90, 122, 0.1);
         }
-
 
         .mi-person-view,
         .mi-person-edit {
@@ -406,703 +326,528 @@ function injectFamilyStyles() {
             align-items: center;
             justify-content: center;
             gap: 6px;
-
             border: 0;
             background: transparent;
-
             font: inherit;
             font-size: 0.82rem;
             font-weight: 700;
-
             cursor: pointer;
-
             padding: 5px 0;
-
             transition: var(--transition);
         }
-
 
         .mi-person-view {
             color: var(--accent);
         }
 
-
         .mi-person-edit {
             color: var(--primary);
         }
-
 
         .mi-person-view:hover,
         .mi-person-edit:hover {
             transform: translateY(-1px);
         }
 
-
-        .mi-family-empty {
+        .mi-family-empty,
+        .mi-family-loading {
             grid-column: 1 / -1;
-
-            padding: 45px 30px;
-
+            padding: 40px 30px;
             text-align: center;
-
-            border:
-                1px dashed
-                rgba(0, 0, 0, 0.18);
-
-            border-radius: 18px;
-
             color: var(--gray);
         }
 
+        .mi-family-empty {
+            border:
+                1px dashed rgba(0, 0, 0, 0.18);
+            border-radius: 18px;
+        }
 
         .mi-family-empty i {
             font-size: 2rem;
-
             margin-bottom: 15px;
-
             color: var(--secondary);
         }
-
-
-        .mi-family-loading {
-            grid-column: 1 / -1;
-
-            padding: 40px;
-
-            text-align: center;
-
-            color: var(--gray);
-        }
-
 
         .mi-family-backdrop,
         .mi-profile-backdrop {
             position: fixed;
-
             inset: 0;
-
             z-index: 10000;
-
             display: none;
-
             align-items: center;
             justify-content: center;
-
             padding: 20px;
-
-            background:
-                rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.55);
         }
-
 
         .mi-family-backdrop.is-open,
         .mi-profile-backdrop.is-open {
             display: flex;
         }
 
-
         .mi-family-modal,
         .mi-profile-modal {
-            width:
-                min(
-                    100%,
-                    560px
-                );
-
+            width: min(100%, 560px);
             max-height: 90vh;
-
             overflow-y: auto;
-
             background: #ffffff;
-
             border-radius: 20px;
-
             padding: 28px;
-
             position: relative;
-
             box-shadow:
-                0 24px 70px
-                rgba(0, 0, 0, 0.25);
+                0 24px 70px rgba(0, 0, 0, 0.25);
         }
-
 
         .mi-profile-modal {
-            width:
-                min(
-                    100%,
-                    680px
-                );
-
+            width: min(100%, 720px);
             padding: 34px;
         }
-
 
         .mi-family-modal h2,
         .mi-profile-modal h2 {
             margin: 0 0 8px;
-
             color: var(--primary);
-
-            font-family:
-                'Playfair Display',
-                serif;
+            font-family: 'Playfair Display', serif;
         }
-
 
         .mi-family-modal-intro {
             margin: 0 0 22px;
-
             color: var(--gray);
-
             line-height: 1.6;
         }
-
 
         .mi-family-close,
         .mi-profile-close {
             position: absolute;
-
             top: 14px;
             right: 14px;
-
             width: 38px;
             height: 38px;
-
             border: 0;
             border-radius: 50%;
-
             background: var(--secondary);
             color: var(--primary);
-
             cursor: pointer;
         }
-
 
         .mi-family-form {
             display: grid;
             gap: 16px;
         }
 
-
         .mi-family-form-grid {
             display: grid;
-
             grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
-
+                repeat(2, minmax(0, 1fr));
             gap: 14px;
         }
-
 
         .mi-family-field {
             display: grid;
             gap: 6px;
         }
 
-
         .mi-family-field.full {
             grid-column: 1 / -1;
         }
 
-
         .mi-family-field label {
             color: var(--primary);
-
             font-size: 0.9rem;
             font-weight: 600;
         }
 
-
         .mi-family-field input,
         .mi-family-field textarea {
             width: 100%;
-
-            border:
-                1px solid
-                rgba(0, 0, 0, 0.16);
-
+            border: 1px solid rgba(0, 0, 0, 0.16);
             border-radius: 10px;
-
             padding: 12px 14px;
-
             font: inherit;
         }
-
 
         .mi-family-field input:focus,
         .mi-family-field textarea:focus {
             outline: none;
-
             border-color: var(--accent);
-
             box-shadow:
-                0 0 0 4px
-                rgba(197, 110, 79, 0.1);
+                0 0 0 4px rgba(197, 110, 79, 0.1);
         }
-
 
         .mi-family-field textarea {
             min-height: 110px;
             resize: vertical;
         }
 
-
         .mi-family-submit {
             border: 0;
             border-radius: 10px;
-
             padding: 13px 18px;
-
             background: var(--accent);
             color: #ffffff;
-
             font: inherit;
             font-weight: 700;
-
             cursor: pointer;
         }
-
 
         .mi-family-submit:disabled {
             opacity: 0.65;
             cursor: wait;
         }
 
-
         .mi-family-message {
             display: none;
-
             padding: 10px 12px;
-
             border-radius: 10px;
-
             font-size: 0.88rem;
             line-height: 1.5;
         }
 
-
         .mi-family-message.is-visible {
             display: block;
         }
-
 
         .mi-family-message.success {
             background: #effaf2;
             color: #236b37;
         }
 
-
         .mi-family-message.error {
             background: #fff1f1;
             color: #9d2020;
         }
 
-
         .mi-memory-person-help {
             display: flex;
-
             align-items: center;
             justify-content: space-between;
-
             gap: 12px;
-
             flex-wrap: wrap;
-
             margin-top: 6px;
         }
 
-
         .mi-memory-person-help span {
             color: var(--gray);
-
             font-size: 0.78rem;
             line-height: 1.4;
         }
 
-
         .mi-memory-person-add {
             border: 0;
             background: transparent;
-
             color: var(--accent);
-
             font: inherit;
             font-size: 0.78rem;
             font-weight: 700;
-
             cursor: pointer;
-
             padding: 0;
         }
-
 
         .mi-memory-person-add:hover {
             text-decoration: underline;
         }
 
-
-        /* ==================================================
-           PERFIL INDIVIDUAL
-        ================================================== */
-
         .mi-profile-header {
             display: flex;
             align-items: center;
             gap: 20px;
-
             padding-bottom: 24px;
-
             border-bottom:
-                1px solid
-                rgba(45, 90, 122, 0.1);
+                1px solid rgba(45, 90, 122, 0.1);
         }
-
 
         .mi-profile-avatar {
             width: 82px;
             height: 82px;
-
             flex: 0 0 82px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 50%;
-
             background: var(--secondary);
             color: var(--primary);
-
             font-size: 2rem;
         }
-
 
         .mi-profile-title {
             min-width: 0;
         }
 
-
         .mi-profile-title h2 {
             margin-bottom: 4px;
-
             font-size: 2rem;
         }
 
-
         .mi-profile-family {
             color: var(--gray);
-
             font-size: 0.9rem;
         }
 
-
         .mi-profile-preferred {
             color: var(--accent);
-
             font-weight: 700;
-
             margin-top: 4px;
         }
-
 
         .mi-profile-content {
             display: grid;
             gap: 24px;
-
             margin-top: 28px;
         }
 
-
         .mi-profile-section {
             background: var(--light);
-
             border-radius: 16px;
-
             padding: 22px;
         }
 
-
         .mi-profile-section h3 {
             color: var(--primary);
-
             font-size: 1.1rem;
-
             margin-bottom: 16px;
         }
 
-
         .mi-profile-details {
             display: grid;
-
             grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
-
+                repeat(2, minmax(0, 1fr));
             gap: 18px;
         }
-
 
         .mi-profile-detail {
             display: grid;
             gap: 4px;
         }
 
-
         .mi-profile-detail-label {
             color: var(--gray);
-
             font-size: 0.76rem;
-
             text-transform: uppercase;
-
             letter-spacing: 0.05em;
-
             font-weight: 700;
         }
 
-
         .mi-profile-detail-value {
             color: var(--dark);
-
             font-size: 0.95rem;
         }
 
-
         .mi-profile-biography {
             color: var(--dark);
-
             line-height: 1.7;
-
             white-space: pre-line;
         }
 
-
         .mi-profile-empty-value {
             color: var(--gray);
-
             font-style: italic;
         }
 
+        .mi-profile-memories {
+            display: grid;
+            gap: 12px;
+        }
+
+        .mi-profile-memory {
+            background: #ffffff;
+            border:
+                1px solid rgba(45, 90, 122, 0.1);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .mi-profile-memory-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .mi-profile-memory h4 {
+            margin: 0;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+        }
+
+        .mi-profile-memory-category {
+            flex: 0 0 auto;
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .mi-profile-memory-meta {
+            color: var(--gray);
+            font-size: 0.78rem;
+            margin-bottom: 8px;
+        }
+
+        .mi-profile-memory-story {
+            color: var(--dark);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .mi-profile-memory-state {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
 
         .mi-profile-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
-
             gap: 14px;
-
             flex-wrap: wrap;
-
             margin-top: 28px;
         }
-
 
         .mi-profile-back-button,
         .mi-profile-edit-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-
             gap: 8px;
-
             border-radius: 999px;
-
             padding: 11px 18px;
-
             font: inherit;
             font-size: 0.88rem;
             font-weight: 700;
-
             cursor: pointer;
-
             transition: var(--transition);
         }
 
-
         .mi-profile-back-button {
             border:
-                1px solid
-                rgba(45, 90, 122, 0.25);
-
+                1px solid rgba(45, 90, 122, 0.25);
             background: transparent;
-
             color: var(--primary);
         }
 
-
         .mi-profile-edit-button {
             border: 0;
-
             background: var(--accent);
-
             color: #ffffff;
         }
-
 
         .mi-profile-back-button:hover,
         .mi-profile-edit-button:hover {
             transform: translateY(-2px);
         }
 
-
         @media (max-width: 768px) {
-
             .mi-family-form-grid,
             .mi-profile-details {
                 grid-template-columns: 1fr;
             }
 
-
             .mi-family-field.full {
                 grid-column: auto;
             }
-
 
             .mi-family-add-button {
                 width: 100%;
             }
 
-
             .mi-memory-person-help {
                 align-items: flex-start;
-
                 flex-direction: column;
             }
-
 
             .mi-profile-header {
                 align-items: flex-start;
-
                 flex-direction: column;
             }
 
+            .mi-profile-memory-top {
+                flex-direction: column;
+                gap: 5px;
+            }
 
             .mi-profile-actions {
                 align-items: stretch;
-
                 flex-direction: column;
             }
-
 
             .mi-profile-back-button,
             .mi-profile-edit-button {
                 width: 100%;
             }
-
         }
-
     `;
 
-    document.head.appendChild(
-        style
-    );
+    document.head.appendChild(style);
 }
 
 
 // ==========================================================
-// NAV
+// NAV / SEÇÃO
 // ==========================================================
 
 function injectFamilyNavLink() {
-    const nav =
-        document.querySelector(
-            '.nav-links'
-        );
+    const nav = document.querySelector('.nav-links');
 
     if (
         !nav ||
-        document.getElementById(
-            'miFamilyNavLink'
-        )
+        document.getElementById('miFamilyNavLink')
     ) {
         return;
     }
 
-    const link =
-        document.createElement(
-            'a'
-        );
+    const link = document.createElement('a');
 
-    link.id =
-        'miFamilyNavLink';
-
-    link.href =
-        '#familia';
-
-    link.textContent =
-        'Minha Família';
+    link.id = 'miFamilyNavLink';
+    link.href = '#familia';
+    link.textContent = 'Minha Família';
 
     const archiveLink =
-        Array.from(
-            nav.querySelectorAll(
-                'a'
-            )
-        ).find(
-            function (item) {
-                return (
-                    item.getAttribute(
-                        'href'
-                    ) ===
-                    '#acervo'
-                );
-            }
-        );
+        Array.from(nav.querySelectorAll('a'))
+            .find(
+                function (item) {
+                    return (
+                        item.getAttribute('href') ===
+                        '#acervo'
+                    );
+                }
+            );
 
     if (archiveLink) {
-        archiveLink
-            .insertAdjacentElement(
-                'afterend',
-                link
-            );
-    } else {
-        nav.appendChild(
+        archiveLink.insertAdjacentElement(
+            'afterend',
             link
         );
+    } else {
+        nav.appendChild(link);
     }
 }
 
 
-// ==========================================================
-// SEÇÃO MINHA FAMÍLIA
-// ==========================================================
-
 function injectFamilySection() {
-    if (
-        document.getElementById(
-            'familia'
-        )
-    ) {
+    if (document.getElementById('familia')) {
         return;
     }
 
     const archiveSection =
-        document.getElementById(
-            'acervo'
-        );
+        document.getElementById('acervo');
 
     if (!archiveSection) {
         return;
     }
 
     const section =
-        document.createElement(
-            'section'
-        );
+        document.createElement('section');
 
-    section.id =
-        'familia';
-
-    section.className =
-        'mi-family-section';
+    section.id = 'familia';
+    section.className = 'mi-family-section';
 
     section.innerHTML = `
-
         <div class="container">
 
             <h2 class="section-title">
@@ -1131,7 +876,6 @@ function injectFamilySection() {
                     id="miAddPersonButton"
                 >
                     <i class="fas fa-user-plus"></i>
-
                     Adicionar familiar
                 </button>
 
@@ -1144,14 +888,12 @@ function injectFamilySection() {
             ></div>
 
         </div>
-
     `;
 
-    archiveSection
-        .insertAdjacentElement(
-            'afterend',
-            section
-        );
+    archiveSection.insertAdjacentElement(
+        'afterend',
+        section
+    );
 }
 
 
@@ -1161,23 +903,16 @@ function injectFamilySection() {
 
 function injectFamilyModal() {
     if (
-        document.getElementById(
-            'miFamilyBackdrop'
-        )
+        document.getElementById('miFamilyBackdrop')
     ) {
         return;
     }
 
     const backdrop =
-        document.createElement(
-            'div'
-        );
+        document.createElement('div');
 
-    backdrop.id =
-        'miFamilyBackdrop';
-
-    backdrop.className =
-        'mi-family-backdrop';
+    backdrop.id = 'miFamilyBackdrop';
+    backdrop.className = 'mi-family-backdrop';
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -1185,7 +920,6 @@ function injectFamilyModal() {
     );
 
     backdrop.innerHTML = `
-
         <div
             class="mi-family-modal"
             role="dialog"
@@ -1222,7 +956,6 @@ function injectFamilyModal() {
                 <div class="mi-family-form-grid">
 
                     <div class="mi-family-field">
-
                         <label for="miPersonFirstName">
                             Nome *
                         </label>
@@ -1233,11 +966,9 @@ function injectFamilyModal() {
                             maxlength="100"
                             required
                         >
-
                     </div>
 
                     <div class="mi-family-field">
-
                         <label for="miPersonLastName">
                             Sobrenome
                         </label>
@@ -1247,11 +978,9 @@ function injectFamilyModal() {
                             id="miPersonLastName"
                             maxlength="100"
                         >
-
                     </div>
 
                     <div class="mi-family-field">
-
                         <label for="miPersonPreferredName">
                             Nome pelo qual era conhecido(a)
                         </label>
@@ -1261,11 +990,9 @@ function injectFamilyModal() {
                             id="miPersonPreferredName"
                             maxlength="100"
                         >
-
                     </div>
 
                     <div class="mi-family-field">
-
                         <label for="miPersonBirthDate">
                             Data de nascimento
                         </label>
@@ -1274,11 +1001,9 @@ function injectFamilyModal() {
                             type="date"
                             id="miPersonBirthDate"
                         >
-
                     </div>
 
                     <div class="mi-family-field full">
-
                         <label for="miPersonBirthPlace">
                             Local de nascimento
                         </label>
@@ -1289,11 +1014,9 @@ function injectFamilyModal() {
                             maxlength="160"
                             placeholder="Ex.: Rio de Janeiro, RJ"
                         >
-
                     </div>
 
                     <div class="mi-family-field full">
-
                         <label for="miPersonBiography">
                             Breve descrição
                         </label>
@@ -1303,7 +1026,6 @@ function injectFamilyModal() {
                             maxlength="1000"
                             placeholder="Ex.: Avó materna, professora, conhecida pelas histórias da infância..."
                         ></textarea>
-
                     </div>
 
                 </div>
@@ -1325,12 +1047,9 @@ function injectFamilyModal() {
             </form>
 
         </div>
-
     `;
 
-    document.body.appendChild(
-        backdrop
-    );
+    document.body.appendChild(backdrop);
 }
 
 
@@ -1340,23 +1059,16 @@ function injectFamilyModal() {
 
 function injectPersonProfileModal() {
     if (
-        document.getElementById(
-            'miProfileBackdrop'
-        )
+        document.getElementById('miProfileBackdrop')
     ) {
         return;
     }
 
     const backdrop =
-        document.createElement(
-            'div'
-        );
+        document.createElement('div');
 
-    backdrop.id =
-        'miProfileBackdrop';
-
-    backdrop.className =
-        'mi-profile-backdrop';
+    backdrop.id = 'miProfileBackdrop';
+    backdrop.className = 'mi-profile-backdrop';
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -1364,7 +1076,6 @@ function injectPersonProfileModal() {
     );
 
     backdrop.innerHTML = `
-
         <div
             class="mi-profile-modal"
             role="dialog"
@@ -1381,13 +1092,11 @@ function injectPersonProfileModal() {
                 <i class="fas fa-xmark"></i>
             </button>
 
-
             <div class="mi-profile-header">
 
                 <div class="mi-profile-avatar">
                     <i class="fas fa-user"></i>
                 </div>
-
 
                 <div class="mi-profile-title">
 
@@ -1409,9 +1118,7 @@ function injectPersonProfileModal() {
 
             </div>
 
-
             <div class="mi-profile-content">
-
 
                 <div class="mi-profile-section">
 
@@ -1420,12 +1127,9 @@ function injectPersonProfileModal() {
                         Informações
                     </h3>
 
-
                     <div class="mi-profile-details">
 
-
                         <div class="mi-profile-detail">
-
                             <span class="mi-profile-detail-label">
                                 Nome completo
                             </span>
@@ -1434,12 +1138,9 @@ function injectPersonProfileModal() {
                                 class="mi-profile-detail-value"
                                 id="miProfileFullName"
                             ></span>
-
                         </div>
 
-
                         <div class="mi-profile-detail">
-
                             <span class="mi-profile-detail-label">
                                 Nascimento
                             </span>
@@ -1448,12 +1149,9 @@ function injectPersonProfileModal() {
                                 class="mi-profile-detail-value"
                                 id="miProfileBirthDate"
                             ></span>
-
                         </div>
 
-
                         <div class="mi-profile-detail">
-
                             <span class="mi-profile-detail-label">
                                 Local de nascimento
                             </span>
@@ -1462,12 +1160,9 @@ function injectPersonProfileModal() {
                                 class="mi-profile-detail-value"
                                 id="miProfileBirthPlace"
                             ></span>
-
                         </div>
 
-
                         <div class="mi-profile-detail">
-
                             <span class="mi-profile-detail-label">
                                 Falecimento
                             </span>
@@ -1476,14 +1171,11 @@ function injectPersonProfileModal() {
                                 class="mi-profile-detail-value"
                                 id="miProfileDeathDate"
                             ></span>
-
                         </div>
-
 
                     </div>
 
                 </div>
-
 
                 <div class="mi-profile-section">
 
@@ -1499,9 +1191,26 @@ function injectPersonProfileModal() {
 
                 </div>
 
+                <div class="mi-profile-section">
+
+                    <h3>
+                        <i class="fas fa-clock-rotate-left"></i>
+                        Memórias desta pessoa
+                    </h3>
+
+                    <div
+                        class="mi-profile-memories"
+                        id="miProfileMemories"
+                        aria-live="polite"
+                    >
+                        <div class="mi-profile-memory-state">
+                            Abra um perfil para carregar as memórias.
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
-
 
             <div class="mi-profile-actions">
 
@@ -1511,10 +1220,8 @@ function injectPersonProfileModal() {
                     id="miProfileBack"
                 >
                     <i class="fas fa-arrow-left"></i>
-
                     Voltar para Minha Família
                 </button>
-
 
                 <button
                     type="button"
@@ -1522,19 +1229,15 @@ function injectPersonProfileModal() {
                     id="miProfileEdit"
                 >
                     <i class="fas fa-pen"></i>
-
                     Editar familiar
                 </button>
 
             </div>
 
         </div>
-
     `;
 
-    document.body.appendChild(
-        backdrop
-    );
+    document.body.appendChild(backdrop);
 }
 
 
@@ -1545,89 +1248,55 @@ function injectPersonProfileModal() {
 function getFamilyElements() {
     return {
         grid:
-            document.getElementById(
-                'miFamilyGrid'
-            ),
+            document.getElementById('miFamilyGrid'),
 
         summary:
-            document.getElementById(
-                'miFamilySummary'
-            ),
+            document.getElementById('miFamilySummary'),
 
         intro:
-            document.getElementById(
-                'miFamilyIntro'
-            ),
+            document.getElementById('miFamilyIntro'),
 
         addButton:
-            document.getElementById(
-                'miAddPersonButton'
-            ),
+            document.getElementById('miAddPersonButton'),
 
         backdrop:
-            document.getElementById(
-                'miFamilyBackdrop'
-            ),
+            document.getElementById('miFamilyBackdrop'),
 
         close:
-            document.getElementById(
-                'miFamilyClose'
-            ),
+            document.getElementById('miFamilyClose'),
 
         form:
-            document.getElementById(
-                'miFamilyForm'
-            ),
+            document.getElementById('miFamilyForm'),
 
         modalTitle:
-            document.getElementById(
-                'miFamilyModalTitle'
-            ),
+            document.getElementById('miFamilyModalTitle'),
 
         modalIntro:
-            document.getElementById(
-                'miFamilyModalIntro'
-            ),
+            document.getElementById('miFamilyModalIntro'),
 
         firstName:
-            document.getElementById(
-                'miPersonFirstName'
-            ),
+            document.getElementById('miPersonFirstName'),
 
         lastName:
-            document.getElementById(
-                'miPersonLastName'
-            ),
+            document.getElementById('miPersonLastName'),
 
         preferredName:
-            document.getElementById(
-                'miPersonPreferredName'
-            ),
+            document.getElementById('miPersonPreferredName'),
 
         birthDate:
-            document.getElementById(
-                'miPersonBirthDate'
-            ),
+            document.getElementById('miPersonBirthDate'),
 
         birthPlace:
-            document.getElementById(
-                'miPersonBirthPlace'
-            ),
+            document.getElementById('miPersonBirthPlace'),
 
         biography:
-            document.getElementById(
-                'miPersonBiography'
-            ),
+            document.getElementById('miPersonBiography'),
 
         message:
-            document.getElementById(
-                'miFamilyMessage'
-            ),
+            document.getElementById('miFamilyMessage'),
 
         submit:
-            document.getElementById(
-                'miFamilySubmit'
-            )
+            document.getElementById('miFamilySubmit')
     };
 }
 
@@ -1635,106 +1304,53 @@ function getFamilyElements() {
 function getProfileElements() {
     return {
         backdrop:
-            document.getElementById(
-                'miProfileBackdrop'
-            ),
+            document.getElementById('miProfileBackdrop'),
 
         close:
-            document.getElementById(
-                'miProfileClose'
-            ),
+            document.getElementById('miProfileClose'),
 
         back:
-            document.getElementById(
-                'miProfileBack'
-            ),
+            document.getElementById('miProfileBack'),
 
         edit:
-            document.getElementById(
-                'miProfileEdit'
-            ),
+            document.getElementById('miProfileEdit'),
 
         name:
-            document.getElementById(
-                'miProfileName'
-            ),
+            document.getElementById('miProfileName'),
 
         preferred:
-            document.getElementById(
-                'miProfilePreferred'
-            ),
+            document.getElementById('miProfilePreferred'),
 
         family:
-            document.getElementById(
-                'miProfileFamily'
-            ),
+            document.getElementById('miProfileFamily'),
 
         fullName:
-            document.getElementById(
-                'miProfileFullName'
-            ),
+            document.getElementById('miProfileFullName'),
 
         birthDate:
-            document.getElementById(
-                'miProfileBirthDate'
-            ),
+            document.getElementById('miProfileBirthDate'),
 
         birthPlace:
-            document.getElementById(
-                'miProfileBirthPlace'
-            ),
+            document.getElementById('miProfileBirthPlace'),
 
         deathDate:
-            document.getElementById(
-                'miProfileDeathDate'
-            ),
+            document.getElementById('miProfileDeathDate'),
 
         biography:
-            document.getElementById(
-                'miProfileBiography'
-            )
+            document.getElementById('miProfileBiography'),
+
+        memories:
+            document.getElementById('miProfileMemories')
     };
 }
 
 
 // ==========================================================
-// VALOR DO PERFIL
-// ==========================================================
-
-function setProfileValue(
-    element,
-    value
-) {
-    if (!element) {
-        return;
-    }
-
-    if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ''
-    ) {
-        element.innerHTML = `
-            <span class="mi-profile-empty-value">
-                Não informado
-            </span>
-        `;
-
-        return;
-    }
-
-    element.textContent =
-        value;
-}
-
-
-// ==========================================================
-// RESET DO FORMULÁRIO
+// FORMULÁRIO
 // ==========================================================
 
 function resetFamilyFormState() {
-    editingPersonId =
-        null;
+    editingPersonId = null;
 
     const {
         form,
@@ -1742,8 +1358,7 @@ function resetFamilyFormState() {
         modalIntro,
         submit,
         message
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     form?.reset();
 
@@ -1763,18 +1378,31 @@ function resetFamilyFormState() {
     }
 
     if (message) {
-        message.textContent =
-            '';
-
+        message.textContent = '';
         message.className =
             'mi-family-message';
     }
 }
 
 
-// ==========================================================
-// ABRIR MODAL PARA CADASTRO
-// ==========================================================
+function showFamilyMessage(
+    text,
+    type = 'error'
+) {
+    const {
+        message
+    } = getFamilyElements();
+
+    if (!message) {
+        return;
+    }
+
+    message.textContent = text;
+
+    message.className =
+        `mi-family-message is-visible ${type}`;
+}
+
 
 function openFamilyModal() {
     if (
@@ -1793,16 +1421,13 @@ function openFamilyModal() {
     const {
         backdrop,
         firstName
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     if (!backdrop) {
         return;
     }
 
-    backdrop.classList.add(
-        'is-open'
-    );
+    backdrop.classList.add('is-open');
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -1818,18 +1443,11 @@ function openFamilyModal() {
 }
 
 
-// ==========================================================
-// ABRIR MODAL PARA EDIÇÃO
-// ==========================================================
-
 function openEditPersonModal(personId) {
     const person =
         familyPeople.find(
             function (item) {
-                return (
-                    item.id ===
-                    personId
-                );
+                return item.id === personId;
             }
         );
 
@@ -1855,15 +1473,13 @@ function openEditPersonModal(personId) {
         biography,
         submit,
         message
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     if (!backdrop) {
         return;
     }
 
-    editingPersonId =
-        person.id;
+    editingPersonId = person.id;
 
     if (modalTitle) {
         modalTitle.textContent =
@@ -1911,16 +1527,12 @@ function openEditPersonModal(personId) {
     }
 
     if (message) {
-        message.textContent =
-            '';
-
+        message.textContent = '';
         message.className =
             'mi-family-message';
     }
 
-    backdrop.classList.add(
-        'is-open'
-    );
+    backdrop.classList.add('is-open');
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -1936,23 +1548,16 @@ function openEditPersonModal(personId) {
 }
 
 
-// ==========================================================
-// FECHAR MODAL CADASTRO/EDIÇÃO
-// ==========================================================
-
 function closeFamilyModal() {
     const {
         backdrop
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     if (!backdrop) {
         return;
     }
 
-    backdrop.classList.remove(
-        'is-open'
-    );
+    backdrop.classList.remove('is-open');
 
     backdrop.setAttribute(
         'aria-hidden',
@@ -1964,17 +1569,231 @@ function closeFamilyModal() {
 
 
 // ==========================================================
-// ABRIR PERFIL
+// PERFIL — MEMÓRIAS
 // ==========================================================
 
-function openPersonProfile(personId) {
+function renderProfileMemories(memories) {
+    const {
+        memories: container
+    } = getProfileElements();
+
+    if (!container) {
+        return;
+    }
+
+    if (
+        !Array.isArray(memories) ||
+        memories.length === 0
+    ) {
+        container.innerHTML = `
+            <div class="mi-profile-memory-state">
+                <i class="fas fa-book-open"></i>
+                Nenhuma memória vinculada a esta pessoa ainda.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = '';
+
+    memories.forEach(
+        function (memory) {
+            const card =
+                document.createElement('article');
+
+            card.className =
+                'mi-profile-memory';
+
+            const story =
+                String(
+                    memory.story || ''
+                ).trim();
+
+            const excerpt =
+                story.length > 240
+                    ? `${story.slice(0, 240).trim()}…`
+                    : story;
+
+            const period =
+                String(
+                    memory.period_text || ''
+                ).trim();
+
+            const createdAt =
+                familyFormatDateTime(
+                    memory.created_at
+                );
+
+            const meta =
+                [period, createdAt]
+                    .filter(Boolean)
+                    .join(' • ');
+
+            card.innerHTML = `
+                <div class="mi-profile-memory-top">
+
+                    <h4>
+                        ${familyEscapeHTML(
+                            memory.title ||
+                            'Memória sem título'
+                        )}
+                    </h4>
+
+                    <span class="mi-profile-memory-category">
+                        ${familyEscapeHTML(
+                            memory.category ||
+                            'Outras'
+                        )}
+                    </span>
+
+                </div>
+
+                ${
+                    meta
+                        ? `
+                            <div class="mi-profile-memory-meta">
+                                ${familyEscapeHTML(meta)}
+                            </div>
+                        `
+                        : ''
+                }
+
+                <div class="mi-profile-memory-story">
+                    ${
+                        excerpt
+                            ? familyEscapeHTML(excerpt)
+                            : `
+                                <span class="mi-profile-empty-value">
+                                    Sem texto registrado.
+                                </span>
+                            `
+                    }
+                </div>
+            `;
+
+            container.appendChild(card);
+        }
+    );
+}
+
+
+async function loadProfileMemories(personId) {
+    const supabase =
+        getFamilySupabase();
+
+    const familyId =
+        getFamilyActiveFamilyId();
+
+    const {
+        memories: container
+    } = getProfileElements();
+
+    if (!container) {
+        return;
+    }
+
+    if (
+        !supabase ||
+        !personId ||
+        !familyId
+    ) {
+        renderProfileMemories([]);
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="mi-profile-memory-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            Carregando memórias...
+        </div>
+    `;
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from('memory_people')
+            .select(`
+                memory_id,
+                role,
+                memories (
+                    id,
+                    family_id,
+                    title,
+                    story,
+                    category,
+                    period_text,
+                    created_at
+                )
+            `)
+            .eq(
+                'person_id',
+                personId
+            );
+
+    if (error) {
+        console.error(
+            'Erro ao carregar memórias da pessoa:',
+            error
+        );
+
+        container.innerHTML = `
+            <div class="mi-profile-memory-state">
+                <i class="fas fa-circle-exclamation"></i>
+                Não foi possível carregar as memórias desta pessoa.
+            </div>
+        `;
+
+        return;
+    }
+
+    const memories =
+        (data || [])
+            .map(
+                function (relation) {
+                    return (
+                        relation.memories ||
+                        null
+                    );
+                }
+            )
+            .filter(
+                function (memory) {
+                    return (
+                        memory &&
+                        memory.family_id ===
+                            familyId
+                    );
+                }
+            )
+            .sort(
+                function (a, b) {
+                    return (
+                        new Date(
+                            b.created_at
+                        ).getTime() -
+                        new Date(
+                            a.created_at
+                        ).getTime()
+                    );
+                }
+            );
+
+    renderProfileMemories(memories);
+}
+
+
+// ==========================================================
+// PERFIL
+// ==========================================================
+
+async function openPersonProfile(personId) {
     const person =
         familyPeople.find(
             function (item) {
-                return (
-                    item.id ===
-                    personId
-                );
+                return item.id === personId;
             }
         );
 
@@ -1986,8 +1805,7 @@ function openPersonProfile(personId) {
         return;
     }
 
-    viewingPersonId =
-        person.id;
+    viewingPersonId = person.id;
 
     const {
         backdrop,
@@ -1999,22 +1817,17 @@ function openPersonProfile(personId) {
         birthPlace,
         deathDate,
         biography
-    } =
-        getProfileElements();
+    } = getProfileElements();
 
     if (!backdrop) {
         return;
     }
 
     const completeName =
-        familyFullName(
-            person
-        );
+        familyFullName(person);
 
     const displayName =
-        familyDisplayName(
-            person
-        );
+        familyDisplayName(person);
 
     if (name) {
         name.textContent =
@@ -2024,17 +1837,11 @@ function openPersonProfile(personId) {
     }
 
     if (preferred) {
-        if (
+        preferred.textContent =
             person.preferred_name &&
-            person.preferred_name !==
-                completeName
-        ) {
-            preferred.textContent =
-                `Conhecido(a) como ${person.preferred_name}`;
-        } else {
-            preferred.textContent =
-                '';
-        }
+            person.preferred_name !== completeName
+                ? `Conhecido(a) como ${person.preferred_name}`
+                : '';
     }
 
     if (family) {
@@ -2075,67 +1882,45 @@ function openPersonProfile(personId) {
         person.biography
     );
 
-    backdrop.classList.add(
-        'is-open'
-    );
+    backdrop.classList.add('is-open');
 
     backdrop.setAttribute(
         'aria-hidden',
         'false'
     );
+
+    await loadProfileMemories(
+        person.id
+    );
 }
 
 
-// ==========================================================
-// FECHAR PERFIL
-// ==========================================================
-
 function closePersonProfile() {
     const {
-        backdrop
-    } =
-        getProfileElements();
+        backdrop,
+        memories
+    } = getProfileElements();
 
     if (!backdrop) {
         return;
     }
 
-    backdrop.classList.remove(
-        'is-open'
-    );
+    backdrop.classList.remove('is-open');
 
     backdrop.setAttribute(
         'aria-hidden',
         'true'
     );
 
-    viewingPersonId =
-        null;
-}
-
-
-// ==========================================================
-// MENSAGEM
-// ==========================================================
-
-function showFamilyMessage(
-    text,
-    type = 'error'
-) {
-    const {
-        message
-    } =
-        getFamilyElements();
-
-    if (!message) {
-        return;
+    if (memories) {
+        memories.innerHTML = `
+            <div class="mi-profile-memory-state">
+                Abra um perfil para carregar as memórias.
+            </div>
+        `;
     }
 
-    message.textContent =
-        text;
-
-    message.className =
-        `mi-family-message is-visible ${type}`;
+    viewingPersonId = null;
 }
 
 
@@ -2145,9 +1930,7 @@ function showFamilyMessage(
 
 function ensureMemoryPersonAutocomplete() {
     const memoryPerson =
-        document.getElementById(
-            'memoryPerson'
-        );
+        document.getElementById('memoryPerson');
 
     if (!memoryPerson) {
         return;
@@ -2160,16 +1943,12 @@ function ensureMemoryPersonAutocomplete() {
 
     if (!dataList) {
         dataList =
-            document.createElement(
-                'datalist'
-            );
+            document.createElement('datalist');
 
         dataList.id =
             'miFamilyPeopleList';
 
-        document.body.appendChild(
-            dataList
-        );
+        document.body.appendChild(dataList);
     }
 
     memoryPerson.setAttribute(
@@ -2189,41 +1968,29 @@ function ensureMemoryPersonAutocomplete() {
             : 'Digite o nome da pessoa'
     );
 
-    dataList.innerHTML =
-        '';
+    dataList.innerHTML = '';
 
     familyPeople.forEach(
         function (person) {
             const name =
-                familyFullName(
-                    person
-                ) ||
-                familyDisplayName(
-                    person
-                );
+                familyFullName(person) ||
+                familyDisplayName(person);
 
             if (!name) {
                 return;
             }
 
             const option =
-                document.createElement(
-                    'option'
-                );
+                document.createElement('option');
 
-            option.value =
-                name;
+            option.value = name;
 
-            if (
-                person.preferred_name
-            ) {
+            if (person.preferred_name) {
                 option.label =
                     `Conhecido(a) como ${person.preferred_name}`;
             }
 
-            dataList.appendChild(
-                option
-            );
+            dataList.appendChild(option);
         }
     );
 
@@ -2231,24 +1998,16 @@ function ensureMemoryPersonAutocomplete() {
 }
 
 
-// ==========================================================
-// AJUDA ABAIXO DO CAMPO PESSOA
-// ==========================================================
-
 function ensureMemoryPersonHelp() {
     const memoryPerson =
-        document.getElementById(
-            'memoryPerson'
-        );
+        document.getElementById('memoryPerson');
 
     if (!memoryPerson) {
         return;
     }
 
     const formGroup =
-        memoryPerson.closest(
-            '.form-group'
-        );
+        memoryPerson.closest('.form-group');
 
     if (
         !formGroup ||
@@ -2260,9 +2019,7 @@ function ensureMemoryPersonHelp() {
     }
 
     const helper =
-        document.createElement(
-            'div'
-        );
+        document.createElement('div');
 
     helper.id =
         'miMemoryPersonHelp';
@@ -2271,12 +2028,9 @@ function ensureMemoryPersonHelp() {
         'mi-memory-person-help';
 
     helper.innerHTML = `
-
         <span id="miMemoryPersonHint">
-
             Selecione um familiar já cadastrado
             ou digite um novo nome.
-
         </span>
 
         <button
@@ -2285,30 +2039,20 @@ function ensureMemoryPersonHelp() {
             id="miMemoryPersonAdd"
         >
             <i class="fas fa-user-plus"></i>
-
             Cadastrar familiar
         </button>
-
     `;
 
-    formGroup.appendChild(
-        helper
-    );
+    formGroup.appendChild(helper);
 
     document
-        .getElementById(
-            'miMemoryPersonAdd'
-        )
+        .getElementById('miMemoryPersonAdd')
         ?.addEventListener(
             'click',
             openFamilyModal
         );
 }
 
-
-// ==========================================================
-// ATUALIZAR AUTOCOMPLETE
-// ==========================================================
 
 function refreshMemoryPersonAutocomplete() {
     ensureMemoryPersonAutocomplete();
@@ -2322,18 +2066,14 @@ function refreshMemoryPersonAutocomplete() {
         return;
     }
 
-    if (
-        !getFamilyCurrentUser()
-    ) {
+    if (!getFamilyCurrentUser()) {
         hint.textContent =
             'Entre em sua conta para selecionar pessoas do acervo familiar.';
 
         return;
     }
 
-    if (
-        familyPeople.length === 0
-    ) {
+    if (familyPeople.length === 0) {
         hint.textContent =
             'Nenhum familiar cadastrado ainda. Você pode digitar um nome ou cadastrar uma pessoa.';
 
@@ -2365,13 +2105,9 @@ async function loadFamilyPeople() {
         grid,
         summary,
         intro
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
-    if (
-        !grid ||
-        !summary
-    ) {
+    if (!grid || !summary) {
         return;
     }
 
@@ -2380,8 +2116,7 @@ async function loadFamilyPeople() {
         !user ||
         !familyId
     ) {
-        familyPeople =
-            [];
+        familyPeople = [];
 
         summary.textContent =
             'Entre em sua conta para acessar sua família.';
@@ -2392,15 +2127,12 @@ async function loadFamilyPeople() {
         }
 
         renderFamilyPeople();
-
         refreshMemoryPersonAutocomplete();
 
         return;
     }
 
-    familyLoading =
-        true;
-
+    familyLoading = true;
     renderFamilyPeople();
 
     const {
@@ -2408,9 +2140,7 @@ async function loadFamilyPeople() {
         error
     } =
         await supabase
-            .from(
-                'people'
-            )
+            .from('people')
             .select(`
                 id,
                 family_id,
@@ -2432,13 +2162,11 @@ async function loadFamilyPeople() {
             .order(
                 'first_name',
                 {
-                    ascending:
-                        true
+                    ascending: true
                 }
             );
 
-    familyLoading =
-        false;
+    familyLoading = false;
 
     if (error) {
         console.error(
@@ -2450,14 +2178,12 @@ async function loadFamilyPeople() {
             'Não foi possível carregar os familiares.';
 
         renderFamilyPeople();
-
         refreshMemoryPersonAutocomplete();
 
         return;
     }
 
-    familyPeople =
-        data || [];
+    familyPeople = data || [];
 
     if (intro) {
         intro.textContent =
@@ -2470,7 +2196,6 @@ async function loadFamilyPeople() {
             : `${familyPeople.length} pessoas cadastradas`;
 
     renderFamilyPeople();
-
     refreshMemoryPersonAutocomplete();
 
     window.dispatchEvent(
@@ -2479,7 +2204,7 @@ async function loadFamilyPeople() {
             {
                 detail: {
                     people:
-                        familyPeople
+                        [...familyPeople]
                 }
             }
         )
@@ -2488,14 +2213,13 @@ async function loadFamilyPeople() {
 
 
 // ==========================================================
-// RENDER
+// RENDER DA FAMÍLIA
 // ==========================================================
 
 function renderFamilyPeople() {
     const {
         grid
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     if (!grid) {
         return;
@@ -2503,25 +2227,17 @@ function renderFamilyPeople() {
 
     if (familyLoading) {
         grid.innerHTML = `
-
             <div class="mi-family-loading">
-
                 <i class="fas fa-spinner fa-spin"></i>
-
                 Carregando sua família...
-
             </div>
-
         `;
 
         return;
     }
 
-    if (
-        familyPeople.length === 0
-    ) {
+    if (familyPeople.length === 0) {
         grid.innerHTML = `
-
             <div class="mi-family-empty">
 
                 <i class="fas fa-users"></i>
@@ -2536,63 +2252,46 @@ function renderFamilyPeople() {
                 </p>
 
             </div>
-
         `;
 
         return;
     }
 
-    grid.innerHTML =
-        '';
+    grid.innerHTML = '';
 
     familyPeople.forEach(
         function (person) {
             const card =
-                document.createElement(
-                    'article'
-                );
+                document.createElement('article');
 
             card.className =
                 'mi-person-card';
 
             const displayName =
-                familyDisplayName(
-                    person
-                );
+                familyDisplayName(person);
 
             const fullName =
-                familyFullName(
-                    person
-                );
+                familyFullName(person);
 
             const preferredLine =
                 person.preferred_name &&
-                person.preferred_name !==
-                    fullName
+                person.preferred_name !== fullName
                     ? `
                         <div class="mi-person-preferred">
-
                             ${familyEscapeHTML(
                                 person.preferred_name
                             )}
-
                         </div>
                     `
                     : '';
 
             const fullNameLine =
                 fullName &&
-                displayName !==
-                    fullName
+                displayName !== fullName
                     ? `
                         <div>
-
                             <i class="fas fa-id-card"></i>
-
-                            ${familyEscapeHTML(
-                                fullName
-                            )}
-
+                            ${familyEscapeHTML(fullName)}
                         </div>
                     `
                     : '';
@@ -2601,17 +2300,13 @@ function renderFamilyPeople() {
                 person.birth_date
                     ? `
                         <div>
-
                             <i class="fas fa-cake-candles"></i>
-
                             Nascimento:
-
                             ${familyEscapeHTML(
                                 familyFormatDate(
                                     person.birth_date
                                 )
                             )}
-
                         </div>
                     `
                     : '';
@@ -2620,13 +2315,10 @@ function renderFamilyPeople() {
                 person.birth_place
                     ? `
                         <div>
-
                             <i class="fas fa-location-dot"></i>
-
                             ${familyEscapeHTML(
                                 person.birth_place
                             )}
-
                         </div>
                     `
                     : '';
@@ -2635,50 +2327,31 @@ function renderFamilyPeople() {
                 person.biography
                     ? `
                         <div>
-
                             <i class="fas fa-book-open"></i>
-
                             ${familyEscapeHTML(
                                 person.biography
                             )}
-
                         </div>
                     `
                     : '';
 
             card.innerHTML = `
-
                 <div class="mi-person-avatar">
-
                     <i class="fas fa-user"></i>
-
                 </div>
 
-
                 <h3>
-
-                    ${familyEscapeHTML(
-                        displayName
-                    )}
-
+                    ${familyEscapeHTML(displayName)}
                 </h3>
-
 
                 ${preferredLine}
 
-
                 <div class="mi-person-meta">
-
                     ${fullNameLine}
-
                     ${birthLine}
-
                     ${placeLine}
-
                     ${biographyLine}
-
                 </div>
-
 
                 <div class="mi-person-actions">
 
@@ -2690,10 +2363,8 @@ function renderFamilyPeople() {
                         )}"
                     >
                         <i class="fas fa-user"></i>
-
                         Ver perfil
                     </button>
-
 
                     <button
                         type="button"
@@ -2703,18 +2374,14 @@ function renderFamilyPeople() {
                         )}"
                     >
                         <i class="fas fa-pen"></i>
-
                         Editar
                     </button>
 
                 </div>
-
             `;
 
             card
-                .querySelector(
-                    '[data-view-person]'
-                )
+                .querySelector('[data-view-person]')
                 ?.addEventListener(
                     'click',
                     function () {
@@ -2725,9 +2392,7 @@ function renderFamilyPeople() {
                 );
 
             card
-                .querySelector(
-                    '[data-edit-person]'
-                )
+                .querySelector('[data-edit-person]')
                 ?.addEventListener(
                     'click',
                     function () {
@@ -2737,21 +2402,17 @@ function renderFamilyPeople() {
                     }
                 );
 
-            grid.appendChild(
-                card
-            );
+            grid.appendChild(card);
         }
     );
 }
 
 
 // ==========================================================
-// SUBMIT — CADASTRO OU EDIÇÃO
+// SALVAR FAMILIAR
 // ==========================================================
 
-async function handleFamilySubmit(
-    event
-) {
+async function handleFamilySubmit(event) {
     event.preventDefault();
 
     const supabase =
@@ -2771,8 +2432,7 @@ async function handleFamilySubmit(
         birthPlace,
         biography,
         submit
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     if (
         !supabase ||
@@ -2787,33 +2447,22 @@ async function handleFamilySubmit(
     }
 
     const first =
-        firstName?.value
-            .trim() ||
-        '';
+        firstName?.value.trim() || '';
 
     const last =
-        lastName?.value
-            .trim() ||
-        '';
+        lastName?.value.trim() || '';
 
     const preferred =
-        preferredName?.value
-            .trim() ||
-        '';
+        preferredName?.value.trim() || '';
 
     const birth =
-        birthDate?.value ||
-        null;
+        birthDate?.value || null;
 
     const place =
-        birthPlace?.value
-            .trim() ||
-        '';
+        birthPlace?.value.trim() || '';
 
     const bio =
-        biography?.value
-            .trim() ||
-        '';
+        biography?.value.trim() || '';
 
     if (!first) {
         showFamilyMessage(
@@ -2838,24 +2487,16 @@ async function handleFamilySubmit(
     }
 
     if (submit) {
-        submit.disabled =
-            true;
+        submit.disabled = true;
     }
 
     try {
-
-        // ==================================================
-        // EDIÇÃO
-        // ==================================================
-
         if (editingPersonId) {
             const {
                 error
             } =
                 await supabase
-                    .from(
-                        'people'
-                    )
+                    .from('people')
                     .update({
                         first_name:
                             first,
@@ -2903,19 +2544,12 @@ async function handleFamilySubmit(
             return;
         }
 
-
-        // ==================================================
-        // CADASTRO
-        // ==================================================
-
         const {
             data,
             error
         } =
             await supabase
-                .from(
-                    'people'
-                )
+                .from('people')
                 .insert({
                     family_id:
                         familyId,
@@ -2978,12 +2612,8 @@ async function handleFamilySubmit(
             data
         ) {
             memoryPerson.value =
-                familyFullName(
-                    data
-                ) ||
-                familyDisplayName(
-                    data
-                );
+                familyFullName(data) ||
+                familyDisplayName(data);
         }
 
         setTimeout(
@@ -3005,8 +2635,7 @@ async function handleFamilySubmit(
 
     } finally {
         if (submit) {
-            submit.disabled =
-                false;
+            submit.disabled = false;
         }
     }
 }
@@ -3022,89 +2651,72 @@ function bindFamilyEvents() {
         close,
         backdrop,
         form
-    } =
-        getFamilyElements();
+    } = getFamilyElements();
 
     const profile =
         getProfileElements();
 
-    addButton
-        ?.addEventListener(
-            'click',
-            openFamilyModal
-        );
+    addButton?.addEventListener(
+        'click',
+        openFamilyModal
+    );
 
-    close
-        ?.addEventListener(
-            'click',
-            closeFamilyModal
-        );
+    close?.addEventListener(
+        'click',
+        closeFamilyModal
+    );
 
-    form
-        ?.addEventListener(
-            'submit',
-            handleFamilySubmit
-        );
+    form?.addEventListener(
+        'submit',
+        handleFamilySubmit
+    );
 
-    backdrop
-        ?.addEventListener(
-            'click',
-            function (event) {
-                if (
-                    event.target ===
-                    backdrop
-                ) {
-                    closeFamilyModal();
-                }
+    backdrop?.addEventListener(
+        'click',
+        function (event) {
+            if (event.target === backdrop) {
+                closeFamilyModal();
             }
-        );
+        }
+    );
 
-    profile.close
-        ?.addEventListener(
-            'click',
-            closePersonProfile
-        );
+    profile.close?.addEventListener(
+        'click',
+        closePersonProfile
+    );
 
-    profile.back
-        ?.addEventListener(
-            'click',
-            closePersonProfile
-        );
+    profile.back?.addEventListener(
+        'click',
+        closePersonProfile
+    );
 
-    profile.edit
-        ?.addEventListener(
-            'click',
-            function () {
-                if (
+    profile.edit?.addEventListener(
+        'click',
+        function () {
+            if (viewingPersonId) {
+                openEditPersonModal(
                     viewingPersonId
-                ) {
-                    openEditPersonModal(
-                        viewingPersonId
-                    );
-                }
+                );
             }
-        );
+        }
+    );
 
-    profile.backdrop
-        ?.addEventListener(
-            'click',
-            function (event) {
-                if (
-                    event.target ===
-                    profile.backdrop
-                ) {
-                    closePersonProfile();
-                }
+    profile.backdrop?.addEventListener(
+        'click',
+        function (event) {
+            if (
+                event.target ===
+                profile.backdrop
+            ) {
+                closePersonProfile();
             }
-        );
+        }
+    );
 
     document.addEventListener(
         'keydown',
         function (event) {
-            if (
-                event.key !==
-                'Escape'
-            ) {
+            if (event.key !== 'Escape') {
                 return;
             }
 
@@ -3112,12 +2724,9 @@ function bindFamilyEvents() {
                 getProfileElements()
                     .backdrop
                     ?.classList
-                    .contains(
-                        'is-open'
-                    )
+                    .contains('is-open')
             ) {
                 closePersonProfile();
-
                 return;
             }
 
@@ -3132,27 +2741,18 @@ function bindFamilyEvents() {
 // ==========================================================
 
 async function initializeFamilyModule() {
-    if (
-        familyModuleInitialized
-    ) {
+    if (familyModuleInitialized) {
         return;
     }
 
-    familyModuleInitialized =
-        true;
+    familyModuleInitialized = true;
 
     injectFamilyStyles();
-
     injectFamilyNavLink();
-
     injectFamilySection();
-
     injectFamilyModal();
-
     injectPersonProfileModal();
-
     ensureMemoryPersonAutocomplete();
-
     bindFamilyEvents();
 
     await loadFamilyPeople();
@@ -3160,9 +2760,7 @@ async function initializeFamilyModule() {
     window.MemoriasInvisiveisFamily = {
         getPeople:
             function () {
-                return [
-                    ...familyPeople
-                ];
+                return [...familyPeople];
             },
 
         refresh:
@@ -3188,22 +2786,17 @@ window.addEventListener(
     'memorias-invisiveis:auth-ready',
     async function () {
         await initializeFamilyModule();
-
         await loadFamilyPeople();
     }
 );
-
 
 window.addEventListener(
     'memorias-invisiveis:auth-change',
     async function () {
         closePersonProfile();
 
-        if (
-            !familyModuleInitialized
-        ) {
+        if (!familyModuleInitialized) {
             await initializeFamilyModule();
-
             return;
         }
 
@@ -3216,10 +2809,7 @@ window.addEventListener(
 // START
 // ==========================================================
 
-if (
-    document.readyState ===
-    'loading'
-) {
+if (document.readyState === 'loading') {
     document.addEventListener(
         'DOMContentLoaded',
         async function () {
