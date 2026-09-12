@@ -1,6 +1,14 @@
 // ==========================================================
 // MEMÓRIAS INVISÍVEIS
-// FASE 7.4 — PERFIS, MEMÓRIAS E RELAÇÕES FAMILIARES
+// FASE 7.5 — NAVEGAÇÃO PESSOA ↔ PESSOA
+//
+// Inclui:
+// - Perfis familiares
+// - Memórias vinculadas
+// - Relações familiares
+// - Cadastro/edição de familiares
+// - Cadastro/remoção de relacionamentos
+// - Navegação direta entre perfis relacionados
 // ==========================================================
 
 let familyPeople = [];
@@ -734,14 +742,33 @@ function injectFamilyStyles() {
             gap: 16px;
         }
 
-        .mi-profile-memory h4,
-        .mi-relationship-card h4 {
+        .mi-profile-memory h4 {
             margin: 0;
             color: var(--primary);
             font-family:
                 'Playfair Display',
                 serif;
             font-size: 1rem;
+        }
+
+        .mi-related-person-button {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            color: var(--primary);
+            font-family:
+                'Playfair Display',
+                serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .mi-related-person-button:hover {
+            color: var(--accent);
+            text-decoration: underline;
         }
 
         .mi-profile-memory-category,
@@ -1790,7 +1817,7 @@ function getProfileElements() {
 
 
 // ==========================================================
-// MODAL FAMILIAR
+// FORMULÁRIO FAMILIAR
 // ==========================================================
 
 function resetFamilyFormState() {
@@ -2493,7 +2520,13 @@ function renderProfileRelationships(
                     class="mi-relationship-main"
                 >
 
-                    <h4>
+                    <button
+                        type="button"
+                        class="mi-related-person-button"
+                        data-related-person-id="${familyEscapeHTML(
+                            otherPerson.id
+                        )}"
+                    >
                         ${familyEscapeHTML(
                             familyDisplayName(
                                 otherPerson
@@ -2502,7 +2535,7 @@ function renderProfileRelationships(
                                 otherPerson
                             )
                         )}
-                    </h4>
+                    </button>
 
                     <div
                         class="mi-relationship-direction"
@@ -2541,6 +2574,18 @@ function renderProfileRelationships(
 
                 </div>
             `;
+
+            card.querySelector(
+                '[data-related-person-id]'
+            )
+                ?.addEventListener(
+                    'click',
+                    async function () {
+                        await openPersonProfile(
+                            otherPerson.id
+                        );
+                    }
+                );
 
             card.querySelector(
                 '[data-relationship-id]'
