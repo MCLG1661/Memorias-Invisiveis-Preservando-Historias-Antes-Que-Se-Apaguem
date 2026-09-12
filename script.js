@@ -1,19 +1,13 @@
-// ========================================================== 
+// ==========================================================
 // MEMÓRIAS INVISÍVEIS
-// MVP CLOUD
+// FASE 7.5 — NAVEGAÇÃO MEMÓRIA ↔ PESSOA
 //
 // Persistência:
 // - Visitante não autenticado -> localStorage
 // - Usuário autenticado       -> Supabase
 //
-// Modelo relacional:
-// families
-//    ↓
-// people
-//    ↓
-// memory_people
-//    ↓
-// memories
+// Integração relacional:
+// Pessoa ↔ Memória ↔ Pessoa
 // ==========================================================
 
 
@@ -46,44 +40,61 @@ const prompts = [
 // ELEMENTOS
 // ==========================================================
 
-const header = document.getElementById('header');
+const header =
+    document.getElementById('header');
 
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenuBtn =
+    document.getElementById('mobileMenuBtn');
 
-const navLinks = document.querySelector('.nav-links');
+const navLinks =
+    document.querySelector('.nav-links');
 
-const memoryForm = document.getElementById('memoryForm');
+const memoryForm =
+    document.getElementById('memoryForm');
 
-const memoryPerson = document.getElementById('memoryPerson');
+const memoryPerson =
+    document.getElementById('memoryPerson');
 
-const memoryPeriod = document.getElementById('memoryPeriod');
+const memoryPeriod =
+    document.getElementById('memoryPeriod');
 
-const memoryTitle = document.getElementById('memoryTitle');
+const memoryTitle =
+    document.getElementById('memoryTitle');
 
-const memoryCategory = document.getElementById('memoryCategory');
+const memoryCategory =
+    document.getElementById('memoryCategory');
 
-const memoryStory = document.getElementById('memoryStory');
+const memoryStory =
+    document.getElementById('memoryStory');
 
-const clearFormButton = document.getElementById('clearFormButton');
+const clearFormButton =
+    document.getElementById('clearFormButton');
 
-const formMessage = document.getElementById('formMessage');
+const formMessage =
+    document.getElementById('formMessage');
 
-const promptText = document.getElementById('promptText');
+const promptText =
+    document.getElementById('promptText');
 
-const newPromptButton = document.getElementById('newPromptButton');
+const newPromptButton =
+    document.getElementById('newPromptButton');
 
-const memorySearch = document.getElementById('memorySearch');
+const memorySearch =
+    document.getElementById('memorySearch');
 
-const categoryFilter = document.getElementById('categoryFilter');
+const categoryFilter =
+    document.getElementById('categoryFilter');
 
-const memoryArchive = document.getElementById('memoryArchive');
+const memoryArchive =
+    document.getElementById('memoryArchive');
 
 
 // ==========================================================
 // ESTADO
 // ==========================================================
 
-let memories = loadLocalMemories();
+let memories =
+    loadLocalMemories();
 
 let usingCloud = false;
 
@@ -93,16 +104,70 @@ let initializationStarted = false;
 
 
 // ==========================================================
-// SUPABASE / AUTH HELPERS
+// ESTILO DA NAVEGAÇÃO MEMÓRIA → PESSOA
+// ==========================================================
+
+function injectMemoryNavigationStyles() {
+    if (
+        document.getElementById(
+            'mi-memory-navigation-styles'
+        )
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement('style');
+
+    style.id =
+        'mi-memory-navigation-styles';
+
+    style.textContent = `
+        .memory-person-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .memory-person-button:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .memory-person-button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+
+// ==========================================================
+// SUPABASE / AUTH
 // ==========================================================
 
 function getAuthController() {
-    return window.MemoriasInvisiveisAuth || null;
+    return (
+        window.MemoriasInvisiveisAuth ||
+        null
+    );
 }
 
 
 function getCurrentUser() {
-    const auth = getAuthController();
+    const auth =
+        getAuthController();
 
     if (
         !auth ||
@@ -116,11 +181,13 @@ function getCurrentUser() {
 
 
 function getActiveFamily() {
-    const auth = getAuthController();
+    const auth =
+        getAuthController();
 
     if (
         !auth ||
-        typeof auth.getActiveFamily !== 'function'
+        typeof auth.getActiveFamily !==
+            'function'
     ) {
         return null;
     }
@@ -130,14 +197,16 @@ function getActiveFamily() {
 
 
 function getSupabaseClient() {
-    const auth = getAuthController();
-
-    return auth?.supabase || null;
+    return (
+        getAuthController()?.supabase ||
+        null
+    );
 }
 
 
 function getActiveFamilyId() {
-    const family = getActiveFamily();
+    const family =
+        getActiveFamily();
 
     return (
         family?.family_id ||
@@ -151,17 +220,24 @@ function getActiveFamilyId() {
 // HEADER
 // ==========================================================
 
-window.addEventListener('scroll', function () {
-    if (!header) {
-        return;
-    }
+window.addEventListener(
+    'scroll',
+    function () {
+        if (!header) {
+            return;
+        }
 
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
+        if (window.scrollY > 50) {
+            header.classList.add(
+                'scrolled'
+            );
+        } else {
+            header.classList.remove(
+                'scrolled'
+            );
+        }
     }
-});
+);
 
 
 // ==========================================================
@@ -176,23 +252,43 @@ if (
         'click',
         function () {
             const isOpen =
-                navLinks.style.display === 'flex';
+                navLinks.style.display ===
+                'flex';
 
             if (isOpen) {
                 closeMobileMenu();
                 return;
             }
 
-            navLinks.style.display = 'flex';
-            navLinks.style.flexDirection = 'column';
-            navLinks.style.position = 'absolute';
-            navLinks.style.top = '100%';
-            navLinks.style.left = '0';
-            navLinks.style.width = '100%';
-            navLinks.style.backgroundColor = 'var(--light)';
-            navLinks.style.padding = '30px';
-            navLinks.style.boxShadow = 'var(--shadow)';
-            navLinks.style.gap = '20px';
+            navLinks.style.display =
+                'flex';
+
+            navLinks.style.flexDirection =
+                'column';
+
+            navLinks.style.position =
+                'absolute';
+
+            navLinks.style.top =
+                '100%';
+
+            navLinks.style.left =
+                '0';
+
+            navLinks.style.width =
+                '100%';
+
+            navLinks.style.backgroundColor =
+                'var(--light)';
+
+            navLinks.style.padding =
+                '30px';
+
+            navLinks.style.boxShadow =
+                'var(--shadow)';
+
+            navLinks.style.gap =
+                '20px';
 
             mobileMenuBtn.setAttribute(
                 'aria-expanded',
@@ -211,8 +307,11 @@ function closeMobileMenu() {
         return;
     }
 
-    if (window.innerWidth <= 768) {
-        navLinks.style.display = 'none';
+    if (
+        window.innerWidth <= 768
+    ) {
+        navLinks.style.display =
+            'none';
 
         mobileMenuBtn.setAttribute(
             'aria-expanded',
@@ -232,17 +331,38 @@ window.addEventListener(
             return;
         }
 
-        if (window.innerWidth > 768) {
-            navLinks.style.display = '';
-            navLinks.style.flexDirection = '';
-            navLinks.style.position = '';
-            navLinks.style.top = '';
-            navLinks.style.left = '';
-            navLinks.style.width = '';
-            navLinks.style.backgroundColor = '';
-            navLinks.style.padding = '';
-            navLinks.style.boxShadow = '';
-            navLinks.style.gap = '';
+        if (
+            window.innerWidth > 768
+        ) {
+            navLinks.style.display =
+                '';
+
+            navLinks.style.flexDirection =
+                '';
+
+            navLinks.style.position =
+                '';
+
+            navLinks.style.top =
+                '';
+
+            navLinks.style.left =
+                '';
+
+            navLinks.style.width =
+                '';
+
+            navLinks.style.backgroundColor =
+                '';
+
+            navLinks.style.padding =
+                '';
+
+            navLinks.style.boxShadow =
+                '';
+
+            navLinks.style.gap =
+                '';
 
             mobileMenuBtn.setAttribute(
                 'aria-expanded',
@@ -258,41 +378,54 @@ window.addEventListener(
 // ==========================================================
 
 document
-    .querySelectorAll('a[href^="#"]')
-    .forEach(function (anchor) {
-        anchor.addEventListener(
-            'click',
-            function (event) {
-                const targetId =
-                    this.getAttribute('href');
+    .querySelectorAll(
+        'a[href^="#"]'
+    )
+    .forEach(
+        function (anchor) {
+            anchor.addEventListener(
+                'click',
+                function (event) {
+                    const targetId =
+                        this.getAttribute(
+                            'href'
+                        );
 
-                if (
-                    !targetId ||
-                    targetId === '#'
-                ) {
-                    return;
+                    if (
+                        !targetId ||
+                        targetId === '#'
+                    ) {
+                        return;
+                    }
+
+                    const targetElement =
+                        document.querySelector(
+                            targetId
+                        );
+
+                    if (
+                        !targetElement
+                    ) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    closeMobileMenu();
+
+                    window.scrollTo({
+                        top:
+                            targetElement
+                                .offsetTop -
+                            100,
+
+                        behavior:
+                            'smooth'
+                    });
                 }
-
-                const targetElement =
-                    document.querySelector(targetId);
-
-                if (!targetElement) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                closeMobileMenu();
-
-                window.scrollTo({
-                    top:
-                        targetElement.offsetTop -
-                        100,
-                    behavior: 'smooth'
-                });
-            }
-        );
-    });
+            );
+        }
+    );
 
 
 // ==========================================================
@@ -301,35 +434,44 @@ document
 
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin:
+        '0px 0px -50px 0px'
 };
 
 
-if ('IntersectionObserver' in window) {
+if (
+    'IntersectionObserver' in
+    window
+) {
     const observer =
         new IntersectionObserver(
             function (entries) {
                 entries.forEach(
                     function (entry) {
                         if (
-                            entry.isIntersecting
+                            !entry.isIntersecting
                         ) {
-                            entry.target.style.opacity =
-                                '1';
-
-                            entry.target.style.transform =
-                                'translateY(0)';
-
-                            observer.unobserve(
-                                entry.target
-                            );
+                            return;
                         }
+
+                        entry.target
+                            .style
+                            .opacity =
+                            '1';
+
+                        entry.target
+                            .style
+                            .transform =
+                            'translateY(0)';
+
+                        observer.unobserve(
+                            entry.target
+                        );
                     }
                 );
             },
             observerOptions
         );
-
 
     const animatedElements =
         document.querySelectorAll(
@@ -344,10 +486,10 @@ if ('IntersectionObserver' in window) {
             ].join(', ')
         );
 
-
     animatedElements.forEach(
         function (element) {
-            element.style.opacity = '0';
+            element.style.opacity =
+                '0';
 
             element.style.transform =
                 'translateY(20px)';
@@ -355,7 +497,9 @@ if ('IntersectionObserver' in window) {
             element.style.transition =
                 'opacity 0.6s ease, transform 0.6s ease';
 
-            observer.observe(element);
+            observer.observe(
+                element
+            );
         }
     );
 }
@@ -382,6 +526,7 @@ function loadLocalMemories() {
         return Array.isArray(parsed)
             ? parsed
             : [];
+
     } catch (error) {
         console.error(
             'Erro ao carregar memórias locais:',
@@ -397,10 +542,13 @@ function saveLocalMemories() {
     try {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify(memories)
+            JSON.stringify(
+                memories
+            )
         );
 
         return true;
+
     } catch (error) {
         console.error(
             'Erro ao salvar memórias locais:',
@@ -419,10 +567,13 @@ function saveLocalMemories() {
 function createMemoryId() {
     if (
         window.crypto &&
-        typeof window.crypto.randomUUID ===
+        typeof window.crypto
+            .randomUUID ===
             'function'
     ) {
-        return window.crypto.randomUUID();
+        return (
+            window.crypto.randomUUID()
+        );
     }
 
     return (
@@ -435,29 +586,36 @@ function createMemoryId() {
 
 
 // ==========================================================
-// NORMALIZAÇÃO DE TEXTO
+// NORMALIZAÇÃO
 // ==========================================================
 
 function normalizeText(value) {
     return String(value || '')
         .trim()
         .replace(/\s+/g, ' ')
-        .toLocaleLowerCase('pt-BR');
+        .toLocaleLowerCase(
+            'pt-BR'
+        );
 }
 
 
 // ==========================================================
-// NOME DA PESSOA
+// PESSOA
 // ==========================================================
 
-function getPersonDisplayName(person) {
+function getPersonDisplayName(
+    person
+) {
     if (!person) {
-        return 'Pessoa não vinculada';
+        return (
+            'Pessoa não vinculada'
+        );
     }
 
     const preferredName =
         String(
-            person.preferred_name || ''
+            person.preferred_name ||
+            ''
         ).trim();
 
     if (preferredName) {
@@ -466,16 +624,21 @@ function getPersonDisplayName(person) {
 
     const firstName =
         String(
-            person.first_name || ''
+            person.first_name ||
+            ''
         ).trim();
 
     const lastName =
         String(
-            person.last_name || ''
+            person.last_name ||
+            ''
         ).trim();
 
     const fullName =
-        [firstName, lastName]
+        [
+            firstName,
+            lastName
+        ]
             .filter(Boolean)
             .join(' ')
             .trim();
@@ -488,10 +651,65 @@ function getPersonDisplayName(person) {
 
 
 // ==========================================================
+// NAVEGAÇÃO MEMÓRIA → PESSOA
+// ==========================================================
+
+async function openPersonProfileFromMemory(
+    personId
+) {
+    if (!personId) {
+        return;
+    }
+
+    let familyController =
+        window.MemoriasInvisiveisFamily;
+
+    if (
+        !familyController ||
+        typeof familyController
+            .openPersonProfile !==
+            'function'
+    ) {
+        await new Promise(
+            function (resolve) {
+                setTimeout(
+                    resolve,
+                    150
+                );
+            }
+        );
+
+        familyController =
+            window.MemoriasInvisiveisFamily;
+    }
+
+    if (
+        !familyController ||
+        typeof familyController
+            .openPersonProfile !==
+            'function'
+    ) {
+        window.alert(
+            'O perfil familiar ainda não está disponível.'
+        );
+
+        return;
+    }
+
+    familyController
+        .openPersonProfile(
+            personId
+        );
+}
+
+
+// ==========================================================
 // DATA
 // ==========================================================
 
-function formatDate(dateString) {
+function formatDate(
+    dateString
+) {
     if (!dateString) {
         return '';
     }
@@ -524,7 +742,9 @@ function formatDate(dateString) {
 
 function escapeHTML(value) {
     const div =
-        document.createElement('div');
+        document.createElement(
+            'div'
+        );
 
     div.textContent =
         value ?? '';
@@ -558,7 +778,8 @@ function clearFormMessage() {
         return;
     }
 
-    formMessage.textContent = '';
+    formMessage.textContent =
+        '';
 
     formMessage.className =
         'form-message';
@@ -583,10 +804,12 @@ function clearMemoryForm() {
 
 
 // ==========================================================
-// NORMALIZAÇÃO DA MEMÓRIA DO SUPABASE
+// NORMALIZAÇÃO DA MEMÓRIA CLOUD
 // ==========================================================
 
-function normalizeCloudMemory(record) {
+function normalizeCloudMemory(
+    record
+) {
     const relations =
         Array.isArray(
             record.memory_people
@@ -594,29 +817,28 @@ function normalizeCloudMemory(record) {
             ? record.memory_people
             : [];
 
-
     const protagonistRelation =
         relations.find(
-            function (relation) {
+            function (
+                relation
+            ) {
                 return (
                     relation.role ===
                     'protagonist'
                 );
             }
-        )
-        ||
-        relations[0]
-        ||
+        ) ||
+        relations[0] ||
         null;
-
 
     const person =
-        protagonistRelation?.people ||
+        protagonistRelation
+            ?.people ||
         null;
 
-
     return {
-        id: record.id,
+        id:
+            record.id,
 
         person:
             getPersonDisplayName(
@@ -652,7 +874,7 @@ function normalizeCloudMemory(record) {
 
 
 // ==========================================================
-// CARREGAR MEMÓRIAS DA NUVEM
+// CARREGAR CLOUD
 // ==========================================================
 
 async function loadCloudMemories() {
@@ -665,7 +887,6 @@ async function loadCloudMemories() {
     const familyId =
         getActiveFamilyId();
 
-
     if (
         !supabase ||
         !user ||
@@ -674,11 +895,10 @@ async function loadCloudMemories() {
         return false;
     }
 
-
-    cloudLoading = true;
+    cloudLoading =
+        true;
 
     renderLoadingState();
-
 
     const {
         data,
@@ -713,13 +933,13 @@ async function loadCloudMemories() {
             .order(
                 'created_at',
                 {
-                    ascending: false
+                    ascending:
+                        false
                 }
             );
 
-
-    cloudLoading = false;
-
+    cloudLoading =
+        false;
 
     if (error) {
         console.error(
@@ -730,14 +950,14 @@ async function loadCloudMemories() {
         return false;
     }
 
-
     memories =
-        (data || []).map(
-            normalizeCloudMemory
-        );
+        (data || [])
+            .map(
+                normalizeCloudMemory
+            );
 
-
-    usingCloud = true;
+    usingCloud =
+        true;
 
     renderMemories();
 
@@ -752,7 +972,8 @@ async function loadCloudMemories() {
 // ==========================================================
 
 function loadLocalMode() {
-    usingCloud = false;
+    usingCloud =
+        false;
 
     memories =
         loadLocalMemories();
@@ -764,7 +985,7 @@ function loadLocalMode() {
 
 
 // ==========================================================
-// DEFINIR ORIGEM DO ACERVO
+// ORIGEM DO ACERVO
 // ==========================================================
 
 async function refreshMemorySource() {
@@ -773,7 +994,6 @@ async function refreshMemorySource() {
 
     const family =
         getActiveFamily();
-
 
     if (
         user &&
@@ -786,7 +1006,6 @@ async function refreshMemorySource() {
             return;
         }
     }
-
 
     loadLocalMode();
 }
@@ -803,22 +1022,27 @@ function renderLoadingState() {
 
     memoryArchive.innerHTML = `
         <div class="empty-state">
-            <i class="fas fa-spinner fa-spin"></i>
+
+            <i
+                class="fas fa-spinner fa-spin"
+            ></i>
 
             <h3>
                 Carregando seu acervo
             </h3>
 
             <p>
-                Buscando as histórias preservadas na nuvem.
+                Buscando as histórias
+                preservadas na nuvem.
             </p>
+
         </div>
     `;
 }
 
 
 // ==========================================================
-// TEXTOS DO MODO LOCAL / NUVEM
+// LABELS LOCAL / CLOUD
 // ==========================================================
 
 function updateStorageLabels() {
@@ -831,18 +1055,17 @@ function updateStorageLabels() {
         return;
     }
 
-
     const intro =
-        archiveSection.querySelector(
-            '.section-intro'
-        );
-
+        archiveSection
+            .querySelector(
+                '.section-intro'
+            );
 
     const summaryParagraphs =
-        archiveSection.querySelectorAll(
-            '.archive-summary p'
-        );
-
+        archiveSection
+            .querySelectorAll(
+                '.archive-summary p'
+            );
 
     if (usingCloud) {
         if (intro) {
@@ -850,15 +1073,18 @@ function updateStorageLabels() {
                 'As histórias deste acervo familiar são armazenadas com segurança na nuvem e ficam disponíveis após o login.';
         }
 
-
-        if (summaryParagraphs[0]) {
-            summaryParagraphs[0].innerHTML = `
+        if (
+            summaryParagraphs[0]
+        ) {
+            summaryParagraphs[0]
+                .innerHTML = `
                 <span
                     class="memory-count"
                     id="memoryCount"
                 >
                     ${
-                        memories.length === 1
+                        memories.length ===
+                        1
                             ? '1 memória'
                             : `${memories.length} memórias`
                     }
@@ -868,32 +1094,40 @@ function updateStorageLabels() {
             `;
         }
 
+        if (
+            summaryParagraphs[1]
+        ) {
+            summaryParagraphs[1]
+                .innerHTML = `
+                <i
+                    class="fas fa-cloud"
+                ></i>
 
-        if (summaryParagraphs[1]) {
-            summaryParagraphs[1].innerHTML = `
-                <i class="fas fa-cloud"></i>
-                Acervo sincronizado com a nuvem
+                Acervo sincronizado
+                com a nuvem
             `;
         }
 
         return;
     }
 
-
     if (intro) {
         intro.textContent =
             'As histórias registradas sem login permanecem somente neste navegador. Entre em sua conta para acessar o acervo familiar em nuvem.';
     }
 
-
-    if (summaryParagraphs[0]) {
-        summaryParagraphs[0].innerHTML = `
+    if (
+        summaryParagraphs[0]
+    ) {
+        summaryParagraphs[0]
+            .innerHTML = `
             <span
                 class="memory-count"
                 id="memoryCount"
             >
                 ${
-                    memories.length === 1
+                    memories.length ===
+                    1
                         ? '1 memória'
                         : `${memories.length} memórias`
                 }
@@ -903,11 +1137,17 @@ function updateStorageLabels() {
         `;
     }
 
+    if (
+        summaryParagraphs[1]
+    ) {
+        summaryParagraphs[1]
+            .innerHTML = `
+            <i
+                class="fas fa-lock"
+            ></i>
 
-    if (summaryParagraphs[1]) {
-        summaryParagraphs[1].innerHTML = `
-            <i class="fas fa-lock"></i>
-            Armazenamento local neste navegador
+            Armazenamento local
+            neste navegador
         `;
     }
 }
@@ -929,7 +1169,6 @@ async function findOrCreatePerson(
     const familyId =
         getActiveFamilyId();
 
-
     if (
         !supabase ||
         !user ||
@@ -940,29 +1179,21 @@ async function findOrCreatePerson(
         );
     }
 
-
     const cleanName =
-        String(personName || '')
+        String(
+            personName || ''
+        )
             .trim()
-            .replace(/\s+/g, ' ');
-
+            .replace(
+                /\s+/g,
+                ' '
+            );
 
     if (!cleanName) {
         throw new Error(
             'Nome da pessoa não informado.'
         );
     }
-
-
-    // ======================================================
-    // Procuramos as pessoas já existentes na família.
-    //
-    // A comparação é feita no navegador para:
-    // - evitar duplicidade simples;
-    // - reconhecer tanto registros cujo nome completo esteja
-    //   em first_name quanto registros separados em
-    //   first_name + last_name.
-    // ======================================================
 
     const {
         data: people,
@@ -981,65 +1212,75 @@ async function findOrCreatePerson(
                 familyId
             );
 
-
     if (peopleError) {
         throw peopleError;
     }
 
-
     const normalizedInput =
-        normalizeText(cleanName);
-
-
-    const existingPerson =
-        (people || []).find(
-            function (person) {
-                const displayName =
-                    normalizeText(
-                        getPersonDisplayName(
-                            person
-                        )
-                    );
-
-                const firstName =
-                    normalizeText(
-                        person.first_name
-                    );
-
-                return (
-                    displayName ===
-                        normalizedInput
-                    ||
-                    firstName ===
-                        normalizedInput
-                );
-            }
+        normalizeText(
+            cleanName
         );
 
+    const existingPerson =
+        (people || [])
+            .find(
+                function (
+                    person
+                ) {
+                    const displayName =
+                        normalizeText(
+                            getPersonDisplayName(
+                                person
+                            )
+                        );
 
-    if (existingPerson) {
+                    const firstName =
+                        normalizeText(
+                            person.first_name
+                        );
+
+                    const fullName =
+                        normalizeText(
+                            [
+                                person.first_name,
+                                person.last_name
+                            ]
+                                .filter(
+                                    Boolean
+                                )
+                                .join(
+                                    ' '
+                                )
+                        );
+
+                    return (
+                        displayName ===
+                            normalizedInput ||
+                        firstName ===
+                            normalizedInput ||
+                        fullName ===
+                            normalizedInput
+                    );
+                }
+            );
+
+    if (
+        existingPerson
+    ) {
         return {
             person:
                 existingPerson,
+
             created:
                 false
         };
     }
 
-
-    // ======================================================
-    // Criamos uma nova entidade people.
-    //
-    // Nesta versão o texto informado pelo usuário é
-    // preservado integralmente em first_name.
-    //
-    // Em uma evolução futura o cadastro poderá separar
-    // nome, sobrenome, apelido, nascimento, biografia etc.
-    // ======================================================
-
     const {
-        data: createdPerson,
-        error: createError
+        data:
+            createdPerson,
+        error:
+            createError
     } =
         await supabase
             .from('people')
@@ -1061,15 +1302,14 @@ async function findOrCreatePerson(
             `)
             .single();
 
-
     if (createError) {
         throw createError;
     }
 
-
     return {
         person:
             createdPerson,
+
         created:
             true
     };
@@ -1083,40 +1323,41 @@ async function findOrCreatePerson(
 if (memoryForm) {
     memoryForm.addEventListener(
         'submit',
-        async function (event) {
+        async function (
+            event
+        ) {
             event.preventDefault();
 
             clearFormMessage();
 
-
             const person =
-                memoryPerson?.value
+                memoryPerson
+                    ?.value
                     .trim() ||
                 '';
-
 
             const period =
-                memoryPeriod?.value
+                memoryPeriod
+                    ?.value
                     .trim() ||
                 '';
-
 
             const title =
-                memoryTitle?.value
+                memoryTitle
+                    ?.value
                     .trim() ||
                 '';
-
 
             const category =
-                memoryCategory?.value ||
+                memoryCategory
+                    ?.value ||
                 '';
-
 
             const story =
-                memoryStory?.value
+                memoryStory
+                    ?.value
                     .trim() ||
                 '';
-
 
             if (
                 !person ||
@@ -1132,13 +1373,11 @@ if (memoryForm) {
                 return;
             }
 
-
             const user =
                 getCurrentUser();
 
             const family =
                 getActiveFamily();
-
 
             if (
                 user &&
@@ -1155,7 +1394,6 @@ if (memoryForm) {
                 return;
             }
 
-
             saveMemoryLocally({
                 person,
                 period,
@@ -1169,16 +1407,21 @@ if (memoryForm) {
 
 
 // ==========================================================
-// SALVAR LOCALMENTE
+// SALVAR LOCAL
 // ==========================================================
 
-function saveMemoryLocally(values) {
+function saveMemoryLocally(
+    values
+) {
     const newMemory = {
         id:
             createMemoryId(),
 
         person:
             values.person,
+
+        personId:
+            null,
 
         period:
             values.period,
@@ -1193,18 +1436,16 @@ function saveMemoryLocally(values) {
             values.story,
 
         createdAt:
-            new Date().toISOString()
+            new Date()
+                .toISOString()
     };
-
 
     memories.unshift(
         newMemory
     );
 
-
     const saved =
         saveLocalMemories();
-
 
     if (!saved) {
         memories.shift();
@@ -1217,37 +1458,28 @@ function saveMemoryLocally(values) {
         return;
     }
 
-
     renderMemories();
 
     updateStorageLabels();
 
     memoryForm.reset();
 
-
     showFormMessage(
         'Memória preservada neste navegador. Entre em sua conta para usar o acervo em nuvem.',
         'success'
     );
-
 
     scrollToArchive();
 }
 
 
 // ==========================================================
-// SALVAR NA NUVEM
-//
-// Fluxo:
-//
-// 1. localizar/criar pessoa
-// 2. criar memória
-// 3. criar memory_people
-// 4. role = protagonist
-// 5. recarregar o acervo do Supabase
+// SALVAR CLOUD
 // ==========================================================
 
-async function saveMemoryToCloud(values) {
+async function saveMemoryToCloud(
+    values
+) {
     const supabase =
         getSupabaseClient();
 
@@ -1256,7 +1488,6 @@ async function saveMemoryToCloud(values) {
 
     const familyId =
         getActiveFamilyId();
-
 
     if (
         !supabase ||
@@ -1271,26 +1502,21 @@ async function saveMemoryToCloud(values) {
         return;
     }
 
-
     const submitButton =
-        memoryForm.querySelector(
-            'button[type="submit"]'
-        );
-
+        memoryForm
+            .querySelector(
+                'button[type="submit"]'
+            );
 
     if (submitButton) {
-        submitButton.disabled = true;
+        submitButton.disabled =
+            true;
     }
 
-
-    let createdMemoryId = null;
-
+    let createdMemoryId =
+        null;
 
     try {
-        // ==================================================
-        // 1. Pessoa
-        // ==================================================
-
         const {
             person
         } =
@@ -1298,21 +1524,17 @@ async function saveMemoryToCloud(values) {
                 values.person
             );
 
-
         if (!person?.id) {
             throw new Error(
                 'Não foi possível criar ou localizar a pessoa.'
             );
         }
 
-
-        // ==================================================
-        // 2. Memória
-        // ==================================================
-
         const {
-            data: createdMemory,
-            error: memoryError
+            data:
+                createdMemory,
+            error:
+                memoryError
         } =
             await supabase
                 .from('memories')
@@ -1348,28 +1570,21 @@ async function saveMemoryToCloud(values) {
                 `)
                 .single();
 
-
         if (memoryError) {
             throw memoryError;
         }
 
-
         createdMemoryId =
             createdMemory.id;
 
-
-        // ==================================================
-        // 3. Relação memória ↔ pessoa
-        //
-        // protagonist é um dos valores aceitos pelo CHECK
-        // memory_people_role_check.
-        // ==================================================
-
         const {
-            error: relationError
+            error:
+                relationError
         } =
             await supabase
-                .from('memory_people')
+                .from(
+                    'memory_people'
+                )
                 .insert({
                     memory_id:
                         createdMemory.id,
@@ -1381,16 +1596,13 @@ async function saveMemoryToCloud(values) {
                         'protagonist'
                 });
 
-
-        if (relationError) {
-            // A memória sem relação não representa o
-            // registro completo esperado pela Fase 5.
-            //
-            // Tentamos removê-la para evitar um registro
-            // parcialmente criado.
-
+        if (
+            relationError
+        ) {
             await supabase
-                .from('memories')
+                .from(
+                    'memories'
+                )
                 .delete()
                 .eq(
                     'id',
@@ -1401,19 +1613,14 @@ async function saveMemoryToCloud(values) {
                     familyId
                 );
 
-            createdMemoryId = null;
+            createdMemoryId =
+                null;
 
             throw relationError;
         }
 
-
-        // ==================================================
-        // 4. Recarregar diretamente do modelo relacional
-        // ==================================================
-
         const loaded =
             await loadCloudMemories();
-
 
         if (!loaded) {
             throw new Error(
@@ -1421,15 +1628,16 @@ async function saveMemoryToCloud(values) {
             );
         }
 
-
         memoryForm.reset();
-
 
         showFormMessage(
             'Memória preservada com sucesso no seu acervo familiar.',
             'success'
         );
 
+        window
+            .MemoriasInvisiveisFamily
+            ?.refresh?.();
 
         scrollToArchive();
 
@@ -1439,7 +1647,6 @@ async function saveMemoryToCloud(values) {
             error
         );
 
-
         showFormMessage(
             'Não foi possível preservar esta memória na nuvem. Nenhuma alteração incompleta será considerada válida.',
             'error'
@@ -1447,7 +1654,8 @@ async function saveMemoryToCloud(values) {
 
     } finally {
         if (submitButton) {
-            submitButton.disabled = false;
+            submitButton.disabled =
+                false;
         }
     }
 }
@@ -1473,7 +1681,9 @@ function scrollToArchive() {
                 top:
                     archive.offsetTop -
                     100,
-                behavior: 'smooth'
+
+                behavior:
+                    'smooth'
             });
         },
         400
@@ -1482,17 +1692,18 @@ function scrollToArchive() {
 
 
 // ==========================================================
-// BOTÃO LIMPAR
+// LIMPAR
 // ==========================================================
 
-clearFormButton?.addEventListener(
-    'click',
-    clearMemoryForm
-);
+clearFormButton
+    ?.addEventListener(
+        'click',
+        clearMemoryForm
+    );
 
 
 // ==========================================================
-// PERGUNTAS INSPIRADORAS
+// PROMPTS
 // ==========================================================
 
 function showRandomPrompt() {
@@ -1503,7 +1714,6 @@ function showRandomPrompt() {
         return;
     }
 
-
     let newPrompt =
         prompts[
             Math.floor(
@@ -1512,56 +1722,57 @@ function showRandomPrompt() {
             )
         ];
 
-
     if (
         prompts.length > 1 &&
         newPrompt ===
-            promptText.textContent.trim()
+        promptText
+            .textContent
+            .trim()
     ) {
         const currentIndex =
             prompts.indexOf(
                 newPrompt
             );
 
-        const nextIndex =
-            (currentIndex + 1) %
-            prompts.length;
-
         newPrompt =
-            prompts[nextIndex];
+            prompts[
+                (
+                    currentIndex +
+                    1
+                ) %
+                prompts.length
+            ];
     }
-
 
     promptText.textContent =
         newPrompt;
 }
 
 
-newPromptButton?.addEventListener(
-    'click',
-    showRandomPrompt
-);
+newPromptButton
+    ?.addEventListener(
+        'click',
+        showRandomPrompt
+    );
 
 
 // ==========================================================
-// BUSCA E FILTROS
+// BUSCA / FILTROS
 // ==========================================================
 
-memorySearch?.addEventListener(
-    'input',
-    renderMemories
-);
+memorySearch
+    ?.addEventListener(
+        'input',
+        renderMemories
+    );
 
 
-categoryFilter?.addEventListener(
-    'change',
-    renderMemories
-);
+categoryFilter
+    ?.addEventListener(
+        'change',
+        renderMemories
+    );
 
-
-// ==========================================================
-// FILTRAGEM
-// ==========================================================
 
 function getFilteredMemories() {
     const searchTerm =
@@ -1571,21 +1782,18 @@ function getFilteredMemories() {
             .toLowerCase() ||
         '';
 
-
     const selectedCategory =
-        categoryFilter?.value ||
+        categoryFilter
+            ?.value ||
         'all';
-
 
     return memories.filter(
         function (memory) {
             const matchesCategory =
                 selectedCategory ===
-                    'all'
-                ||
+                    'all' ||
                 memory.category ===
                     selectedCategory;
-
 
             const searchableText =
                 [
@@ -1598,13 +1806,11 @@ function getFilteredMemories() {
                     .join(' ')
                     .toLowerCase();
 
-
             const matchesSearch =
                 !searchTerm ||
                 searchableText.includes(
                     searchTerm
                 );
-
 
             return (
                 matchesCategory &&
@@ -1616,7 +1822,7 @@ function getFilteredMemories() {
 
 
 // ==========================================================
-// RENDERIZAÇÃO DO ACERVO
+// RENDER ACERVO
 // ==========================================================
 
 function renderMemories() {
@@ -1624,34 +1830,37 @@ function renderMemories() {
         return;
     }
 
-
     if (cloudLoading) {
         return;
     }
 
-
     updateMemoryCount();
-
 
     const filteredMemories =
         getFilteredMemories();
 
+    memoryArchive.innerHTML =
+        '';
 
-    memoryArchive.innerHTML = '';
-
-
-    if (memories.length === 0) {
+    if (
+        memories.length === 0
+    ) {
         memoryArchive.innerHTML = `
             <div class="empty-state">
 
-                <i class="fas fa-book-open"></i>
+                <i
+                    class="fas fa-book-open"
+                ></i>
 
                 <h3>
-                    Seu acervo começa com uma história
+                    Seu acervo começa
+                    com uma história
                 </h3>
 
                 <p>
-                    Registre uma memória acima e ela aparecerá aqui.
+                    Registre uma memória
+                    acima e ela aparecerá
+                    aqui.
                 </p>
 
             </div>
@@ -1660,21 +1869,25 @@ function renderMemories() {
         return;
     }
 
-
     if (
-        filteredMemories.length === 0
+        filteredMemories.length ===
+        0
     ) {
         memoryArchive.innerHTML = `
             <div class="empty-state">
 
-                <i class="fas fa-magnifying-glass"></i>
+                <i
+                    class="fas fa-magnifying-glass"
+                ></i>
 
                 <h3>
                     Nenhuma memória encontrada
                 </h3>
 
                 <p>
-                    Tente alterar a busca ou selecionar outra categoria.
+                    Tente alterar a busca
+                    ou selecionar outra
+                    categoria.
                 </p>
 
             </div>
@@ -1683,17 +1896,14 @@ function renderMemories() {
         return;
     }
 
-
     filteredMemories.forEach(
         function (memory) {
-            const card =
-                createMemoryCard(
-                    memory
+            memoryArchive
+                .appendChild(
+                    createMemoryCard(
+                        memory
+                    )
                 );
-
-            memoryArchive.appendChild(
-                card
-            );
         }
     );
 }
@@ -1703,20 +1913,19 @@ function renderMemories() {
 // CARD DA MEMÓRIA
 // ==========================================================
 
-function createMemoryCard(memory) {
+function createMemoryCard(
+    memory
+) {
     const card =
         document.createElement(
             'article'
         );
 
-
     card.className =
         'memory-card';
 
-
     card.dataset.memoryId =
         memory.id;
-
 
     const periodText =
         memory.period
@@ -1725,28 +1934,73 @@ function createMemoryCard(memory) {
             )
             : 'Período não informado';
 
-
     const createdDate =
         formatDate(
             memory.createdAt
         );
 
+    const hasPersonProfile =
+        Boolean(
+            usingCloud &&
+            memory.personId
+        );
+
+    const personMarkup =
+        hasPersonProfile
+            ? `
+                <button
+                    type="button"
+                    class="memory-person memory-person-button"
+                    data-memory-person-id="${escapeHTML(
+                        memory.personId
+                    )}"
+                    aria-label="Abrir perfil de ${escapeHTML(
+                        memory.person
+                    )}"
+                >
+                    <i
+                        class="fas fa-user"
+                    ></i>
+
+                    ${escapeHTML(
+                        memory.person
+                    )}
+                </button>
+            `
+            : `
+                <p class="memory-person">
+
+                    <i
+                        class="fas fa-user"
+                    ></i>
+
+                    ${escapeHTML(
+                        memory.person
+                    )}
+
+                </p>
+            `;
 
     card.innerHTML = `
-        <div class="memory-card-top">
+        <div
+            class="memory-card-top"
+        >
 
-            <span class="memory-category">
+            <span
+                class="memory-category"
+            >
                 ${escapeHTML(
                     memory.category
                 )}
             </span>
 
-            <span class="memory-period">
+            <span
+                class="memory-period"
+            >
                 ${periodText}
             </span>
 
         </div>
-
 
         <div>
 
@@ -1756,30 +2010,25 @@ function createMemoryCard(memory) {
                 )}
             </h3>
 
-
-            <p class="memory-person">
-
-                <i class="fas fa-user"></i>
-
-                ${escapeHTML(
-                    memory.person
-                )}
-
-            </p>
+            ${personMarkup}
 
         </div>
 
-
-        <p class="memory-story">
+        <p
+            class="memory-story"
+        >
             ${escapeHTML(
                 memory.story
             )}
         </p>
 
+        <div
+            class="memory-meta"
+        >
 
-        <div class="memory-meta">
-
-            <i class="fas fa-clock"></i>
+            <i
+                class="fas fa-clock"
+            ></i>
 
             Registrada em
 
@@ -1787,8 +2036,9 @@ function createMemoryCard(memory) {
 
         </div>
 
-
-        <div class="memory-card-actions">
+        <div
+            class="memory-card-actions"
+        >
 
             <button
                 type="button"
@@ -1801,7 +2051,9 @@ function createMemoryCard(memory) {
                 )}"
             >
 
-                <i class="fas fa-trash"></i>
+                <i
+                    class="fas fa-trash"
+                ></i>
 
                 Excluir
 
@@ -1810,22 +2062,35 @@ function createMemoryCard(memory) {
         </div>
     `;
 
+    const profileButton =
+        card.querySelector(
+            '[data-memory-person-id]'
+        );
+
+    profileButton
+        ?.addEventListener(
+            'click',
+            async function () {
+                await openPersonProfileFromMemory(
+                    memory.personId
+                );
+            }
+        );
 
     const deleteButton =
         card.querySelector(
             '[data-delete-memory]'
         );
 
-
-    deleteButton?.addEventListener(
-        'click',
-        function () {
-            deleteMemory(
-                memory.id
-            );
-        }
-    );
-
+    deleteButton
+        ?.addEventListener(
+            'click',
+            function () {
+                deleteMemory(
+                    memory.id
+                );
+            }
+        );
 
     return card;
 }
@@ -1841,15 +2106,12 @@ function updateMemoryCount() {
             'memoryCount'
         );
 
-
     if (!counter) {
         return;
     }
 
-
     const total =
         memories.length;
-
 
     counter.textContent =
         total === 1
@@ -1862,7 +2124,9 @@ function updateMemoryCount() {
 // EXCLUSÃO
 // ==========================================================
 
-async function deleteMemory(memoryId) {
+async function deleteMemory(
+    memoryId
+) {
     const memory =
         memories.find(
             function (item) {
@@ -1873,22 +2137,18 @@ async function deleteMemory(memoryId) {
             }
         );
 
-
     if (!memory) {
         return;
     }
-
 
     const confirmed =
         window.confirm(
             `Excluir a memória "${memory.title}"?\n\nEsta ação não poderá ser desfeita.`
         );
 
-
     if (!confirmed) {
         return;
     }
-
 
     if (usingCloud) {
         await deleteCloudMemory(
@@ -1897,7 +2157,6 @@ async function deleteMemory(memoryId) {
 
         return;
     }
-
 
     deleteLocalMemory(
         memoryId
@@ -1909,10 +2168,11 @@ async function deleteMemory(memoryId) {
 // EXCLUSÃO LOCAL
 // ==========================================================
 
-function deleteLocalMemory(memoryId) {
+function deleteLocalMemory(
+    memoryId
+) {
     const previousMemories =
         [...memories];
-
 
     memories =
         memories.filter(
@@ -1924,10 +2184,8 @@ function deleteLocalMemory(memoryId) {
             }
         );
 
-
     const saved =
         saveLocalMemories();
-
 
     if (!saved) {
         memories =
@@ -1940,7 +2198,6 @@ function deleteLocalMemory(memoryId) {
         return;
     }
 
-
     renderMemories();
 
     updateStorageLabels();
@@ -1948,10 +2205,7 @@ function deleteLocalMemory(memoryId) {
 
 
 // ==========================================================
-// EXCLUSÃO NA NUVEM
-//
-// memory_people possui FK com ON DELETE CASCADE,
-// portanto a relação é removida automaticamente.
+// EXCLUSÃO CLOUD
 // ==========================================================
 
 async function deleteCloudMemory(
@@ -1963,7 +2217,6 @@ async function deleteCloudMemory(
     const familyId =
         getActiveFamilyId();
 
-
     if (
         !supabase ||
         !familyId
@@ -1974,7 +2227,6 @@ async function deleteCloudMemory(
 
         return;
     }
-
 
     const {
         error
@@ -1991,7 +2243,6 @@ async function deleteCloudMemory(
                 familyId
             );
 
-
     if (error) {
         console.error(
             'Erro ao excluir memória:',
@@ -2005,13 +2256,12 @@ async function deleteCloudMemory(
         return;
     }
 
-
     await loadCloudMemories();
 }
 
 
 // ==========================================================
-// EVENTOS DE AUTENTICAÇÃO
+// AUTH EVENTS
 // ==========================================================
 
 window.addEventListener(
@@ -2035,19 +2285,24 @@ window.addEventListener(
 // ==========================================================
 
 async function initializeMemories() {
-    if (initializationStarted) {
+    if (
+        initializationStarted
+    ) {
         return;
     }
 
-    initializationStarted = true;
+    initializationStarted =
+        true;
 
+    injectMemoryNavigationStyles();
 
     renderMemories();
 
     updateStorageLabels();
 
-
-    if (getAuthController()) {
+    if (
+        getAuthController()
+    ) {
         await refreshMemorySource();
     }
 }
@@ -2064,6 +2319,7 @@ if (
             once: true
         }
     );
+
 } else {
     initializeMemories();
 }
