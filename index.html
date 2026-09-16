@@ -1,1659 +1,786 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta
-        name="description"
-        content="Memórias Invisíveis — plataforma digital em desenvolvimento para capturar, organizar e preservar histórias e memórias familiares entre gerações."
-    >
-
-    <title>Memórias Invisíveis — Preservando Histórias</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
-
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Memórias Invisíveis — plataforma digital em desenvolvimento para capturar, organizar e preservar histórias e memórias familiares entre gerações.">
+<title>Memórias Invisíveis — Preservando Histórias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- ======================================================
-         HEADER
-    ======================================================= -->
-
-    <header id="header">
-
-        <div class="container nav-container">
-
-            <a href="#inicio" class="logo">
-                <i class="fas fa-book-open"></i>
-                Memórias<span>Invisíveis</span>
-            </a>
-
-            <button
-                class="mobile-menu-btn"
-                id="mobileMenuBtn"
-                type="button"
-                aria-label="Abrir menu"
-                aria-expanded="false"
-            >
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <nav class="nav-links">
-
-                <a href="#problem">
-                    O Problema
-                </a>
-
-                <a href="#solution">
-                    A Solução
-                </a>
-
-                <a href="#journey">
-                    A Jornada
-                </a>
-
-                <a href="#registrar">
-                    Registrar
-                </a>
-
-                <a href="#acervo">
-                    Acervo
-                </a>
-
-                <a
-                    href="#registrar"
-                    class="cta-button"
-                >
-                    Preservar Memória
-                </a>
-
-            </nav>
-
-        </div>
-
-    </header>
-
-
-    <!-- ======================================================
-         HERO
-    ======================================================= -->
-
-    <section
-        class="hero"
-        id="inicio"
-    >
-
-        <div class="container hero-content">
-
-            <div class="hero-text">
-
-                <h1>
-                    Antes que as histórias se tornem invisíveis
-                </h1>
-
-                <p>
-                    Muitas das histórias mais importantes de uma
-                    família nunca chegam a ser registradas.
-                </p>
-
-                <p>
-                    Experiências de infância, trabalho, viagens,
-                    receitas, tradições, acontecimentos e aprendizados
-                    podem permanecer apenas na memória e na
-                    transmissão oral.
-                </p>
-
-                <p>
-
-                    <span class="highlight">
-                        Memórias Invisíveis
-                    </span>
-
-                    é uma plataforma digital em desenvolvimento que
-                    utiliza tecnologia para ajudar famílias a capturar,
-                    organizar e preservar suas histórias para as
-                    próximas gerações.
-
-                </p>
-
-                <div style="margin-top: 40px;">
-
-                    <a
-                        href="#registrar"
-                        class="cta-button"
-                        style="margin-right: 15px;"
-                    >
-                        <i class="fas fa-pen"></i>
-                        Registrar uma Memória
-                    </a>
-
-                    <a
-                        href="#solution"
-                        class="cta-button"
-                        style="
-                            background: transparent;
-                            border: 2px solid var(--accent);
-                            color: var(--accent);
-                        "
-                    >
-                        <i class="fas fa-book-open"></i>
-                        Conhecer a Solução
-                    </a>
-
-                </div>
-
-                <p
-                    style="
-                        margin-top: 25px;
-                        font-size: 0.9rem;
-                    "
-                >
-                    <strong>
-                        MVP em validação.
-                    </strong>
-
-                    Uma experiência funcional para capturar,
-                    organizar e preservar histórias familiares,
-                    conectando memórias e gerações.
-                </p>
-
-            </div>
-
-
-            <div class="hero-image">
-
-                <img
-                    src="https://images.unsplash.com/photo-1516733968668-dbdce39c4651?auto=format&fit=crop&w=1470&q=80"
-                    alt="Duas gerações compartilhando histórias"
-                >
-
-                <div class="fading-overlay"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         PILARES
-    ======================================================= -->
-
-    <section class="stats">
-
-        <div class="container stats-container">
-
-            <div class="stat-item">
-
-                <div class="stat-number">
-                    Capturar
-                </div>
-
-                <div class="stat-label">
-                    Histórias, experiências e lembranças
-                </div>
-
-            </div>
-
-
-            <div class="stat-item">
-
-                <div class="stat-number">
-                    Organizar
-                </div>
-
-                <div class="stat-label">
-                    Pessoas, temas, períodos e acontecimentos
-                </div>
-
-            </div>
-
-
-            <div class="stat-item">
-
-                <div class="stat-number">
-                    Preservar
-                </div>
-
-                <div class="stat-label">
-                    Memórias para futuras gerações
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         PROBLEMA
-    ======================================================= -->
-
-    <section
-        class="problem"
-        id="problem"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Histórias desaparecem quando deixam de ser contadas
-            </h2>
-
-            <div class="problem-content">
-
-                <div class="problem-text">
-
-                    <p>
-                        Parte importante da história de uma família
-                        não está registrada em documentos, fotografias
-                        ou arquivos digitais.
-                    </p>
-
-                    <p style="margin-top: 20px;">
-                        Ela permanece nas lembranças das pessoas:
-                        histórias de infância, receitas, tradições,
-                        experiências profissionais, viagens, encontros,
-                        conselhos, acontecimentos e aprendizados.
-                    </p>
-
-                    <p style="margin-top: 20px;">
-                        Quando essas histórias deixam de ser transmitidas,
-                        perde-se mais do que uma lembrança. Perde-se
-                        contexto, identidade, conhecimento e parte do
-                        patrimônio afetivo construído entre gerações.
-                    </p>
-
-                    <p style="margin-top: 20px;">
-                        Memórias Invisíveis nasce para enfrentar
-                        esse desafio:
-                    </p>
-
-                    <p style="margin-top: 15px;">
-
-                        <span class="highlight">
-                            Como tornar simples e natural o processo
-                            de capturar, organizar e preservar histórias
-                            antes que elas desapareçam?
-                        </span>
-
-                    </p>
-
-                    <div style="margin-top: 30px;">
-
-                        <a
-                            href="#solution"
-                            class="cta-button"
-                        >
-                            Conheça a solução
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="problem-visual">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1581579431537-2c7e47c1f7e8?auto=format&fit=crop&w=1470&q=80"
-                        alt="Memórias familiares representadas por fotografias"
-                        class="fading-image"
-                    >
-
-                    <div class="fading-overlay"></div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         SOLUÇÃO
-    ======================================================= -->
-
-    <section
-        class="solution"
-        id="solution"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Memórias Invisíveis: preservando o que importa
-            </h2>
-
-            <p class="section-intro">
-                Uma plataforma criada para transformar lembranças
-                dispersas em um acervo familiar organizado,
-                acessível e capaz de atravessar gerações.
-            </p>
-
-
-            <div class="solution-cards">
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-microphone"></i>
-                    </div>
-
-                    <h3>
-                        Capturar
-                    </h3>
-
-                    <p>
-                        Utilizar perguntas e temas como ponto de
-                        partida para recuperar histórias sobre infância,
-                        família, trabalho, viagens, tradições,
-                        acontecimentos e aprendizados.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-
-                    <h3>
-                        Organizar
-                    </h3>
-
-                    <p>
-                        Estruturar histórias por pessoas, temas,
-                        datas, períodos e acontecimentos, tornando
-                        o acervo mais fácil de navegar e compreender.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-box-archive"></i>
-                    </div>
-
-                    <h3>
-                        Preservar
-                    </h3>
-
-                    <p>
-                        Construir um acervo digital capaz de manter
-                        histórias, experiências e seu contexto
-                        acessíveis às futuras gerações.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         JORNADA
-    ======================================================= -->
-
-    <section
-        id="journey"
-        style="background-color: var(--light);"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Uma jornada entre gerações
-            </h2>
-
-            <p class="section-intro">
-                Preservar uma história começa de forma simples:
-                lembrar, conversar, registrar e organizar.
-            </p>
-
-            <div
-                class="solution-cards"
-                style="margin-top: 20px;"
-            >
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-user-group"></i>
-                    </div>
-
-                    <h3>
-                        1. Escolher
-                    </h3>
-
-                    <p>
-                        Escolher uma pessoa, uma lembrança ou
-                        um período da história familiar.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-
-                    <h3>
-                        2. Conversar
-                    </h3>
-
-                    <p>
-                        Utilizar perguntas como estímulo para
-                        recuperar experiências e histórias.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-pen"></i>
-                    </div>
-
-                    <h3>
-                        3. Registrar
-                    </h3>
-
-                    <p>
-                        Transformar uma lembrança em um registro
-                        estruturado que possa ser preservado.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-sitemap"></i>
-                    </div>
-
-                    <h3>
-                        4. Organizar
-                    </h3>
-
-                    <p>
-                        Relacionar pessoas, temas, lugares,
-                        períodos e acontecimentos.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-
-                    <h3>
-                        5. Compartilhar
-                    </h3>
-
-                    <p>
-                        Em uma próxima evolução, permitir que
-                        familiares colaborem no mesmo acervo com
-                        diferentes níveis de acesso e privacidade.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-clock-rotate-left"></i>
-                    </div>
-
-                    <h3>
-                        6. Preservar
-                    </h3>
-
-                    <p>
-                        Construir progressivamente um patrimônio
-                        digital de histórias entre gerações.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         MVP — REGISTRAR UMA MEMÓRIA
-    ======================================================= -->
-
-    <section
-        class="memory-experience"
-        id="registrar"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Registre uma Memória
-            </h2>
-
-            <p class="section-intro">
-                Experimente o MVP do Memórias Invisíveis.
-                Escolha uma lembrança, registre sua história
-                e comece a construir um acervo digital de memórias
-                que merecem continuar existindo.
-            </p>
-
-
-            <div class="memory-layout">
-
-                <!-- FORMULÁRIO -->
-
-                <div class="memory-panel">
-
-                    <div class="memory-panel-header">
-
-                        <h3>
-                            <i class="fas fa-pen-nib"></i>
-                            Conte uma história
-                        </h3>
-
-                        <p>
-                            Não precisa escrever tudo de uma vez.
-                            Comece pelo que você mais gostaria que
-                            alguém da sua família pudesse conhecer
-                            no futuro.
-                        </p>
-
-                    </div>
-
-
-                    <form
-                        class="memory-form"
-                        id="memoryForm"
-                    >
-
-                        <div class="form-grid">
-
-                            <div class="form-group">
-
-                                <label for="memoryPerson">
-                                    Pessoa relacionada à memória *
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="memoryPerson"
-                                    class="form-control"
-                                    placeholder="Ex.: Minha avó Maria"
-                                    maxlength="80"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="form-group">
-
-                                <label for="memoryPeriod">
-                                    Período ou ano
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="memoryPeriod"
-                                    class="form-control"
-                                    placeholder="Ex.: 1975 ou Anos 80"
-                                    maxlength="40"
-                                >
-
-                            </div>
-
-
-                            <div class="form-group full-width">
-
-                                <label for="memoryTitle">
-                                    Título da memória *
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="memoryTitle"
-                                    class="form-control"
-                                    placeholder="Ex.: Os almoços de domingo"
-                                    maxlength="100"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="form-group full-width">
-
-                                <label for="memoryCategory">
-                                    Categoria *
-                                </label>
-
-                                <select
-                                    id="memoryCategory"
-                                    class="form-control"
-                                    required
-                                >
-
-                                    <option value="">
-                                        Selecione uma categoria
-                                    </option>
-
-                                    <option value="Infância">
-                                        Infância
-                                    </option>
-
-                                    <option value="Família">
-                                        Família
-                                    </option>
-
-                                    <option value="Trabalho">
-                                        Trabalho
-                                    </option>
-
-                                    <option value="Viagens">
-                                        Viagens
-                                    </option>
-
-                                    <option value="Tradições">
-                                        Tradições
-                                    </option>
-
-                                    <option value="Receitas">
-                                        Receitas
-                                    </option>
-
-                                    <option value="Relacionamentos">
-                                        Relacionamentos
-                                    </option>
-
-                                    <option value="Acontecimentos">
-                                        Acontecimentos
-                                    </option>
-
-                                    <option value="Aprendizados">
-                                        Aprendizados
-                                    </option>
-
-                                    <option value="Outras">
-                                        Outras
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <div class="form-group full-width">
-
-                                <label for="memoryStory">
-                                    Conte a memória *
-                                </label>
-
-                                <textarea
-                                    id="memoryStory"
-                                    class="form-control"
-                                    placeholder="Escreva aqui a história que você gostaria de preservar..."
-                                    maxlength="3000"
-                                    required
-                                ></textarea>
-
-                                <small>
-                                    Nesta versão do MVP, a história
-                                    permanece armazenada somente neste
-                                    navegador e não é enviada para
-                                    um servidor.
-                                </small>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-actions">
-
-                            <button
-                                type="submit"
-                                class="cta-button"
-                            >
-                                <i class="fas fa-bookmark"></i>
-                                Preservar esta Memória
-                            </button>
-
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                id="clearFormButton"
-                            >
-                                Limpar
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            class="form-message"
-                            id="formMessage"
-                            role="status"
-                            aria-live="polite"
-                        ></div>
-
-                    </form>
-
-                </div>
-
-
-                <!-- INSPIRAÇÃO -->
-
-                <div class="memory-panel">
-
-                    <div class="memory-panel-header">
-
-                        <h3>
-                            <i class="fas fa-lightbulb"></i>
-                            Precisa de inspiração?
-                        </h3>
-
-                        <p>
-                            Às vezes uma boa pergunta é suficiente
-                            para trazer de volta uma história inteira.
-                        </p>
-
-                    </div>
-
-
-                    <div class="prompt-box">
-
-                        <span class="prompt-label">
-                            Pergunta para começar
-                        </span>
-
-                        <p
-                            class="prompt-text"
-                            id="promptText"
-                        >
-                            Qual lembrança da sua infância você nunca
-                            gostaria de esquecer?
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        id="newPromptButton"
-                    >
-                        <i class="fas fa-rotate"></i>
-                        Outra pergunta
-                    </button>
-
-
-                    <div
-                        class="memory-helper"
-                        style="margin-top: 30px;"
-                    >
-
-                        <div class="helper-card">
-
-                            <div class="helper-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-
-                            <div>
-
-                                <h4>
-                                    Pense em uma pessoa
-                                </h4>
-
-                                <p>
-                                    Quem aparece primeiro quando você
-                                    pensa nas histórias da sua família?
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="helper-card">
-
-                            <div class="helper-icon">
-                                <i class="fas fa-calendar-days"></i>
-                            </div>
-
-                            <div>
-
-                                <h4>
-                                    Volte a um período
-                                </h4>
-
-                                <p>
-                                    Infância, escola, primeiro emprego,
-                                    casamento, viagens ou mudanças podem
-                                    despertar lembranças.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="helper-card">
-
-                            <div class="helper-icon">
-                                <i class="fas fa-heart"></i>
-                            </div>
-
-                            <div>
-
-                                <h4>
-                                    Preserve o significado
-                                </h4>
-
-                                <p>
-                                    Mais importante que lembrar cada
-                                    detalhe é registrar por que aquela
-                                    história merece continuar existindo.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         MVP — ACERVO
-    ======================================================= -->
-
-    <section
-        class="memory-archive"
-        id="acervo"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Meu Acervo de Memórias
-            </h2>
-
-            <p class="section-intro">
-                As histórias registradas no MVP são organizadas
-                em um acervo pesquisável. Nesta versão, os registros
-                permanecem somente no navegador utilizado.
-            </p>
-
-
-            <div class="archive-toolbar">
-
-                <div class="search-wrapper">
-
-                    <i class="fas fa-magnifying-glass"></i>
-
-                    <input
-                        type="search"
-                        id="memorySearch"
-                        class="form-control"
-                        placeholder="Buscar por pessoa, título ou palavra..."
-                        aria-label="Buscar memórias"
-                    >
-
-                </div>
-
-
-                <select
-                    id="categoryFilter"
-                    class="form-control"
-                    aria-label="Filtrar memórias por categoria"
-                >
-
-                    <option value="all">
-                        Todas as categorias
-                    </option>
-
-                    <option value="Infância">
-                        Infância
-                    </option>
-
-                    <option value="Família">
-                        Família
-                    </option>
-
-                    <option value="Trabalho">
-                        Trabalho
-                    </option>
-
-                    <option value="Viagens">
-                        Viagens
-                    </option>
-
-                    <option value="Tradições">
-                        Tradições
-                    </option>
-
-                    <option value="Receitas">
-                        Receitas
-                    </option>
-
-                    <option value="Relacionamentos">
-                        Relacionamentos
-                    </option>
-
-                    <option value="Acontecimentos">
-                        Acontecimentos
-                    </option>
-
-                    <option value="Aprendizados">
-                        Aprendizados
-                    </option>
-
-                    <option value="Outras">
-                        Outras
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="archive-summary">
-
-                <p>
-                    <span
-                        class="memory-count"
-                        id="memoryCount"
-                    >
-                        0 memórias
-                    </span>
-                    preservadas neste navegador.
-                </p>
-
-                <p>
-                    <i class="fas fa-lock"></i>
-                    Armazenamento local nesta versão do MVP
-                </p>
-
-            </div>
-
-
-            <div
-                class="archive-grid"
-                id="memoryArchive"
-                aria-live="polite"
-            >
-
-                <div class="empty-state">
-
-                    <i class="fas fa-book-open"></i>
-
-                    <h3>
-                        Seu acervo começa com uma história
-                    </h3>
-
-                    <p>
-                        Registre uma memória acima e ela
-                        aparecerá aqui.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         MVP ATUAL
-    ======================================================= -->
-
-    <section
-        class="solution"
-        id="experience"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                O MVP Atual
-            </h2>
-
-            <p class="section-intro">
-                A versão atual permite validar a experiência central
-                do produto: registrar, organizar, pesquisar e preservar
-                memórias em uma interface web funcional.
-            </p>
-
-
-            <div class="solution-cards">
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-desktop"></i>
-                    </div>
-
-                    <h3>
-                        Experiência Web
-                    </h3>
-
-                    <p>
-                        Interface responsiva desenvolvida para
-                        desktop e dispositivos móveis, permitindo
-                        acesso simples à experiência de registro.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-book-bookmark"></i>
-                    </div>
-
-                    <h3>
-                        Acervo Interativo
-                    </h3>
-
-                    <p>
-                        Registro, organização, busca e filtragem de
-                        memórias com persistência local no navegador.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-route"></i>
-                    </div>
-
-                    <h3>
-                        Jornada Validável
-                    </h3>
-
-                    <p>
-                        Uma experiência que permite observar como
-                        usuários capturam, organizam, pesquisam e
-                        interagem com suas próprias histórias.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         ROADMAP
-    ======================================================= -->
-
-    <section
-        id="roadmap"
-        style="background-color: var(--light);"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Próximos Passos
-            </h2>
-
-            <p class="section-intro">
-                O MVP valida o fluxo central do produto.
-                A próxima etapa é ampliar essa experiência com
-                infraestrutura, colaboração familiar, conteúdo
-                multimídia e inteligência aplicada ao acervo.
-            </p>
-
-
-            <div class="solution-cards">
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-
-                    <h3>
-                        Acervo Familiar
-                    </h3>
-
-                    <p>
-                        Perfis familiares, múltiplos participantes,
-                        fotografias, áudio, vídeo, relações entre
-                        pessoas e linha do tempo.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-
-                    <h3>
-                        Plataforma em Nuvem
-                    </h3>
-
-                    <p>
-                        Autenticação, banco de dados, armazenamento
-                        em nuvem, sincronização entre dispositivos,
-                        backup, compartilhamento e privacidade.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-
-                    <h3>
-                        Inteligência Artificial
-                    </h3>
-
-                    <p>
-                        Transcrição de áudio, resumo, identificação
-                        de pessoas, datas e lugares, classificação,
-                        tags automáticas e busca semântica.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         VISÃO FUTURA
-    ======================================================= -->
-
-    <section
-        class="solution"
-        id="future"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                De um acervo de histórias a uma memória familiar inteligente
-            </h2>
-
-            <p class="section-intro">
-                A evolução do Memórias Invisíveis pode transformar
-                registros individuais em uma rede de pessoas,
-                histórias, lugares, períodos, imagens e acontecimentos
-                conectados entre si.
-            </p>
-
-
-            <div class="solution-cards">
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-microphone-lines"></i>
-                    </div>
-
-                    <h3>
-                        Conte em vez de digitar
-                    </h3>
-
-                    <p>
-                        O usuário poderá registrar histórias por voz,
-                        enquanto a plataforma transforma o depoimento
-                        em texto estruturado.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-diagram-project"></i>
-                    </div>
-
-                    <h3>
-                        Conecte as memórias
-                    </h3>
-
-                    <p>
-                        Pessoas, lugares, datas e acontecimentos
-                        poderão ser relacionados para revelar conexões
-                        existentes entre diferentes histórias.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        <i class="fas fa-magnifying-glass"></i>
-                    </div>
-
-                    <h3>
-                        Converse com o acervo
-                    </h3>
-
-                    <p>
-                        A busca semântica poderá permitir perguntas
-                        naturais sobre as próprias histórias e
-                        recuperar memórias relacionadas pelo contexto.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         SOBRE
-    ======================================================= -->
-
-    <section
-        id="about"
-        style="background-color: white;"
-    >
-
-        <div class="container">
-
-            <h2 class="section-title">
-                Sobre o Memórias Invisíveis
-            </h2>
-
-
-            <div
-                style="
-                    max-width: 850px;
-                    margin: 0 auto;
-                    text-align: center;
-                "
-            >
-
-                <p
-                    style="
-                        font-size: 1.1rem;
-                        color: var(--gray);
-                        margin-bottom: 30px;
-                    "
-                >
-
-                    <span class="highlight">
-                        Memórias Invisíveis
-                    </span>
-
-                    é uma plataforma digital em desenvolvimento
-                    dedicada à captura, organização e preservação
-                    de histórias pessoais e familiares entre gerações.
-
-                </p>
-
-
-                <p style="margin-bottom: 40px;">
-                    O produto parte de um problema humano simples:
-                    muitas das histórias mais importantes de uma família
-                    existem apenas na memória de quem as viveu.
-                    A proposta é utilizar tecnologia para transformar
-                    essas lembranças em um patrimônio digital organizado,
-                    acessível e capaz de permanecer ao longo do tempo.
-                </p>
-
-
-                <div
-                    style="
-                        display: grid;
-                        grid-template-columns:
-                            repeat(auto-fit, minmax(200px, 1fr));
-                        gap: 30px;
-                        margin-top: 50px;
-                    "
-                >
-
-                    <div style="text-align: center;">
-
-                        <div
-                            style="
-                                width: 100px;
-                                height: 100px;
-                                background-color: var(--secondary);
-                                border-radius: 50%;
-                                margin: 0 auto 15px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 2rem;
-                                color: var(--primary);
-                            "
-                        >
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-
-                        <h4 style="color: var(--primary);">
-                            Problema
-                        </h4>
-
-                        <p style="font-size: 0.9rem;">
-                            Histórias familiares importantes podem
-                            desaparecer quando não são registradas.
-                        </p>
-
-                    </div>
-
-
-                    <div style="text-align: center;">
-
-                        <div
-                            style="
-                                width: 100px;
-                                height: 100px;
-                                background-color: var(--secondary);
-                                border-radius: 50%;
-                                margin: 0 auto 15px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 2rem;
-                                color: var(--primary);
-                            "
-                        >
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-
-                        <h4 style="color: var(--primary);">
-                            Propósito
-                        </h4>
-
-                        <p style="font-size: 0.9rem;">
-                            Tornar simples e significativo o processo
-                            de preservar histórias e conectá-las
-                            entre gerações.
-                        </p>
-
-                    </div>
-
-
-                    <div style="text-align: center;">
-
-                        <div
-                            style="
-                                width: 100px;
-                                height: 100px;
-                                background-color: var(--secondary);
-                                border-radius: 50%;
-                                margin: 0 auto 15px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 2rem;
-                                color: var(--primary);
-                            "
-                        >
-                            <i class="fas fa-rocket"></i>
-                        </div>
-
-                        <h4 style="color: var(--primary);">
-                            Visão
-                        </h4>
-
-                        <p style="font-size: 0.9rem;">
-                            Evoluir para uma plataforma colaborativa
-                            e inteligente de memória e legado familiar.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         CTA FINAL
-    ======================================================= -->
-
-    <section class="cta-section">
-
-        <div class="container">
-
-            <h2>
-                Toda família tem histórias que merecem ser preservadas
-            </h2>
-
-            <p>
-                Uma memória registrada hoje pode se transformar
-                em uma conexão entre gerações amanhã.
-            </p>
-
-            <div style="margin-top: 50px;">
-
-                <a
-                    href="#registrar"
-                    class="cta-button"
-                >
-                    <i class="fas fa-pen"></i>
-                    Registrar uma Memória
-                </a>
-
-            </div>
-
-            <p
-                style="
-                    margin-top: 30px;
-                    font-size: 0.9rem;
-                    opacity: 0.75;
-                "
-            >
-                MVP em validação.
-                Nesta versão, as memórias permanecem armazenadas
-                somente no navegador do usuário e ainda não são
-                sincronizadas ou armazenadas em nuvem.
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         FOOTER
-    ======================================================= -->
-
-    <footer>
-
-        <div class="container">
-
-            <div class="footer-content">
-
-                <div>
-
-                    <a
-                        href="#inicio"
-                        class="footer-logo"
-                    >
-                        MemóriasInvisíveis
-                    </a>
-
-                    <p
-                        style="
-                            max-width: 350px;
-                            color: #bbb;
-                            line-height: 1.7;
-                        "
-                    >
-                        Plataforma digital em desenvolvimento
-                        para capturar, organizar e preservar
-                        histórias e memórias familiares
-                        entre gerações.
-                    </p>
-
-                </div>
-
-
-                <div class="footer-links">
-
-                    <div class="footer-column">
-
-                        <h4>
-                            Produto
-                        </h4>
-
-                        <a href="#problem">
-                            O Problema
-                        </a>
-
-                        <a href="#solution">
-                            A Solução
-                        </a>
-
-                        <a href="#journey">
-                            A Jornada
-                        </a>
-
-                    </div>
-
-
-                    <div class="footer-column">
-
-                        <h4>
-                            Experiência
-                        </h4>
-
-                        <a href="#registrar">
-                            Registrar Memória
-                        </a>
-
-                        <a href="#acervo">
-                            Meu Acervo
-                        </a>
-
-                        <a href="#experience">
-                            MVP Atual
-                        </a>
-
-                    </div>
-
-
-                    <div class="footer-column">
-
-                        <h4>
-                            Evolução
-                        </h4>
-
-                        <a href="#roadmap">
-                            Próximos Passos
-                        </a>
-
-                        <a href="#future">
-                            Visão Futura
-                        </a>
-
-                        <a href="#about">
-                            Sobre
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="copyright">
-
-                <p>
-                    &copy; 2026 Memórias Invisíveis —
-                    desenvolvido por Marcus Guedes.
-                </p>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-
-    <!-- ======================================================
-         SCRIPTS
-    ======================================================= -->
-
-    <script type="module" src="auth.js"></script>
-    <script src="script.js"></script>
-    <script src="family.js"></script>
+<header id="header">
+<div class="container nav-container">
+<a href="#inicio" class="logo">
+<i class="fas fa-book-open"></i>
+Memórias<span>Invisíveis</span>
+</a>
+
+<button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">
+<i class="fas fa-bars"></i>
+</button>
+
+<nav class="nav-links">
+<a href="#problem">O Problema</a>
+<a href="#solution">A Solução</a>
+<a href="#journey">A Jornada</a>
+<a href="#registrar">Registrar</a>
+<a href="#acervo">Acervo</a>
+<a href="#registrar" class="cta-button">Preservar Memória</a>
+</nav>
+</div>
+</header>
+
+<section class="hero" id="inicio">
+<div class="container hero-content">
+<div class="hero-text">
+
+<h1>Antes que as histórias se tornem invisíveis</h1>
+
+<p>
+Muitas das histórias mais importantes de uma
+família nunca chegam a ser registradas.
+</p>
+
+<p>
+Experiências de infância, trabalho, viagens,
+receitas, tradições, acontecimentos e aprendizados
+podem permanecer apenas na memória e na
+transmissão oral.
+</p>
+
+<p>
+<span class="highlight">Memórias Invisíveis</span>
+é uma plataforma digital em desenvolvimento que
+utiliza tecnologia para ajudar famílias a capturar,
+organizar e preservar suas histórias para as
+próximas gerações.
+</p>
+
+<div style="margin-top: 40px;">
+<a href="#registrar" class="cta-button" style="margin-right: 15px;">
+<i class="fas fa-pen"></i>
+Registrar uma Memória
+</a>
+
+<a href="#solution" class="cta-button" style="background: transparent; border: 2px solid var(--accent); color: var(--accent);">
+<i class="fas fa-book-open"></i>
+Conhecer a Solução
+</a>
+</div>
+
+<p style="margin-top: 25px; font-size: 0.9rem;">
+<strong>MVP em validação.</strong>
+Uma experiência funcional para capturar,
+organizar e preservar histórias familiares,
+conectando memórias e gerações.
+</p>
+
+</div>
+
+<div class="hero-image">
+<img src="https://images.unsplash.com/photo-1516733968668-dbdce39c4651?auto=format&fit=crop&w=1470&q=80" alt="Duas gerações compartilhando histórias">
+<div class="fading-overlay"></div>
+</div>
+</div>
+</section>
+
+<section class="stats">
+<div class="container stats-container">
+
+<div class="stat-item">
+<div class="stat-number">Capturar</div>
+<div class="stat-label">Histórias, experiências e lembranças</div>
+</div>
+
+<div class="stat-item">
+<div class="stat-number">Organizar</div>
+<div class="stat-label">Pessoas, temas, períodos e acontecimentos</div>
+</div>
+
+<div class="stat-item">
+<div class="stat-number">Preservar</div>
+<div class="stat-label">Memórias para futuras gerações</div>
+</div>
+
+</div>
+</section>
+
+<section class="problem" id="problem">
+<div class="container">
+
+<h2 class="section-title">
+Histórias desaparecem quando deixam de ser contadas
+</h2>
+
+<div class="problem-content">
+<div class="problem-text">
+
+<p>
+Parte importante da história de uma família
+não está registrada em documentos, fotografias
+ou arquivos digitais.
+</p>
+
+<p style="margin-top: 20px;">
+Ela permanece nas lembranças das pessoas:
+histórias de infância, receitas, tradições,
+experiências profissionais, viagens, encontros,
+conselhos, acontecimentos e aprendizados.
+</p>
+
+<p style="margin-top: 20px;">
+Quando essas histórias deixam de ser transmitidas,
+perde-se mais do que uma lembrança. Perde-se
+contexto, identidade, conhecimento e parte do
+patrimônio afetivo construído entre gerações.
+</p>
+
+<p style="margin-top: 20px;">
+Memórias Invisíveis nasce para enfrentar
+esse desafio:
+</p>
+
+<p style="margin-top: 15px;">
+<span class="highlight">
+Como tornar simples e natural o processo
+de capturar, organizar e preservar histórias
+antes que elas desapareçam?
+</span>
+</p>
+
+<div style="margin-top: 30px;">
+<a href="#solution" class="cta-button">Conheça a solução</a>
+</div>
+
+</div>
+
+<div class="problem-visual">
+<img src="https://images.unsplash.com/photo-1581579431537-2c7e47c1f7e8?auto=format&fit=crop&w=1470&q=80" alt="Memórias familiares representadas por fotografias" class="fading-image">
+<div class="fading-overlay"></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="solution" id="solution">
+<div class="container">
+
+<h2 class="section-title">
+Memórias Invisíveis: preservando o que importa
+</h2>
+
+<p class="section-intro">
+Uma plataforma criada para transformar lembranças
+dispersas em um acervo familiar organizado,
+acessível e capaz de atravessar gerações.
+</p>
+
+<div class="solution-cards">
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-microphone"></i></div>
+<h3>Capturar</h3>
+<p>
+Utilizar perguntas e temas como ponto de
+partida para recuperar histórias sobre infância,
+família, trabalho, viagens, tradições,
+acontecimentos e aprendizados.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-folder-open"></i></div>
+<h3>Organizar</h3>
+<p>
+Estruturar histórias por pessoas, temas,
+datas, períodos e acontecimentos, tornando
+o acervo mais fácil de navegar e compreender.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-box-archive"></i></div>
+<h3>Preservar</h3>
+<p>
+Construir um acervo digital capaz de manter
+histórias, experiências e seu contexto
+acessíveis às futuras gerações.
+</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="journey" style="background-color: var(--light);">
+<div class="container">
+
+<h2 class="section-title">Uma jornada entre gerações</h2>
+
+<p class="section-intro">
+Preservar uma história começa de forma simples:
+lembrar, conversar, registrar e organizar.
+</p>
+
+<div class="solution-cards" style="margin-top: 20px;">
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-user-group"></i></div>
+<h3>1. Escolher</h3>
+<p>Escolher uma pessoa, uma lembrança ou um período da história familiar.</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-comments"></i></div>
+<h3>2. Conversar</h3>
+<p>Utilizar perguntas como estímulo para recuperar experiências e histórias.</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-pen"></i></div>
+<h3>3. Registrar</h3>
+<p>Transformar uma lembrança em um registro estruturado que possa ser preservado.</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-sitemap"></i></div>
+<h3>4. Organizar</h3>
+<p>Relacionar pessoas, temas, lugares, períodos e acontecimentos.</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-heart"></i></div>
+<h3>5. Compartilhar</h3>
+<p>
+Em uma próxima evolução, permitir que
+familiares colaborem no mesmo acervo com
+diferentes níveis de acesso e privacidade.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-clock-rotate-left"></i></div>
+<h3>6. Preservar</h3>
+<p>Construir progressivamente um patrimônio digital de histórias entre gerações.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="memory-experience" id="registrar">
+<div class="container">
+
+<h2 class="section-title">Registre uma Memória</h2>
+
+<p class="section-intro">
+Experimente o MVP do Memórias Invisíveis.
+Escolha uma lembrança, registre sua história
+e comece a construir um acervo digital de memórias
+que merecem continuar existindo.
+</p>
+
+<div class="memory-layout">
+
+<div class="memory-panel">
+<div class="memory-panel-header">
+<h3><i class="fas fa-pen-nib"></i> Conte uma história</h3>
+<p>
+Não precisa escrever tudo de uma vez.
+Comece pelo que você mais gostaria que
+alguém da sua família pudesse conhecer
+no futuro.
+</p>
+</div>
+
+<form class="memory-form" id="memoryForm">
+<div class="form-grid">
+
+<div class="form-group">
+<label for="memoryPerson">Pessoa relacionada à memória *</label>
+<input type="text" id="memoryPerson" class="form-control" placeholder="Ex.: Minha avó Maria" maxlength="80" required>
+</div>
+
+<div class="form-group">
+<label for="memoryPeriod">Período ou ano</label>
+<input type="text" id="memoryPeriod" class="form-control" placeholder="Ex.: 1975 ou Anos 80" maxlength="40">
+</div>
+
+<div class="form-group full-width">
+<label for="memoryTitle">Título da memória *</label>
+<input type="text" id="memoryTitle" class="form-control" placeholder="Ex.: Os almoços de domingo" maxlength="100" required>
+</div>
+
+<div class="form-group full-width">
+<label for="memoryCategory">Categoria *</label>
+
+<select id="memoryCategory" class="form-control" required>
+<option value="">Selecione uma categoria</option>
+<option value="Infância">Infância</option>
+<option value="Família">Família</option>
+<option value="Trabalho">Trabalho</option>
+<option value="Viagens">Viagens</option>
+<option value="Tradições">Tradições</option>
+<option value="Receitas">Receitas</option>
+<option value="Relacionamentos">Relacionamentos</option>
+<option value="Acontecimentos">Acontecimentos</option>
+<option value="Aprendizados">Aprendizados</option>
+<option value="Outras">Outras</option>
+</select>
+</div>
+
+<div class="form-group full-width">
+<label for="memoryStory">Conte a memória *</label>
+
+<textarea id="memoryStory" class="form-control" placeholder="Escreva aqui a história que você gostaria de preservar..." maxlength="3000" required></textarea>
+
+<small>
+Nesta versão do MVP, a história
+permanece armazenada somente neste
+navegador e não é enviada para
+um servidor.
+</small>
+</div>
+
+</div>
+
+<div class="form-actions">
+<button type="submit" class="cta-button">
+<i class="fas fa-bookmark"></i>
+Preservar esta Memória
+</button>
+
+<button type="button" class="secondary-button" id="clearFormButton">
+Limpar
+</button>
+</div>
+
+<div class="form-message" id="formMessage" role="status" aria-live="polite"></div>
+
+</form>
+</div>
+
+<div class="memory-panel">
+
+<div class="memory-panel-header">
+<h3><i class="fas fa-lightbulb"></i> Precisa de inspiração?</h3>
+<p>
+Às vezes uma boa pergunta é suficiente
+para trazer de volta uma história inteira.
+</p>
+</div>
+
+<div class="prompt-box">
+<span class="prompt-label">Pergunta para começar</span>
+<p class="prompt-text" id="promptText">
+Qual lembrança da sua infância você nunca
+gostaria de esquecer?
+</p>
+</div>
+
+<button type="button" class="secondary-button" id="newPromptButton">
+<i class="fas fa-rotate"></i>
+Outra pergunta
+</button>
+
+<div class="memory-helper" style="margin-top: 30px;">
+
+<div class="helper-card">
+<div class="helper-icon"><i class="fas fa-user"></i></div>
+<div>
+<h4>Pense em uma pessoa</h4>
+<p>Quem aparece primeiro quando você pensa nas histórias da sua família?</p>
+</div>
+</div>
+
+<div class="helper-card">
+<div class="helper-icon"><i class="fas fa-calendar-days"></i></div>
+<div>
+<h4>Volte a um período</h4>
+<p>
+Infância, escola, primeiro emprego,
+casamento, viagens ou mudanças podem
+despertar lembranças.
+</p>
+</div>
+</div>
+
+<div class="helper-card">
+<div class="helper-icon"><i class="fas fa-heart"></i></div>
+<div>
+<h4>Preserve o significado</h4>
+<p>
+Mais importante que lembrar cada
+detalhe é registrar por que aquela
+história merece continuar existindo.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="memory-archive" id="acervo">
+<div class="container">
+
+<h2 class="section-title">Meu Acervo de Memórias</h2>
+
+<p class="section-intro">
+As histórias registradas no MVP são organizadas
+em um acervo pesquisável. Nesta versão, os registros
+permanecem somente no navegador utilizado.
+</p>
+
+<div class="archive-toolbar">
+
+<div class="search-wrapper">
+<i class="fas fa-magnifying-glass"></i>
+<input type="search" id="memorySearch" class="form-control" placeholder="Buscar por pessoa, título ou palavra..." aria-label="Buscar memórias">
+</div>
+
+<select id="categoryFilter" class="form-control" aria-label="Filtrar memórias por categoria">
+<option value="all">Todas as categorias</option>
+<option value="Infância">Infância</option>
+<option value="Família">Família</option>
+<option value="Trabalho">Trabalho</option>
+<option value="Viagens">Viagens</option>
+<option value="Tradições">Tradições</option>
+<option value="Receitas">Receitas</option>
+<option value="Relacionamentos">Relacionamentos</option>
+<option value="Acontecimentos">Acontecimentos</option>
+<option value="Aprendizados">Aprendizados</option>
+<option value="Outras">Outras</option>
+</select>
+
+</div>
+
+<div class="archive-summary">
+<p>
+<span class="memory-count" id="memoryCount">0 memórias</span>
+preservadas neste navegador.
+</p>
+
+<p>
+<i class="fas fa-lock"></i>
+Armazenamento local nesta versão do MVP
+</p>
+</div>
+
+<div class="archive-grid" id="memoryArchive" aria-live="polite">
+<div class="empty-state">
+<i class="fas fa-book-open"></i>
+<h3>Seu acervo começa com uma história</h3>
+<p>Registre uma memória acima e ela aparecerá aqui.</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="solution" id="experience">
+<div class="container">
+
+<h2 class="section-title">O MVP Atual</h2>
+
+<p class="section-intro">
+A versão atual permite validar a experiência central
+do produto: registrar, organizar, pesquisar e preservar
+memórias em uma interface web funcional.
+</p>
+
+<div class="solution-cards">
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-desktop"></i></div>
+<h3>Experiência Web</h3>
+<p>
+Interface responsiva desenvolvida para
+desktop e dispositivos móveis, permitindo
+acesso simples à experiência de registro.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-book-bookmark"></i></div>
+<h3>Acervo Interativo</h3>
+<p>
+Registro, organização, busca e filtragem de
+memórias com persistência local no navegador.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-route"></i></div>
+<h3>Jornada Validável</h3>
+<p>
+Uma experiência que permite observar como
+usuários capturam, organizam, pesquisam e
+interagem com suas próprias histórias.
+</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="roadmap" style="background-color: var(--light);">
+<div class="container">
+
+<h2 class="section-title">Próximos Passos</h2>
+
+<p class="section-intro">
+O MVP valida o fluxo central do produto.
+A próxima etapa é ampliar essa experiência com
+infraestrutura, colaboração familiar, conteúdo
+multimídia e inteligência aplicada ao acervo.
+</p>
+
+<div class="solution-cards">
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-users"></i></div>
+<h3>Acervo Familiar</h3>
+<p>
+Perfis familiares, múltiplos participantes,
+fotografias, áudio, vídeo, relações entre
+pessoas e linha do tempo.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-cloud"></i></div>
+<h3>Plataforma em Nuvem</h3>
+<p>
+Autenticação, banco de dados, armazenamento
+em nuvem, sincronização entre dispositivos,
+backup, compartilhamento e privacidade.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-brain"></i></div>
+<h3>Inteligência Artificial</h3>
+<p>
+Transcrição de áudio, resumo, identificação
+de pessoas, datas e lugares, classificação,
+tags automáticas e busca semântica.
+</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="solution" id="future">
+<div class="container">
+
+<h2 class="section-title">
+De um acervo de histórias a uma memória familiar inteligente
+</h2>
+
+<p class="section-intro">
+A evolução do Memórias Invisíveis pode transformar
+registros individuais em uma rede de pessoas,
+histórias, lugares, períodos, imagens e acontecimentos
+conectados entre si.
+</p>
+
+<div class="solution-cards">
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-microphone-lines"></i></div>
+<h3>Conte em vez de digitar</h3>
+<p>
+O usuário poderá registrar histórias por voz,
+enquanto a plataforma transforma o depoimento
+em texto estruturado.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-diagram-project"></i></div>
+<h3>Conecte as memórias</h3>
+<p>
+Pessoas, lugares, datas e acontecimentos
+poderão ser relacionados para revelar conexões
+existentes entre diferentes histórias.
+</p>
+</div>
+
+<div class="card">
+<div class="card-icon"><i class="fas fa-magnifying-glass"></i></div>
+<h3>Converse com o acervo</h3>
+<p>
+A busca semântica poderá permitir perguntas
+naturais sobre as próprias histórias e
+recuperar memórias relacionadas pelo contexto.
+</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="about" style="background-color: white;">
+<div class="container">
+
+<h2 class="section-title">Sobre o Memórias Invisíveis</h2>
+
+<div style="max-width: 850px; margin: 0 auto; text-align: center;">
+
+<p style="font-size: 1.1rem; color: var(--gray); margin-bottom: 30px;">
+<span class="highlight">Memórias Invisíveis</span>
+é uma plataforma digital em desenvolvimento
+dedicada à captura, organização e preservação
+de histórias pessoais e familiares entre gerações.
+</p>
+
+<p style="margin-bottom: 40px;">
+O produto parte de um problema humano simples:
+muitas das histórias mais importantes de uma família
+existem apenas na memória de quem as viveu.
+A proposta é utilizar tecnologia para transformar
+essas lembranças em um patrimônio digital organizado,
+acessível e capaz de permanecer ao longo do tempo.
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 50px;">
+
+<div style="text-align: center;">
+<div style="width: 100px; height: 100px; background-color: var(--secondary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary);">
+<i class="fas fa-lightbulb"></i>
+</div>
+<h4 style="color: var(--primary);">Problema</h4>
+<p style="font-size: 0.9rem;">
+Histórias familiares importantes podem
+desaparecer quando não são registradas.
+</p>
+</div>
+
+<div style="text-align: center;">
+<div style="width: 100px; height: 100px; background-color: var(--secondary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary);">
+<i class="fas fa-bullseye"></i>
+</div>
+<h4 style="color: var(--primary);">Propósito</h4>
+<p style="font-size: 0.9rem;">
+Tornar simples e significativo o processo
+de preservar histórias e conectá-las
+entre gerações.
+</p>
+</div>
+
+<div style="text-align: center;">
+<div style="width: 100px; height: 100px; background-color: var(--secondary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary);">
+<i class="fas fa-rocket"></i>
+</div>
+<h4 style="color: var(--primary);">Visão</h4>
+<p style="font-size: 0.9rem;">
+Evoluir para uma plataforma colaborativa
+e inteligente de memória e legado familiar.
+</p>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section class="cta-section">
+<div class="container">
+
+<h2>
+Toda família tem histórias que merecem ser preservadas
+</h2>
+
+<p>
+Uma memória registrada hoje pode se transformar
+em uma conexão entre gerações amanhã.
+</p>
+
+<div style="margin-top: 50px;">
+<a href="#registrar" class="cta-button">
+<i class="fas fa-pen"></i>
+Registrar uma Memória
+</a>
+</div>
+
+<p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.75;">
+MVP em validação.
+Nesta versão, as memórias permanecem armazenadas
+somente no navegador do usuário e ainda não são
+sincronizadas ou armazenadas em nuvem.
+</p>
+
+</div>
+</section>
+
+<footer>
+<div class="container">
+
+<div class="footer-content">
+
+<div>
+<a href="#inicio" class="footer-logo">MemóriasInvisíveis</a>
+
+<p style="max-width: 350px; color: #bbb; line-height: 1.7;">
+Plataforma digital em desenvolvimento
+para capturar, organizar e preservar
+histórias e memórias familiares
+entre gerações.
+</p>
+</div>
+
+<div class="footer-links">
+
+<div class="footer-column">
+<h4>Produto</h4>
+<a href="#problem">O Problema</a>
+<a href="#solution">A Solução</a>
+<a href="#journey">A Jornada</a>
+</div>
+
+<div class="footer-column">
+<h4>Experiência</h4>
+<a href="#registrar">Registrar Memória</a>
+<a href="#acervo">Meu Acervo</a>
+<a href="#experience">MVP Atual</a>
+</div>
+
+<div class="footer-column">
+<h4>Evolução</h4>
+<a href="#roadmap">Próximos Passos</a>
+<a href="#future">Visão Futura</a>
+<a href="#about">Sobre</a>
+</div>
+
+</div>
+</div>
+
+<div class="copyright">
+<p>
+&copy; 2026 Memórias Invisíveis —
+desenvolvido por Marcus Guedes.
+</p>
+</div>
+
+</div>
+</footer>
+
+<script type="module" src="auth.js"></script>
+<script src="script.js"></script>
+<script src="family.js"></script>
+<script src="timeline.js"></script>
 
 </body>
-
 </html>
