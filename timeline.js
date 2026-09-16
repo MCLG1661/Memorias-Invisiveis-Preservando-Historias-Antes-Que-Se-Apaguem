@@ -3,12 +3,18 @@
 // FASE 8.5 — NAVEGAÇÃO MEMÓRIA ↔ PESSOA
 //
 // Inclui:
-// - Modelo temporal
+// - Modelo temporal da Timeline
 // - Timeline cronológica
 // - Pessoas na Timeline
 // - Filtros Pessoa / Categoria / Período
 // - Navegação Timeline → Memória
 // - Navegação Timeline → Perfil da Pessoa
+//
+// Regra de navegação:
+// - O Acervo é a fonte de verdade.
+// - Se a pessoa é navegável no card do Acervo,
+//   também será navegável na Timeline.
+// - Em modo local, a pessoa permanece informativa.
 // ==========================================================
 
 (function () {
@@ -20,41 +26,22 @@
     // CONFIGURAÇÕES
     // ======================================================
 
-    const TIMELINE_SECTION_ID =
-        'timeline';
+    const TIMELINE_SECTION_ID = 'timeline';
+    const TIMELINE_LIST_ID = 'familyTimeline';
+    const TIMELINE_STYLE_ID = 'mi-timeline-styles';
 
-    const TIMELINE_LIST_ID =
-        'familyTimeline';
+    const PERSON_FILTER_ID = 'timelinePersonFilter';
+    const CATEGORY_FILTER_ID = 'timelineCategoryFilter';
+    const PERIOD_FILTER_ID = 'timelinePeriodFilter';
+    const CLEAR_FILTERS_ID = 'timelineClearFilters';
+    const RESULT_COUNT_ID = 'timelineResultCount';
 
-    const TIMELINE_STYLE_ID =
-        'mi-timeline-styles';
+    const MEMORY_ARCHIVE_ID = 'memoryArchive';
 
-    const PERSON_FILTER_ID =
-        'timelinePersonFilter';
-
-    const CATEGORY_FILTER_ID =
-        'timelineCategoryFilter';
-
-    const PERIOD_FILTER_ID =
-        'timelinePeriodFilter';
-
-    const CLEAR_FILTERS_ID =
-        'timelineClearFilters';
-
-    const RESULT_COUNT_ID =
-        'timelineResultCount';
-
-    const MEMORY_ARCHIVE_ID =
-        'memoryArchive';
-
-    const UNKNOWN_LABEL =
-        'Período não determinado';
-
+    const UNKNOWN_LABEL = 'Período não determinado';
 
     let timelineMemories = [];
-
     let archiveObserver = null;
-
     let syncTimer = null;
 
 
@@ -62,99 +49,58 @@
     // PRECISÃO TEMPORAL
     // ======================================================
 
-    const PRECISION =
-        Object.freeze({
+    const PRECISION = Object.freeze({
 
-            EXACT:
-                'exact',
+        EXACT: 'exact',
+        APPROXIMATE: 'approximate',
+        RANGE: 'range',
+        DECADE: 'decade',
+        UNKNOWN: 'unknown'
 
-            APPROXIMATE:
-                'approximate',
-
-            RANGE:
-                'range',
-
-            DECADE:
-                'decade',
-
-            UNKNOWN:
-                'unknown'
-
-        });
+    });
 
 
     // ======================================================
-    // NORMALIZAÇÃO
+    // UTILITÁRIOS
     // ======================================================
 
-    function normalizeText(
-        value
-    ) {
+    function normalizeText(value) {
 
-        return String(
-            value || ''
-        )
+        return String(value || '')
             .trim()
-            .replace(
-                /\s+/g,
-                ' '
-            )
+            .replace(/\s+/g, ' ')
             .normalize('NFD')
-            .replace(
-                /[\u0300-\u036f]/g,
-                ''
-            )
-            .toLocaleLowerCase(
-                'pt-BR'
-            );
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLocaleLowerCase('pt-BR');
 
     }
 
 
-    function escapeHTML(
-        value
-    ) {
+    function escapeHTML(value) {
 
-        const div =
-            document.createElement(
-                'div'
-            );
+        const div = document.createElement('div');
 
-        div.textContent =
-            value ?? '';
+        div.textContent = value ?? '';
 
         return div.innerHTML;
 
     }
 
 
-    function cleanElementText(
-        element
-    ) {
+    function cleanElementText(element) {
 
         if (!element) {
             return '';
         }
 
-        return String(
-            element.textContent || ''
-        )
+        return String(element.textContent || '')
             .trim()
-            .replace(
-                /\s+/g,
-                ' '
-            );
+            .replace(/\s+/g, ' ');
 
     }
 
 
-    // ======================================================
-    // ANOS
-    // ======================================================
-
-    function isValidYear(
-        year
-    ) {
+    function isValidYear(year) {
 
         return (
             Number.isInteger(year) &&
@@ -165,37 +111,31 @@
     }
 
 
-    function createUnknownTimeline(
-        periodText = ''
-    ) {
+    // ======================================================
+    // MODELO TEMPORAL
+    // ======================================================
 
-        const original =
-            String(
-                periodText || ''
-            ).trim();
+    function createUnknownTimeline(periodText = '') {
+
+        const original = String(periodText || '').trim();
 
         return {
 
             original,
 
-            year:
-                null,
+            year: null,
 
-            endYear:
-                null,
+            endYear: null,
 
-            precision:
-                PRECISION.UNKNOWN,
+            precision: PRECISION.UNKNOWN,
 
             label:
                 original ||
                 UNKNOWN_LABEL,
 
-            sortable:
-                false,
+            sortable: false,
 
-            sortKey:
-                null
+            sortKey: null
 
         };
 
@@ -213,9 +153,7 @@
         return {
 
             original:
-                String(
-                    original || ''
-                ).trim(),
+                String(original || '').trim(),
 
             year,
 
@@ -226,14 +164,10 @@
             label,
 
             sortable:
-                Number.isInteger(
-                    year
-                ),
+                Number.isInteger(year),
 
             sortKey:
-                Number.isInteger(
-                    year
-                )
+                Number.isInteger(year)
                     ? year
                     : null
 
@@ -246,30 +180,17 @@
     // PARSER — ANO EXATO
     // ======================================================
 
-    function parseExactYear(
-        original,
-        normalized
-    ) {
+    function parseExactYear(original, normalized) {
 
         if (
-            !/^(18|19|20)\d{2}$/
-                .test(
-                    normalized
-                )
+            !/^(18|19|20)\d{2}$/.test(normalized)
         ) {
             return null;
         }
 
-        const year =
-            Number(
-                normalized
-            );
+        const year = Number(normalized);
 
-        if (
-            !isValidYear(
-                year
-            )
-        ) {
+        if (!isValidYear(year)) {
             return null;
         }
 
@@ -294,29 +215,18 @@
     // PARSER — INTERVALO
     // ======================================================
 
-    function parseYearRange(
-        original,
-        normalized
-    ) {
+    function parseYearRange(original, normalized) {
 
-        const match =
-            normalized.match(
-                /^((?:18|19|20)\d{2})\s*(?:-|–|—|a|ate)\s*((?:18|19|20)\d{2})$/
-            );
+        const match = normalized.match(
+            /^((?:18|19|20)\d{2})\s*(?:-|–|—|a|ate)\s*((?:18|19|20)\d{2})$/
+        );
 
         if (!match) {
             return null;
         }
 
-        const first =
-            Number(
-                match[1]
-            );
-
-        const second =
-            Number(
-                match[2]
-            );
+        const first = Number(match[1]);
+        const second = Number(match[2]);
 
         if (
             !isValidYear(first) ||
@@ -326,16 +236,10 @@
         }
 
         const year =
-            Math.min(
-                first,
-                second
-            );
+            Math.min(first, second);
 
         const endYear =
-            Math.max(
-                first,
-                second
-            );
+            Math.max(first, second);
 
         return createTimelineResult({
 
@@ -360,27 +264,19 @@
     // PARSER — DÉCADA
     // ======================================================
 
-    function parseDecade(
-        original,
-        normalized
-    ) {
+    function parseDecade(original, normalized) {
 
-        const fourDigits =
-            normalized.match(
-                /^(?:decada de|decada dos|anos)\s*((?:18|19|20)\d{2})$/
-            );
+        const fourDigits = normalized.match(
+            /^(?:decada de|decada dos|anos)\s*((?:18|19|20)\d{2})$/
+        );
 
         if (fourDigits) {
 
             const rawYear =
-                Number(
-                    fourDigits[1]
-                );
+                Number(fourDigits[1]);
 
             const year =
-                Math.floor(
-                    rawYear / 10
-                ) * 10;
+                Math.floor(rawYear / 10) * 10;
 
             return createTimelineResult({
 
@@ -402,36 +298,30 @@
         }
 
 
-        const twoDigits =
-            normalized.match(
-                /^(?:decada de|decada dos|anos)\s*(\d{2})$/
-            );
+        const twoDigits = normalized.match(
+            /^(?:decada de|decada dos|anos)\s*(\d{2})$/
+        );
 
         if (!twoDigits) {
             return null;
         }
 
         const shortYear =
-            Number(
-                twoDigits[1]
-            );
+            Number(twoDigits[1]);
 
         const currentYear =
-            new Date()
-                .getFullYear();
+            new Date().getFullYear();
 
         const currentShort =
             currentYear % 100;
 
         const century =
-            shortYear <=
-            currentShort
+            shortYear <= currentShort
                 ? 2000
                 : 1900;
 
         const year =
-            century +
-            shortYear;
+            century + shortYear;
 
         return createTimelineResult({
 
@@ -473,30 +363,19 @@
         ];
 
 
-        for (
-            const pattern
-            of patterns
-        ) {
+        for (const pattern of patterns) {
 
             const match =
-                normalized.match(
-                    pattern
-                );
+                normalized.match(pattern);
 
             if (!match) {
                 continue;
             }
 
             const year =
-                Number(
-                    match[1]
-                );
+                Number(match[1]);
 
-            if (
-                !isValidYear(
-                    year
-                )
-            ) {
+            if (!isValidYear(year)) {
                 continue;
             }
 
@@ -543,15 +422,9 @@
         }
 
         const year =
-            Number(
-                matches[0]
-            );
+            Number(matches[0]);
 
-        if (
-            !isValidYear(
-                year
-            )
-        ) {
+        if (!isValidYear(year)) {
             return null;
         }
 
@@ -576,47 +449,29 @@
     // INTERPRETAR PERÍODO
     // ======================================================
 
-    function parseMemoryPeriod(
-        periodText
-    ) {
+    function parseMemoryPeriod(periodText) {
 
         const original =
-            String(
-                periodText || ''
-            ).trim();
+            String(periodText || '').trim();
 
         if (!original) {
-
-            return (
-                createUnknownTimeline()
-            );
-
+            return createUnknownTimeline();
         }
 
         const normalized =
-            normalizeText(
-                original
-            );
+            normalizeText(original);
 
         const parsers = [
 
             parseExactYear,
-
             parseYearRange,
-
             parseDecade,
-
             parseApproximateYear,
-
             parseEmbeddedYear
 
         ];
 
-
-        for (
-            const parser
-            of parsers
-        ) {
+        for (const parser of parsers) {
 
             const result =
                 parser(
@@ -630,10 +485,8 @@
 
         }
 
-        return (
-            createUnknownTimeline(
-                original
-            )
+        return createUnknownTimeline(
+            original
         );
 
     }
@@ -643,14 +496,11 @@
     // ENRIQUECIMENTO
     // ======================================================
 
-    function enrichMemoryWithTimeline(
-        memory
-    ) {
+    function enrichMemoryWithTimeline(memory) {
 
         const safe =
             memory &&
-            typeof memory ===
-                'object'
+            typeof memory === 'object'
                 ? memory
                 : {};
 
@@ -668,15 +518,9 @@
     }
 
 
-    function enrichMemoriesWithTimeline(
-        memories
-    ) {
+    function enrichMemoriesWithTimeline(memories) {
 
-        if (
-            !Array.isArray(
-                memories
-            )
-        ) {
+        if (!Array.isArray(memories)) {
             return [];
         }
 
@@ -750,25 +594,18 @@
     }
 
 
-    function sortMemoriesByTimeline(
-        memories
-    ) {
+    function sortMemoriesByTimeline(memories) {
 
-        return (
-            enrichMemoriesWithTimeline(
-                memories
-            )
-                .sort(
-                    compareTimelineAscending
-                )
+        return enrichMemoriesWithTimeline(
+            memories
+        ).sort(
+            compareTimelineAscending
         );
 
     }
 
 
-    function groupMemoriesByTimeline(
-        memories
-    ) {
+    function groupMemoriesByTimeline(memories) {
 
         const sorted =
             sortMemoriesByTimeline(
@@ -779,32 +616,14 @@
 
             chronological:
                 sorted.filter(
-                    function (
-                        memory
-                    ) {
-
-                        return (
-                            memory
-                                .timeline
-                                .sortable
-                        );
-
-                    }
+                    memory =>
+                        memory.timeline.sortable
                 ),
 
             undetermined:
                 sorted.filter(
-                    function (
-                        memory
-                    ) {
-
-                        return (
-                            !memory
-                                .timeline
-                                .sortable
-                        );
-
-                    }
+                    memory =>
+                        !memory.timeline.sortable
                 )
 
         };
@@ -813,179 +632,39 @@
 
 
     // ======================================================
-    // PESSOAS — CONTROLADOR
+    // ACERVO — LOCALIZAR CARD
     // ======================================================
 
-    function getFamilyController() {
+    function getArchive() {
 
-        return (
-            window
-                .MemoriasInvisiveisFamily ||
-            null
+        return document.getElementById(
+            MEMORY_ARCHIVE_ID
         );
 
     }
 
 
-    function getFamilyPeople() {
+    function findArchiveMemoryCard(memoryId) {
 
-        const controller =
-            getFamilyController();
+        const archive =
+            getArchive();
 
-        if (
-            !controller ||
-            typeof controller
-                .getPeople !==
-                'function'
-        ) {
-            return [];
-        }
-
-        const people =
-            controller
-                .getPeople();
-
-        return (
-            Array.isArray(people)
-                ? people
-                : []
-        );
-
-    }
-
-
-    function getFamilyPersonNames(
-        person
-    ) {
-
-        if (!person) {
-            return [];
-        }
-
-        const first =
-            String(
-                person.first_name ||
-                ''
-            ).trim();
-
-        const last =
-            String(
-                person.last_name ||
-                ''
-            ).trim();
-
-        const preferred =
-            String(
-                person.preferred_name ||
-                ''
-            ).trim();
-
-        const full =
-            [
-                first,
-                last
-            ]
-                .filter(Boolean)
-                .join(' ')
-                .trim();
-
-        return [
-            first,
-            full,
-            preferred
-        ]
-            .filter(Boolean)
-            .map(
-                normalizeText
-            );
-
-    }
-
-
-    // ======================================================
-    // RESOLVER ID DA PESSOA
-    //
-    // Estratégia:
-    // 1. Usa personId vindo do card.
-    // 2. Confirma o ID contra familyPeople.
-    // 3. Se necessário, encontra a pessoa pelo nome.
-    //
-    // Isso elimina a dependência exclusiva do DOM.
-    // ======================================================
-
-    function resolvePersonId(
-        memory
-    ) {
-
-        const people =
-            getFamilyPeople();
-
-
-        if (
-            memory?.personId
-        ) {
-
-            const directMatch =
-                people.find(
-                    function (
-                        person
-                    ) {
-
-                        return (
-                            String(
-                                person.id
-                            ) ===
-                            String(
-                                memory.personId
-                            )
-                        );
-
-                    }
-                );
-
-            if (directMatch) {
-
-                return (
-                    directMatch.id
-                );
-
-            }
-
-        }
-
-
-        const memoryPerson =
-            normalizeText(
-                memory?.person
-            );
-
-        if (!memoryPerson) {
+        if (!archive || !memoryId) {
             return null;
         }
 
-
-        const person =
-            people.find(
-                function (
-                    candidate
-                ) {
-
-                    return (
-                        getFamilyPersonNames(
-                            candidate
-                        )
-                            .includes(
-                                memoryPerson
-                            )
-                    );
-
-                }
-            );
-
-
         return (
-            person?.id ||
-            memory?.personId ||
+            Array.from(
+                archive.querySelectorAll(
+                    '.memory-card'
+                )
+            ).find(
+                card =>
+                    String(
+                        card.dataset.memoryId || ''
+                    ) ===
+                    String(memoryId)
+            ) ||
             null
         );
 
@@ -993,50 +672,74 @@
 
 
     // ======================================================
-    // LER PESSOA DO CARD
+    // PESSOA — LER DO CARD ORIGINAL
+    //
+    // IMPORTANTE:
+    // O próprio Acervo define se existe perfil navegável.
+    //
+    // .memory-person-button = pessoa vinculada
+    // .memory-person        = apenas texto/local
     // ======================================================
 
-    function readPersonFromCard(
-        card
-    ) {
+    function readPersonFromCard(card) {
 
-        const element =
-            card?.querySelector(
-                '.memory-person-button, .memory-person'
-            );
-
-        if (!element) {
+        if (!card) {
 
             return {
 
-                name:
-                    '',
-
-                id:
-                    null
+                name: '',
+                personId: null,
+                navigable: false
 
             };
 
         }
 
-        const name =
-            cleanElementText(
-                element
+
+        const button =
+            card.querySelector(
+                '.memory-person-button'
             );
 
-        const id =
-            element.getAttribute(
-                'data-memory-person-id'
-            ) ||
-            element.dataset
-                ?.memoryPersonId ||
-            null;
+        if (button) {
+
+            return {
+
+                name:
+                    cleanElementText(
+                        button
+                    ),
+
+                personId:
+                    button.getAttribute(
+                        'data-memory-person-id'
+                    ) ||
+                    button.dataset
+                        ?.memoryPersonId ||
+                    null,
+
+                navigable: true
+
+            };
+
+        }
+
+
+        const text =
+            card.querySelector(
+                '.memory-person'
+            );
 
         return {
 
-            name,
+            name:
+                cleanElementText(
+                    text
+                ),
 
-            id
+            personId: null,
+
+            navigable: false
 
         };
 
@@ -1044,15 +747,13 @@
 
 
     // ======================================================
-    // LER ACERVO
+    // LER MEMÓRIAS DO ACERVO
     // ======================================================
 
     function readMemoriesFromArchive() {
 
         const archive =
-            document.getElementById(
-                MEMORY_ARCHIVE_ID
-            );
+            getArchive();
 
         if (!archive) {
             return [];
@@ -1066,10 +767,7 @@
         return Array
             .from(cards)
             .map(
-                function (
-                    card,
-                    index
-                ) {
+                function (card, index) {
 
                     const person =
                         readPersonFromCard(
@@ -1093,8 +791,7 @@
                     return {
 
                         id:
-                            card.dataset
-                                .memoryId ||
+                            card.dataset.memoryId ||
                             `memory-${index}`,
 
                         title:
@@ -1108,7 +805,10 @@
                             person.name,
 
                         personId:
-                            person.id,
+                            person.personId,
+
+                        personNavigable:
+                            person.navigable,
 
                         period,
 
@@ -1129,103 +829,6 @@
                     };
 
                 }
-            );
-
-    }
-
-
-    // ======================================================
-    // NAVEGAÇÃO → PERFIL
-    // ======================================================
-
-    async function openPersonProfile(
-        memory
-    ) {
-
-        let controller =
-            getFamilyController();
-
-
-        if (
-            !controller ||
-            typeof controller
-                .openPersonProfile !==
-                'function'
-        ) {
-
-            await new Promise(
-                function (
-                    resolve
-                ) {
-
-                    window.setTimeout(
-                        resolve,
-                        250
-                    );
-
-                }
-            );
-
-            controller =
-                getFamilyController();
-
-        }
-
-
-        if (
-            !controller ||
-            typeof controller
-                .openPersonProfile !==
-                'function'
-        ) {
-
-            window.alert(
-                'O módulo de perfis familiares ainda não está disponível.'
-            );
-
-            return;
-
-        }
-
-
-        let personId =
-            resolvePersonId(
-                memory
-            );
-
-
-        if (
-            !personId &&
-            typeof controller
-                .refresh ===
-                'function'
-        ) {
-
-            await controller
-                .refresh();
-
-            personId =
-                resolvePersonId(
-                    memory
-                );
-
-        }
-
-
-        if (!personId) {
-
-            window.alert(
-                `Não foi possível localizar o perfil de ${memory.person || 'esta pessoa'} no acervo familiar.`
-            );
-
-            return;
-
-        }
-
-
-        await controller
-            .openPersonProfile(
-                personId
             );
 
     }
@@ -1253,15 +856,13 @@
             search.value
         ) {
 
-            search.value =
-                '';
+            search.value = '';
 
             search.dispatchEvent(
                 new Event(
                     'input',
                     {
-                        bubbles:
-                            true
+                        bubbles: true
                     }
                 )
             );
@@ -1271,19 +872,16 @@
 
         if (
             category &&
-            category.value !==
-                'all'
+            category.value !== 'all'
         ) {
 
-            category.value =
-                'all';
+            category.value = 'all';
 
             category.dispatchEvent(
                 new Event(
                     'change',
                     {
-                        bubbles:
-                            true
+                        bubbles: true
                     }
                 )
             );
@@ -1293,85 +891,33 @@
     }
 
 
-    function findArchiveMemoryCard(
-        memoryId
-    ) {
+    function highlightMemory(card) {
 
-        const archive =
-            document.getElementById(
-                MEMORY_ARCHIVE_ID
-            );
-
-        if (!archive) {
-            return null;
+        if (!card) {
+            return;
         }
-
-        return (
-            Array
-                .from(
-                    archive
-                        .querySelectorAll(
-                            '.memory-card'
-                        )
-                )
-                .find(
-                    function (
-                        card
-                    ) {
-
-                        return (
-                            String(
-                                card.dataset
-                                    .memoryId ||
-                                ''
-                            ) ===
-                            String(
-                                memoryId
-                            )
-                        );
-
-                    }
-                ) ||
-            null
-        );
-
-    }
-
-
-    function highlightMemory(
-        card
-    ) {
 
         document
             .querySelectorAll(
                 '.memory-card.mi-memory-highlight'
             )
             .forEach(
-                function (
-                    item
-                ) {
-
-                    item.classList
-                        .remove(
-                            'mi-memory-highlight'
-                        );
-
-                }
+                item =>
+                    item.classList.remove(
+                        'mi-memory-highlight'
+                    )
             );
-
 
         card.classList.add(
             'mi-memory-highlight'
         );
 
-
         window.setTimeout(
             function () {
 
-                card.classList
-                    .remove(
-                        'mi-memory-highlight'
-                    );
+                card.classList.remove(
+                    'mi-memory-highlight'
+                );
 
             },
             2800
@@ -1380,9 +926,7 @@
     }
 
 
-    function openMemory(
-        memoryId
-    ) {
+    function openMemory(memoryId) {
 
         if (!memoryId) {
             return;
@@ -1391,7 +935,7 @@
         clearArchiveFilters();
 
 
-        window.setTimeout(
+        const locateAndOpen =
             function () {
 
                 const card =
@@ -1400,34 +944,93 @@
                     );
 
                 if (!card) {
+                    return false;
+                }
+
+                card.scrollIntoView({
+
+                    behavior: 'smooth',
+
+                    block: 'center'
+
+                });
+
+                highlightMemory(card);
+
+                return true;
+
+            };
+
+
+        if (locateAndOpen()) {
+            return;
+        }
+
+
+        window.setTimeout(
+            function () {
+
+                if (!locateAndOpen()) {
 
                     window.alert(
                         'Não foi possível localizar esta memória no Acervo.'
                     );
 
-                    return;
-
                 }
 
-
-                card.scrollIntoView({
-
-                    behavior:
-                        'smooth',
-
-                    block:
-                        'center'
-
-                });
-
-
-                highlightMemory(
-                    card
-                );
-
             },
-            180
+            250
         );
+
+    }
+
+
+    // ======================================================
+    // NAVEGAÇÃO → PERFIL DA PESSOA
+    //
+    // Não duplicamos a lógica do family.js.
+    // Reutilizamos o botão da pessoa existente no card
+    // original do Acervo.
+    // ======================================================
+
+    function openPersonProfile(memoryId) {
+
+        if (!memoryId) {
+            return;
+        }
+
+        const card =
+            findArchiveMemoryCard(
+                memoryId
+            );
+
+        if (!card) {
+
+            window.alert(
+                'Não foi possível localizar esta memória no Acervo.'
+            );
+
+            return;
+
+        }
+
+
+        const personButton =
+            card.querySelector(
+                '.memory-person-button'
+            );
+
+
+        if (!personButton) {
+
+            // Modo local ou memória sem perfil vinculado.
+            // O chip é apenas informativo.
+            return;
+
+        }
+
+
+        personButton.click();
 
     }
 
@@ -1436,50 +1039,34 @@
     // FILTROS
     // ======================================================
 
-    function uniqueValues(
-        property
-    ) {
+    function uniqueValues(property) {
 
         return [
             ...new Set(
 
                 timelineMemories
                     .map(
-                        function (
-                            memory
-                        ) {
-
-                            return String(
-                                memory[
-                                    property
-                                ] || ''
-                            ).trim();
-
-                        }
+                        memory =>
+                            String(
+                                memory[property] || ''
+                            ).trim()
                     )
                     .filter(Boolean)
 
             )
-        ]
-            .sort(
-                function (
-                    first,
-                    second
-                ) {
+        ].sort(
+            function (first, second) {
 
-                    return (
-                        first.localeCompare(
-                            second,
-                            'pt-BR',
-                            {
-                                sensitivity:
-                                    'base'
-                            }
-                        )
-                    );
+                return first.localeCompare(
+                    second,
+                    'pt-BR',
+                    {
+                        sensitivity: 'base'
+                    }
+                );
 
-                }
-            );
+            }
+        );
 
     }
 
@@ -1492,44 +1079,36 @@
 
         enrichMemoriesWithTimeline(
             timelineMemories
-        )
-            .forEach(
-                function (
-                    memory
-                ) {
+        ).forEach(
+            function (memory) {
 
-                    const timeline =
-                        memory.timeline;
+                const timeline =
+                    memory.timeline;
 
-                    const label =
-                        timeline.sortable
-                            ? timeline.label
-                            : UNKNOWN_LABEL;
+                const label =
+                    timeline.sortable
+                        ? timeline.label
+                        : UNKNOWN_LABEL;
 
-                    if (
-                        !values.has(
-                            label
-                        )
-                    ) {
+                if (!values.has(label)) {
 
-                        values.set(
+                    values.set(
+                        label,
+                        {
                             label,
-                            {
-                                label,
 
-                                key:
-                                    timeline.sortable
-                                        ? timeline
-                                            .sortKey
-                                        : Number
-                                            .MAX_SAFE_INTEGER
-                            }
-                        );
-
-                    }
+                            key:
+                                timeline.sortable
+                                    ? timeline.sortKey
+                                    : Number
+                                        .MAX_SAFE_INTEGER
+                        }
+                    );
 
                 }
-            );
+
+            }
+        );
 
 
         return Array
@@ -1537,28 +1116,13 @@
                 values.values()
             )
             .sort(
-                function (
-                    first,
-                    second
-                ) {
-
-                    return (
-                        first.key -
-                        second.key
-                    );
-
-                }
+                (first, second) =>
+                    first.key -
+                    second.key
             )
             .map(
-                function (
-                    item
-                ) {
-
-                    return (
-                        item.label
-                    );
-
-                }
+                item =>
+                    item.label
             );
 
     }
@@ -1582,16 +1146,15 @@
         const previous =
             select.value;
 
-        select.innerHTML =
-            '';
+        select.innerHTML = '';
+
 
         const defaultOption =
             document.createElement(
                 'option'
             );
 
-        defaultOption.value =
-            'all';
+        defaultOption.value = 'all';
 
         defaultOption.textContent =
             defaultLabel;
@@ -1602,9 +1165,7 @@
 
 
         values.forEach(
-            function (
-                value
-            ) {
+            function (value) {
 
                 const option =
                     document.createElement(
@@ -1628,19 +1189,11 @@
         if (
             Array.from(
                 select.options
+            ).some(
+                option =>
+                    option.value ===
+                    previous
             )
-                .some(
-                    function (
-                        option
-                    ) {
-
-                        return (
-                            option.value ===
-                            previous
-                        );
-
-                    }
-                )
         ) {
 
             select.value =
@@ -1656,17 +1209,13 @@
         fillSelect(
             PERSON_FILTER_ID,
             'Todas as pessoas',
-            uniqueValues(
-                'person'
-            )
+            uniqueValues('person')
         );
 
         fillSelect(
             CATEGORY_FILTER_ID,
             'Todas as categorias',
-            uniqueValues(
-                'category'
-            )
+            uniqueValues('category')
         );
 
         fillSelect(
@@ -1716,58 +1265,46 @@
         const filters =
             getFilters();
 
-        return (
-            enrichMemoriesWithTimeline(
-                timelineMemories
-            )
-                .filter(
-                    function (
-                        memory
-                    ) {
+        return enrichMemoriesWithTimeline(
+            timelineMemories
+        ).filter(
+            function (memory) {
 
-                        const period =
-                            memory
-                                .timeline
-                                .sortable
-                                ? memory
-                                    .timeline
-                                    .label
-                                : UNKNOWN_LABEL;
+                const period =
+                    memory.timeline.sortable
+                        ? memory.timeline.label
+                        : UNKNOWN_LABEL;
 
-                        return (
+                return (
 
-                            (
-                                filters.person ===
-                                    'all' ||
-                                memory.person ===
-                                    filters.person
-                            ) &&
+                    (
+                        filters.person === 'all' ||
+                        memory.person ===
+                            filters.person
+                    ) &&
 
-                            (
-                                filters.category ===
-                                    'all' ||
-                                memory.category ===
-                                    filters.category
-                            ) &&
+                    (
+                        filters.category === 'all' ||
+                        memory.category ===
+                            filters.category
+                    ) &&
 
-                            (
-                                filters.period ===
-                                    'all' ||
-                                period ===
-                                    filters.period
-                            )
+                    (
+                        filters.period === 'all' ||
+                        period ===
+                            filters.period
+                    )
 
-                        );
+                );
 
-                    }
-                )
+            }
         );
 
     }
 
 
     // ======================================================
-    // SEÇÃO
+    // SEÇÃO DA TIMELINE
     // ======================================================
 
     function ensureTimelineSection() {
@@ -1781,6 +1318,7 @@
             return section;
         }
 
+
         const archiveSection =
             document.getElementById(
                 'acervo'
@@ -1789,6 +1327,7 @@
         if (!archiveSection) {
             return null;
         }
+
 
         section =
             document.createElement(
@@ -1800,6 +1339,7 @@
 
         section.className =
             'mi-timeline-section';
+
 
         section.innerHTML = `
 
@@ -1816,16 +1356,11 @@
                 </p>
 
 
-                <div
-                    class="mi-timeline-filters"
-                >
+                <div class="mi-timeline-filters">
 
-                    <div
-                        class="mi-timeline-filter-group"
-                    >
-                        <label
-                            for="${PERSON_FILTER_ID}"
-                        >
+                    <div class="mi-timeline-filter-group">
+
+                        <label for="${PERSON_FILTER_ID}">
                             <i class="fas fa-user"></i>
                             Pessoa
                         </label>
@@ -1838,15 +1373,13 @@
                                 Todas as pessoas
                             </option>
                         </select>
+
                     </div>
 
 
-                    <div
-                        class="mi-timeline-filter-group"
-                    >
-                        <label
-                            for="${CATEGORY_FILTER_ID}"
-                        >
+                    <div class="mi-timeline-filter-group">
+
+                        <label for="${CATEGORY_FILTER_ID}">
                             <i class="fas fa-tag"></i>
                             Categoria
                         </label>
@@ -1859,15 +1392,13 @@
                                 Todas as categorias
                             </option>
                         </select>
+
                     </div>
 
 
-                    <div
-                        class="mi-timeline-filter-group"
-                    >
-                        <label
-                            for="${PERIOD_FILTER_ID}"
-                        >
+                    <div class="mi-timeline-filter-group">
+
+                        <label for="${PERIOD_FILTER_ID}">
                             <i class="fas fa-calendar-days"></i>
                             Período
                         </label>
@@ -1880,6 +1411,7 @@
                                 Todos os períodos
                             </option>
                         </select>
+
                     </div>
 
 
@@ -1895,14 +1427,12 @@
                 </div>
 
 
-                <div
-                    class="mi-timeline-results-summary"
-                >
-                    <span
-                        id="${RESULT_COUNT_ID}"
-                    >
+                <div class="mi-timeline-results-summary">
+
+                    <span id="${RESULT_COUNT_ID}">
                         0 memórias
                     </span>
+
                 </div>
 
 
@@ -1917,11 +1447,10 @@
         `;
 
 
-        archiveSection
-            .insertAdjacentElement(
-                'afterend',
-                section
-            );
+        archiveSection.insertAdjacentElement(
+            'afterend',
+            section
+        );
 
         return section;
 
@@ -1929,12 +1458,10 @@
 
 
     // ======================================================
-    // COMPONENTE PESSOA
+    // CHIP DA PESSOA
     // ======================================================
 
-    function createPersonMarkup(
-        memory
-    ) {
+    function createPersonMarkup(memory) {
 
         const personName =
             String(
@@ -1946,30 +1473,20 @@
         }
 
 
-        const personId =
-            resolvePersonId(
-                memory
-            );
-
-
-        if (!personId) {
+        if (!memory.personNavigable) {
 
             return `
 
-                <div
-                    class="mi-timeline-person"
-                >
-                    <span
-                        class="mi-timeline-person-icon"
-                    >
+                <div class="mi-timeline-person">
+
+                    <span class="mi-timeline-person-icon">
                         <i class="fas fa-user"></i>
                     </span>
 
                     <span>
-                        ${escapeHTML(
-                            personName
-                        )}
+                        ${escapeHTML(personName)}
                     </span>
+
                 </div>
 
             `;
@@ -1986,28 +1503,24 @@
                     mi-timeline-person-button
                 "
                 data-timeline-person
-                aria-label="Abrir perfil de ${escapeHTML(
-                    personName
-                )}"
-                title="Abrir perfil de ${escapeHTML(
-                    personName
-                )}"
+                aria-label="Abrir perfil de ${escapeHTML(personName)}"
+                title="Abrir perfil de ${escapeHTML(personName)}"
             >
 
-                <span
-                    class="mi-timeline-person-icon"
-                >
+                <span class="mi-timeline-person-icon">
                     <i class="fas fa-user"></i>
                 </span>
 
                 <span>
-                    ${escapeHTML(
-                        personName
-                    )}
+                    ${escapeHTML(personName)}
                 </span>
 
                 <i
-                    class="fas fa-arrow-up-right-from-square mi-timeline-link-icon"
+                    class="
+                        fas
+                        fa-arrow-up-right-from-square
+                        mi-timeline-link-icon
+                    "
                 ></i>
 
             </button>
@@ -2018,12 +1531,10 @@
 
 
     // ======================================================
-    // CARD
+    // CARD CRONOLÓGICO
     // ======================================================
 
-    function createTimelineItem(
-        memory
-    ) {
+    function createTimelineItem(memory) {
 
         const article =
             document.createElement(
@@ -2036,75 +1547,62 @@
         article.dataset.memoryId =
             memory.id || '';
 
+
         article.innerHTML = `
 
-            <div
-                class="mi-timeline-date"
-            >
+            <div class="mi-timeline-date">
+
                 ${escapeHTML(
-                    memory.timeline
-                        ?.label ||
+                    memory.timeline?.label ||
                     UNKNOWN_LABEL
                 )}
+
             </div>
 
 
-            <div
-                class="mi-timeline-content"
-            >
+            <div class="mi-timeline-content">
 
                 ${
                     memory.category
                         ? `
-                            <span
-                                class="mi-timeline-category"
-                            >
-                                ${escapeHTML(
-                                    memory.category
-                                )}
+                            <span class="mi-timeline-category">
+                                ${escapeHTML(memory.category)}
                             </span>
                         `
                         : ''
                 }
 
 
-                <h3
-                    class="mi-timeline-title"
-                >
+                <h3 class="mi-timeline-title">
+
                     ${escapeHTML(
                         memory.title ||
                         'Memória sem título'
                     )}
+
                 </h3>
 
 
-                ${createPersonMarkup(
-                    memory
-                )}
+                ${createPersonMarkup(memory)}
 
 
                 ${
                     memory.story
                         ? `
-                            <p
-                                class="mi-timeline-story"
-                            >
-                                ${escapeHTML(
-                                    memory.story
-                                )}
+                            <p class="mi-timeline-story">
+                                ${escapeHTML(memory.story)}
                             </p>
                         `
                         : ''
                 }
 
 
-                <div
-                    class="mi-timeline-actions"
-                >
+                <div class="mi-timeline-actions">
 
                     <button
                         type="button"
                         class="mi-timeline-memory-button"
+                        data-timeline-memory
                     >
                         <i class="fas fa-book-open"></i>
                         Ver memória
@@ -2116,64 +1614,16 @@
 
         `;
 
-
-        article
-            .querySelector(
-                '.mi-timeline-person-button'
-            )
-            ?.addEventListener(
-                'click',
-                function (
-                    event
-                ) {
-
-                    event
-                        .preventDefault();
-
-                    event
-                        .stopPropagation();
-
-                    openPersonProfile(
-                        memory
-                    );
-
-                }
-            );
-
-
-        article
-            .querySelector(
-                '.mi-timeline-memory-button'
-            )
-            ?.addEventListener(
-                'click',
-                function (
-                    event
-                ) {
-
-                    event
-                        .preventDefault();
-
-                    openMemory(
-                        memory.id
-                    );
-
-                }
-            );
-
-
         return article;
 
     }
 
 
     // ======================================================
-    // CARD — SEM PERÍODO
+    // CARD — PERÍODO NÃO DETERMINADO
     // ======================================================
 
-    function createUnknownCard(
-        memory
-    ) {
+    function createUnknownCard(memory) {
 
         const article =
             document.createElement(
@@ -2182,6 +1632,10 @@
 
         article.className =
             'mi-timeline-undetermined-card';
+
+        article.dataset.memoryId =
+            memory.id || '';
+
 
         article.innerHTML = `
 
@@ -2192,73 +1646,29 @@
                 )}
             </h4>
 
-            <p
-                class="mi-timeline-undetermined-period"
-            >
+            <p class="mi-timeline-undetermined-period">
                 ${escapeHTML(
                     memory.period ||
                     UNKNOWN_LABEL
                 )}
             </p>
 
-            ${createPersonMarkup(
-                memory
-            )}
+            ${createPersonMarkup(memory)}
 
-            <div
-                class="mi-timeline-actions"
-            >
+            <div class="mi-timeline-actions">
+
                 <button
                     type="button"
                     class="mi-timeline-memory-button"
+                    data-timeline-memory
                 >
                     <i class="fas fa-book-open"></i>
                     Ver memória
                 </button>
+
             </div>
 
         `;
-
-
-        article
-            .querySelector(
-                '.mi-timeline-person-button'
-            )
-            ?.addEventListener(
-                'click',
-                function (
-                    event
-                ) {
-
-                    event
-                        .preventDefault();
-
-                    event
-                        .stopPropagation();
-
-                    openPersonProfile(
-                        memory
-                    );
-
-                }
-            );
-
-
-        article
-            .querySelector(
-                '.mi-timeline-memory-button'
-            )
-            ?.addEventListener(
-                'click',
-                function () {
-
-                    openMemory(
-                        memory.id
-                    );
-
-                }
-            );
-
 
         return article;
 
@@ -2300,32 +1710,26 @@
         }
 
 
-        container.innerHTML =
-            '';
+        container.innerHTML = '';
 
 
-        if (
-            filtered.length === 0
-        ) {
+        if (filtered.length === 0) {
 
             container.innerHTML = `
 
-                <div
-                    class="mi-timeline-empty"
-                >
-                    <i
-                        class="fas fa-clock-rotate-left"
-                    ></i>
+                <div class="mi-timeline-empty">
+
+                    <i class="fas fa-clock-rotate-left"></i>
 
                     <h3>
                         Nenhuma memória encontrada
                     </h3>
 
                     <p>
-                        Registre uma memória ou
-                        altere os filtros da
-                        Linha do Tempo.
+                        Registre uma memória ou altere
+                        os filtros da Linha do Tempo.
                     </p>
+
                 </div>
 
             `;
@@ -2342,9 +1746,7 @@
 
 
         if (
-            groups
-                .chronological
-                .length
+            groups.chronological.length
         ) {
 
             const line =
@@ -2360,30 +1762,23 @@
             );
 
 
-            groups
-                .chronological
-                .forEach(
-                    function (
-                        memory
-                    ) {
+            groups.chronological.forEach(
+                function (memory) {
 
-                        container
-                            .appendChild(
-                                createTimelineItem(
-                                    memory
-                                )
-                            );
+                    container.appendChild(
+                        createTimelineItem(
+                            memory
+                        )
+                    );
 
-                    }
-                );
+                }
+            );
 
         }
 
 
         if (
-            groups
-                .undetermined
-                .length
+            groups.undetermined.length
         ) {
 
             const section =
@@ -2394,21 +1789,18 @@
             section.className =
                 'mi-timeline-undetermined';
 
+
             section.innerHTML = `
 
-                <h3
-                    class="mi-timeline-undetermined-title"
-                >
-                    <i
-                        class="fas fa-circle-question"
-                    ></i>
+                <h3 class="mi-timeline-undetermined-title">
+
+                    <i class="fas fa-circle-question"></i>
 
                     Período não determinado
+
                 </h3>
 
-                <div
-                    class="mi-timeline-undetermined-list"
-                ></div>
+                <div class="mi-timeline-undetermined-list"></div>
 
             `;
 
@@ -2419,21 +1811,17 @@
                 );
 
 
-            groups
-                .undetermined
-                .forEach(
-                    function (
-                        memory
-                    ) {
+            groups.undetermined.forEach(
+                function (memory) {
 
-                        list.appendChild(
-                            createUnknownCard(
-                                memory
-                            )
-                        );
+                    list.appendChild(
+                        createUnknownCard(
+                            memory
+                        )
+                    );
 
-                    }
-                );
+                }
+            );
 
 
             container.appendChild(
@@ -2441,6 +1829,111 @@
             );
 
         }
+
+    }
+
+
+    // ======================================================
+    // EVENT DELEGATION — FASE 8.5
+    //
+    // Um único listener permanece no container.
+    // A Timeline pode ser recriada quantas vezes precisar
+    // sem perder os eventos.
+    // ======================================================
+
+    function bindTimelineNavigation() {
+
+        const container =
+            document.getElementById(
+                TIMELINE_LIST_ID
+            );
+
+        if (!container) {
+            return;
+        }
+
+
+        if (
+            container.dataset
+                .navigationBound ===
+            'true'
+        ) {
+            return;
+        }
+
+
+        container.dataset.navigationBound =
+            'true';
+
+
+        container.addEventListener(
+            'click',
+            function (event) {
+
+                const personButton =
+                    event.target.closest(
+                        '.mi-timeline-person-button'
+                    );
+
+                const memoryButton =
+                    event.target.closest(
+                        '.mi-timeline-memory-button'
+                    );
+
+
+                if (personButton) {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const article =
+                        personButton.closest(
+                            '[data-memory-id]'
+                        );
+
+                    const memoryId =
+                        article?.dataset
+                            ?.memoryId;
+
+                    if (memoryId) {
+
+                        openPersonProfile(
+                            memoryId
+                        );
+
+                    }
+
+                    return;
+
+                }
+
+
+                if (memoryButton) {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const article =
+                        memoryButton.closest(
+                            '[data-memory-id]'
+                        );
+
+                    const memoryId =
+                        article?.dataset
+                            ?.memoryId;
+
+                    if (memoryId) {
+
+                        openMemory(
+                            memoryId
+                        );
+
+                    }
+
+                }
+
+            }
+        );
 
     }
 
@@ -2471,30 +1964,52 @@
             PERSON_FILTER_ID,
             CATEGORY_FILTER_ID,
             PERIOD_FILTER_ID
-        ]
-            .forEach(
-                function (
-                    id
-                ) {
+        ].forEach(
+            function (id) {
 
-                    document
-                        .getElementById(
-                            id
-                        )
-                        ?.addEventListener(
-                            'change',
-                            renderTimeline
-                        );
+                const select =
+                    document.getElementById(
+                        id
+                    );
 
+                if (!select) {
+                    return;
                 }
+
+                if (
+                    select.dataset.bound ===
+                    'true'
+                ) {
+                    return;
+                }
+
+                select.dataset.bound =
+                    'true';
+
+                select.addEventListener(
+                    'change',
+                    renderTimeline
+                );
+
+            }
+        );
+
+
+        const clearButton =
+            document.getElementById(
+                CLEAR_FILTERS_ID
             );
 
+        if (
+            clearButton &&
+            clearButton.dataset.bound !==
+                'true'
+        ) {
 
-        document
-            .getElementById(
-                CLEAR_FILTERS_ID
-            )
-            ?.addEventListener(
+            clearButton.dataset.bound =
+                'true';
+
+            clearButton.addEventListener(
                 'click',
                 function () {
 
@@ -2502,44 +2017,40 @@
                         PERSON_FILTER_ID,
                         CATEGORY_FILTER_ID,
                         PERIOD_FILTER_ID
-                    ]
-                        .forEach(
-                            function (
-                                id
-                            ) {
+                    ].forEach(
+                        function (id) {
 
-                                const select =
-                                    document
-                                        .getElementById(
-                                            id
-                                        );
+                            const select =
+                                document.getElementById(
+                                    id
+                                );
 
-                                if (select) {
-                                    select.value =
-                                        'all';
-                                }
-
+                            if (select) {
+                                select.value =
+                                    'all';
                             }
-                        );
+
+                        }
+                    );
 
                     renderTimeline();
 
                 }
             );
 
+        }
+
     }
 
 
     // ======================================================
-    // OBSERVER
+    // OBSERVAR ALTERAÇÕES DO ACERVO
     // ======================================================
 
     function observeArchive() {
 
         const archive =
-            document.getElementById(
-                MEMORY_ARCHIVE_ID
-            );
+            getArchive();
 
         if (!archive) {
             return;
@@ -2554,36 +2065,28 @@
             new MutationObserver(
                 function () {
 
-                    window
-                        .clearTimeout(
-                            syncTimer
-                        );
+                    window.clearTimeout(
+                        syncTimer
+                    );
 
                     syncTimer =
-                        window
-                            .setTimeout(
-                                syncTimeline,
-                                100
-                            );
+                        window.setTimeout(
+                            syncTimeline,
+                            100
+                        );
 
                 }
             );
 
 
-        archiveObserver
-            .observe(
-                archive,
-                {
-                    childList:
-                        true,
-
-                    subtree:
-                        true,
-
-                    characterData:
-                        true
-                }
-            );
+        archiveObserver.observe(
+            archive,
+            {
+                childList: true,
+                subtree: true,
+                characterData: true
+            }
+        );
 
     }
 
@@ -2613,8 +2116,7 @@
         style.textContent = `
 
             .mi-timeline-section {
-                background:
-                    var(--light, #faf7f2);
+                background: var(--light, #faf7f2);
                 position: relative;
                 overflow: hidden;
             }
@@ -2629,10 +2131,8 @@
                     auto;
                 gap: 16px;
                 align-items: end;
-                background:
-                    rgba(255,255,255,.82);
-                border:
-                    1px solid rgba(0,0,0,.06);
+                background: rgba(255,255,255,.82);
+                border: 1px solid rgba(0,0,0,.06);
                 border-radius: 18px;
                 box-shadow:
                     0 10px 30px
@@ -2648,14 +2148,12 @@
             .mi-timeline-filter-group label {
                 font-size: .82rem;
                 font-weight: 600;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
             }
 
             .mi-timeline-filter-group label i {
                 margin-right: 5px;
-                color:
-                    var(--accent, #c96f4a);
+                color: var(--accent, #c96f4a);
             }
 
             .mi-timeline-filter-control {
@@ -2667,8 +2165,7 @@
                     rgba(40,83,107,.18);
                 border-radius: 10px;
                 background: white;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
                 font-family: inherit;
                 cursor: pointer;
             }
@@ -2681,16 +2178,14 @@
                     rgba(201,111,74,.28);
                 border-radius: 10px;
                 background: transparent;
-                color:
-                    var(--accent, #c96f4a);
+                color: var(--accent, #c96f4a);
                 font-family: inherit;
                 font-weight: 600;
                 cursor: pointer;
             }
 
             .mi-timeline-clear-button:hover {
-                background:
-                    var(--accent, #c96f4a);
+                background: var(--accent, #c96f4a);
                 color: white;
             }
 
@@ -2698,8 +2193,7 @@
                 max-width: 900px;
                 margin: 22px auto 0;
                 text-align: right;
-                color:
-                    var(--gray, #66727a);
+                color: var(--gray, #66727a);
                 font-size: .85rem;
                 font-weight: 600;
             }
@@ -2716,8 +2210,7 @@
                 bottom: 0;
                 left: 110px;
                 width: 3px;
-                background:
-                    rgba(201,111,74,.25);
+                background: rgba(201,111,74,.25);
                 border-radius: 999px;
             }
 
@@ -2737,8 +2230,7 @@
                     "Playfair Display",
                     serif;
                 font-weight: 700;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
             }
 
             .mi-timeline-content {
@@ -2762,8 +2254,7 @@
                     4px solid
                     var(--light, #faf7f2);
                 border-radius: 50%;
-                background:
-                    var(--accent, #c96f4a);
+                background: var(--accent, #c96f4a);
             }
 
             .mi-timeline-category {
@@ -2771,18 +2262,15 @@
                 margin-bottom: 10px;
                 padding: 5px 10px;
                 border-radius: 999px;
-                color:
-                    var(--accent, #c96f4a);
-                background:
-                    rgba(201,111,74,.10);
+                color: var(--accent, #c96f4a);
+                background: rgba(201,111,74,.10);
                 font-size: .76rem;
                 font-weight: 600;
             }
 
             .mi-timeline-title {
                 margin: 0 0 10px;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
                 font-family:
                     "Playfair Display",
                     serif;
@@ -2791,8 +2279,7 @@
             .mi-timeline-story {
                 margin: 0;
                 line-height: 1.7;
-                color:
-                    var(--gray, #66727a);
+                color: var(--gray, #66727a);
             }
 
             .mi-timeline-person {
@@ -2805,10 +2292,8 @@
                     1px solid
                     rgba(201,111,74,.20);
                 border-radius: 999px;
-                background:
-                    rgba(201,111,74,.08);
-                color:
-                    var(--primary, #28536b);
+                background: rgba(201,111,74,.08);
+                color: var(--primary, #28536b);
                 font-family: inherit;
                 font-size: .88rem;
                 font-weight: 600;
@@ -2816,17 +2301,13 @@
 
             .mi-timeline-person-button {
                 cursor: pointer;
-                transition:
-                    .2s ease;
+                transition: .2s ease;
             }
 
             .mi-timeline-person-button:hover {
-                background:
-                    rgba(201,111,74,.18);
-                border-color:
-                    var(--accent, #c96f4a);
-                transform:
-                    translateY(-1px);
+                background: rgba(201,111,74,.18);
+                border-color: var(--accent, #c96f4a);
+                transform: translateY(-1px);
             }
 
             .mi-timeline-person-icon {
@@ -2836,8 +2317,7 @@
                 align-items: center;
                 justify-content: center;
                 border-radius: 50%;
-                background:
-                    var(--accent, #c96f4a);
+                background: var(--accent, #c96f4a);
                 color: white;
                 font-size: .72rem;
             }
@@ -2867,16 +2347,14 @@
                     rgba(40,83,107,.18);
                 border-radius: 9px;
                 background: transparent;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
                 font-family: inherit;
                 font-weight: 600;
                 cursor: pointer;
             }
 
             .mi-timeline-memory-button:hover {
-                background:
-                    var(--primary, #28536b);
+                background: var(--primary, #28536b);
                 color: white;
             }
 
@@ -2892,11 +2370,13 @@
             }
 
             @keyframes miMemoryPulse {
+
                 50% {
                     box-shadow:
                         0 12px 38px
                         rgba(201,111,74,.32);
                 }
+
             }
 
             .mi-timeline-undetermined {
@@ -2909,8 +2389,7 @@
 
             .mi-timeline-undetermined-title {
                 text-align: center;
-                color:
-                    var(--gray, #66727a);
+                color: var(--gray, #66727a);
             }
 
             .mi-timeline-undetermined-list {
@@ -2934,13 +2413,11 @@
 
             .mi-timeline-undetermined-card h4 {
                 margin: 0 0 10px;
-                color:
-                    var(--primary, #28536b);
+                color: var(--primary, #28536b);
             }
 
             .mi-timeline-undetermined-period {
-                color:
-                    var(--gray, #66727a);
+                color: var(--gray, #66727a);
             }
 
             .mi-timeline-empty {
@@ -2953,9 +2430,7 @@
                     rgba(0,0,0,.08);
             }
 
-            @media (
-                max-width: 980px
-            ) {
+            @media (max-width: 980px) {
 
                 .mi-timeline-filters {
                     grid-template-columns:
@@ -2967,13 +2442,10 @@
 
             }
 
-            @media (
-                max-width: 768px
-            ) {
+            @media (max-width: 768px) {
 
                 .mi-timeline-filters {
-                    grid-template-columns:
-                        1fr;
+                    grid-template-columns: 1fr;
                 }
 
                 .mi-timeline-line {
@@ -3004,16 +2476,15 @@
         `;
 
 
-        document.head
-            .appendChild(
-                style
-            );
+        document.head.appendChild(
+            style
+        );
 
     }
 
 
     // ======================================================
-    // AUTOTESTE DO MODELO
+    // AUTOTESTE DO MODELO TEMPORAL
     // ======================================================
 
     function runSelfCheck() {
@@ -3060,9 +2531,7 @@
 
 
         return tests.map(
-            function (
-                test
-            ) {
+            function (test) {
 
                 const result =
                     parseMemoryPeriod(
@@ -3112,8 +2581,6 @@
 
         readMemoriesFromArchive,
 
-        resolvePersonId,
-
         render:
             renderTimeline,
 
@@ -3146,6 +2613,8 @@
 
         bindFilterEvents();
 
+        bindTimelineNavigation();
+
         renderTimeline();
 
         observeArchive();
@@ -3162,8 +2631,7 @@
             'DOMContentLoaded',
             initializeTimeline,
             {
-                once:
-                    true
+                once: true
             }
         );
 
