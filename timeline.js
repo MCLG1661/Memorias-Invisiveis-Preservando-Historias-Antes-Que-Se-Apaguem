@@ -1,6 +1,6 @@
 // ==========================================================
 // MEMÓRIAS INVISÍVEIS
-// FASE 8.5 — NAVEGAÇÃO MEMÓRIA ↔ PESSOA
+// FASE 8.6 — ESTADOS TEMPORAIS ESPECIAIS
 //
 // Inclui:
 // - Modelo temporal da Timeline
@@ -9,6 +9,7 @@
 // - Filtros Pessoa / Categoria / Período
 // - Navegação Timeline → Memória
 // - Navegação Timeline → Perfil da Pessoa
+// - Estados temporais especiais e incerteza temporal
 //
 // Regra de navegação:
 // - O Acervo é a fonte de verdade.
@@ -39,6 +40,7 @@
     const MEMORY_ARCHIVE_ID = 'memoryArchive';
 
     const UNKNOWN_LABEL = 'Período não determinado';
+    const NOT_INFORMED_LABEL = 'Período não informado';
 
     let timelineMemories = [];
     let archiveObserver = null;
@@ -46,16 +48,41 @@
 
 
     // ======================================================
-    // PRECISÃO TEMPORAL
+    // PRECISÃO TEMPORAL — FASE 8.6
     // ======================================================
 
     const PRECISION = Object.freeze({
 
         EXACT: 'exact',
+
         APPROXIMATE: 'approximate',
+
         RANGE: 'range',
+
         DECADE: 'decade',
+
+        DECADE_PART: 'decade_part',
+
+        BEFORE: 'before',
+
+        AFTER: 'after',
+
         UNKNOWN: 'unknown'
+
+    });
+
+
+    // ======================================================
+    // PARTES DA DÉCADA
+    // ======================================================
+
+    const DECADE_PART = Object.freeze({
+
+        EARLY: 'early',
+
+        MID: 'mid',
+
+        LATE: 'late'
 
     });
 
@@ -78,9 +105,13 @@
 
     function escapeHTML(value) {
 
-        const div = document.createElement('div');
+        const div =
+            document.createElement(
+                'div'
+            );
 
-        div.textContent = value ?? '';
+        div.textContent =
+            value ?? '';
 
         return div.innerHTML;
 
@@ -93,7 +124,9 @@
             return '';
         }
 
-        return String(element.textContent || '')
+        return String(
+            element.textContent || ''
+        )
             .trim()
             .replace(/\s+/g, ' ');
 
@@ -112,12 +145,64 @@
 
 
     // ======================================================
+    // CONVERTER DÉCADA CURTA
+    //
+    // Mantém a regra validada na Fase 8.1:
+    //
+    // Em 2026:
+    // 20 → 2020
+    // 30 → 1930
+    // 70 → 1970
+    // 90 → 1990
+    // ======================================================
+
+    function resolveShortDecade(shortYear) {
+
+        const numeric =
+            Number(shortYear);
+
+        if (
+            !Number.isInteger(numeric) ||
+            numeric < 0 ||
+            numeric > 99
+        ) {
+            return null;
+        }
+
+
+        const currentYear =
+            new Date().getFullYear();
+
+        const currentShort =
+            currentYear % 100;
+
+        const century =
+            numeric <= currentShort
+                ? 2000
+                : 1900;
+
+
+        return (
+            century +
+            numeric
+        );
+
+    }
+
+
+    // ======================================================
     // MODELO TEMPORAL
     // ======================================================
 
-    function createUnknownTimeline(periodText = '') {
+    function createUnknownTimeline(
+        periodText = ''
+    ) {
 
-        const original = String(periodText || '').trim();
+        const original =
+            String(
+                periodText || ''
+            ).trim();
+
 
         return {
 
@@ -127,15 +212,20 @@
 
             endYear: null,
 
-            precision: PRECISION.UNKNOWN,
+            precision:
+                PRECISION.UNKNOWN,
+
+            qualifier: null,
 
             label:
                 original ||
-                UNKNOWN_LABEL,
+                NOT_INFORMED_LABEL,
 
             sortable: false,
 
-            sortKey: null
+            sortKey: null,
+
+            special: true
 
         };
 
@@ -147,13 +237,22 @@
         year,
         endYear = null,
         precision,
-        label
+        label,
+        qualifier = null,
+        sortKey = null,
+        special = false
     }) {
+
+        const validYear =
+            Number.isInteger(year);
+
 
         return {
 
             original:
-                String(original || '').trim(),
+                String(
+                    original || ''
+                ).trim(),
 
             year,
 
@@ -161,15 +260,23 @@
 
             precision,
 
+            qualifier,
+
             label,
 
             sortable:
-                Number.isInteger(year),
+                validYear,
 
             sortKey:
-                Number.isInteger(year)
-                    ? year
-                    : null
+                Number.isFinite(sortKey)
+                    ? sortKey
+                    : (
+                        validYear
+                            ? year
+                            : null
+                    ),
+
+            special
 
         };
 
@@ -180,19 +287,29 @@
     // PARSER — ANO EXATO
     // ======================================================
 
-    function parseExactYear(original, normalized) {
+    function parseExactYear(
+        original,
+        normalized
+    ) {
 
         if (
-            !/^(18|19|20)\d{2}$/.test(normalized)
+            !/^(18|19|20)\d{2}$/
+                .test(normalized)
         ) {
+
             return null;
+
         }
 
-        const year = Number(normalized);
+
+        const year =
+            Number(normalized);
+
 
         if (!isValidYear(year)) {
             return null;
         }
+
 
         return createTimelineResult({
 
@@ -204,7 +321,9 @@
                 PRECISION.EXACT,
 
             label:
-                String(year)
+                String(year),
+
+            special: false
 
         });
 
@@ -215,31 +334,51 @@
     // PARSER — INTERVALO
     // ======================================================
 
-    function parseYearRange(original, normalized) {
+    function parseYearRange(
+        original,
+        normalized
+    ) {
 
-        const match = normalized.match(
-            /^((?:18|19|20)\d{2})\s*(?:-|–|—|a|ate)\s*((?:18|19|20)\d{2})$/
-        );
+        const match =
+            normalized.match(
+                /^((?:18|19|20)\d{2})\s*(?:-|–|—|a|ate)\s*((?:18|19|20)\d{2})$/
+            );
+
 
         if (!match) {
             return null;
         }
 
-        const first = Number(match[1]);
-        const second = Number(match[2]);
+
+        const first =
+            Number(match[1]);
+
+        const second =
+            Number(match[2]);
+
 
         if (
             !isValidYear(first) ||
             !isValidYear(second)
         ) {
+
             return null;
+
         }
 
+
         const year =
-            Math.min(first, second);
+            Math.min(
+                first,
+                second
+            );
 
         const endYear =
-            Math.max(first, second);
+            Math.max(
+                first,
+                second
+            );
+
 
         return createTimelineResult({
 
@@ -253,7 +392,155 @@
                 PRECISION.RANGE,
 
             label:
-                `${year}–${endYear}`
+                `${year}–${endYear}`,
+
+            special: true
+
+        });
+
+    }
+
+
+    // ======================================================
+    // PARSER — PARTE DA DÉCADA
+    //
+    // Exemplos:
+    // início dos anos 80
+    // inicio da decada de 80
+    // meados dos anos 90
+    // final dos anos 60
+    // fim dos anos 70
+    // ======================================================
+
+    function parseDecadePart(
+        original,
+        normalized
+    ) {
+
+        const match =
+            normalized.match(
+                /^(inicio|comeco|meados|meio|final|fim)\s+(?:dos\s+anos|da\s+decada\s+de|da\s+decada\s+dos)\s+((?:18|19|20)\d{2}|\d{2})$/
+            );
+
+
+        if (!match) {
+            return null;
+        }
+
+
+        const partText =
+            match[1];
+
+        const rawDecade =
+            match[2];
+
+
+        let decade;
+
+
+        if (
+            /^\d{2}$/
+                .test(rawDecade)
+        ) {
+
+            decade =
+                resolveShortDecade(
+                    Number(rawDecade)
+                );
+
+        } else {
+
+            decade =
+                Math.floor(
+                    Number(rawDecade) /
+                    10
+                ) * 10;
+
+        }
+
+
+        if (
+            !isValidYear(decade)
+        ) {
+
+            return null;
+
+        }
+
+
+        let qualifier;
+        let label;
+        let sortKey;
+
+
+        if (
+            partText === 'inicio' ||
+            partText === 'comeco'
+        ) {
+
+            qualifier =
+                DECADE_PART.EARLY;
+
+            label =
+                `Início da década de ${decade}`;
+
+            /*
+             * A década continua sendo a âncora.
+             * +1 apenas posiciona internamente
+             * o início antes dos meados/final.
+             */
+
+            sortKey =
+                decade + 1;
+
+        } else if (
+            partText === 'meados' ||
+            partText === 'meio'
+        ) {
+
+            qualifier =
+                DECADE_PART.MID;
+
+            label =
+                `Meados da década de ${decade}`;
+
+            sortKey =
+                decade + 5;
+
+        } else {
+
+            qualifier =
+                DECADE_PART.LATE;
+
+            label =
+                `Final da década de ${decade}`;
+
+            sortKey =
+                decade + 8;
+
+        }
+
+
+        return createTimelineResult({
+
+            original,
+
+            year:
+                decade,
+
+            endYear:
+                decade + 9,
+
+            precision:
+                PRECISION.DECADE_PART,
+
+            qualifier,
+
+            label,
+
+            sortKey,
+
+            special: true
 
         });
 
@@ -264,19 +551,30 @@
     // PARSER — DÉCADA
     // ======================================================
 
-    function parseDecade(original, normalized) {
+    function parseDecade(
+        original,
+        normalized
+    ) {
 
-        const fourDigits = normalized.match(
-            /^(?:decada de|decada dos|anos)\s*((?:18|19|20)\d{2})$/
-        );
+        const fourDigits =
+            normalized.match(
+                /^(?:decada de|decada dos|anos)\s*((?:18|19|20)\d{2})$/
+            );
+
 
         if (fourDigits) {
 
             const rawYear =
-                Number(fourDigits[1]);
+                Number(
+                    fourDigits[1]
+                );
+
 
             const year =
-                Math.floor(rawYear / 10) * 10;
+                Math.floor(
+                    rawYear / 10
+                ) * 10;
+
 
             return createTimelineResult({
 
@@ -291,37 +589,41 @@
                     PRECISION.DECADE,
 
                 label:
-                    `Década de ${year}`
+                    `Década de ${year}`,
+
+                sortKey:
+                    year,
+
+                special: true
 
             });
 
         }
 
 
-        const twoDigits = normalized.match(
-            /^(?:decada de|decada dos|anos)\s*(\d{2})$/
-        );
+        const twoDigits =
+            normalized.match(
+                /^(?:decada de|decada dos|anos)\s*(\d{2})$/
+            );
+
 
         if (!twoDigits) {
             return null;
         }
 
-        const shortYear =
-            Number(twoDigits[1]);
-
-        const currentYear =
-            new Date().getFullYear();
-
-        const currentShort =
-            currentYear % 100;
-
-        const century =
-            shortYear <= currentShort
-                ? 2000
-                : 1900;
 
         const year =
-            century + shortYear;
+            resolveShortDecade(
+                Number(
+                    twoDigits[1]
+                )
+            );
+
+
+        if (!isValidYear(year)) {
+            return null;
+        }
+
 
         return createTimelineResult({
 
@@ -336,7 +638,137 @@
                 PRECISION.DECADE,
 
             label:
-                `Década de ${year}`
+                `Década de ${year}`,
+
+            sortKey:
+                year,
+
+            special: true
+
+        });
+
+    }
+
+
+    // ======================================================
+    // PARSER — ANTES DE
+    //
+    // Importante:
+    // O ano funciona apenas como âncora.
+    // Não afirmamos que o evento ocorreu naquele ano.
+    // ======================================================
+
+    function parseBeforeYear(
+        original,
+        normalized
+    ) {
+
+        const match =
+            normalized.match(
+                /^(?:antes de|anterior a|antes do ano de)\s*((?:18|19|20)\d{2})$/
+            );
+
+
+        if (!match) {
+            return null;
+        }
+
+
+        const year =
+            Number(
+                match[1]
+            );
+
+
+        if (!isValidYear(year)) {
+            return null;
+        }
+
+
+        return createTimelineResult({
+
+            original,
+
+            year,
+
+            precision:
+                PRECISION.BEFORE,
+
+            qualifier:
+                'before',
+
+            label:
+                `Antes de ${year}`,
+
+            /*
+             * Não transformamos "antes de 1980"
+             * em 1979.
+             *
+             * O pequeno deslocamento existe somente
+             * para a ordenação visual em relação a
+             * registros ancorados exatamente em 1980.
+             */
+
+            sortKey:
+                year - 0.5,
+
+            special: true
+
+        });
+
+    }
+
+
+    // ======================================================
+    // PARSER — DEPOIS DE
+    // ======================================================
+
+    function parseAfterYear(
+        original,
+        normalized
+    ) {
+
+        const match =
+            normalized.match(
+                /^(?:depois de|apos|posterior a|depois do ano de)\s*((?:18|19|20)\d{2})$/
+            );
+
+
+        if (!match) {
+            return null;
+        }
+
+
+        const year =
+            Number(
+                match[1]
+            );
+
+
+        if (!isValidYear(year)) {
+            return null;
+        }
+
+
+        return createTimelineResult({
+
+            original,
+
+            year,
+
+            precision:
+                PRECISION.AFTER,
+
+            qualifier:
+                'after',
+
+            label:
+                `Depois de ${year}`,
+
+            sortKey:
+                year + 0.5,
+
+            special: true
 
         });
 
@@ -363,21 +795,32 @@
         ];
 
 
-        for (const pattern of patterns) {
+        for (
+            const pattern
+            of patterns
+        ) {
 
             const match =
-                normalized.match(pattern);
+                normalized.match(
+                    pattern
+                );
+
 
             if (!match) {
                 continue;
             }
 
+
             const year =
-                Number(match[1]);
+                Number(
+                    match[1]
+                );
+
 
             if (!isValidYear(year)) {
                 continue;
             }
+
 
             return createTimelineResult({
 
@@ -389,11 +832,17 @@
                     PRECISION.APPROXIMATE,
 
                 label:
-                    `≈ ${year}`
+                    `≈ ${year}`,
+
+                sortKey:
+                    year,
+
+                special: true
 
             });
 
         }
+
 
         return null;
 
@@ -402,6 +851,12 @@
 
     // ======================================================
     // PARSER — ANO EMBUTIDO
+    //
+    // Exemplo:
+    // "Viagem realizada em 2004"
+    //
+    // É considerado aproximado porque o campo
+    // não forneceu uma data estruturada exata.
     // ======================================================
 
     function parseEmbeddedYear(
@@ -414,19 +869,27 @@
                 /(?:18|19|20)\d{2}/g
             );
 
+
         if (
             !matches ||
             matches.length !== 1
         ) {
+
             return null;
+
         }
 
+
         const year =
-            Number(matches[0]);
+            Number(
+                matches[0]
+            );
+
 
         if (!isValidYear(year)) {
             return null;
         }
+
 
         return createTimelineResult({
 
@@ -438,7 +901,12 @@
                 PRECISION.APPROXIMATE,
 
             label:
-                original
+                original,
+
+            sortKey:
+                year,
+
+            special: true
 
         });
 
@@ -449,29 +917,63 @@
     // INTERPRETAR PERÍODO
     // ======================================================
 
-    function parseMemoryPeriod(periodText) {
+    function parseMemoryPeriod(
+        periodText
+    ) {
 
         const original =
-            String(periodText || '').trim();
+            String(
+                periodText || ''
+            ).trim();
+
 
         if (!original) {
-            return createUnknownTimeline();
+
+            return (
+                createUnknownTimeline()
+            );
+
         }
 
+
         const normalized =
-            normalizeText(original);
+            normalizeText(
+                original
+            );
+
+
+        /*
+         * A ordem dos parsers importa.
+         *
+         * Estados mais específicos precisam ser
+         * testados antes de formatos mais genéricos.
+         */
 
         const parsers = [
 
             parseExactYear,
+
             parseYearRange,
+
+            parseDecadePart,
+
             parseDecade,
+
+            parseBeforeYear,
+
+            parseAfterYear,
+
             parseApproximateYear,
+
             parseEmbeddedYear
 
         ];
 
-        for (const parser of parsers) {
+
+        for (
+            const parser
+            of parsers
+        ) {
 
             const result =
                 parser(
@@ -479,15 +981,97 @@
                     normalized
                 );
 
+
             if (result) {
                 return result;
             }
 
         }
 
-        return createUnknownTimeline(
-            original
+
+        /*
+         * "Infância", "adolescência",
+         * "quando éramos crianças" etc.
+         *
+         * O texto é preservado, mas nenhuma data
+         * é inventada.
+         */
+
+        return (
+            createUnknownTimeline(
+                original
+            )
         );
+
+    }
+
+
+    // ======================================================
+    // DESCRIÇÃO DA PRECISÃO
+    // ======================================================
+
+    function getPrecisionLabel(
+        timeline
+    ) {
+
+        if (!timeline) {
+            return '';
+        }
+
+
+        switch (
+            timeline.precision
+        ) {
+
+            case PRECISION.EXACT:
+
+                return 'Ano informado';
+
+
+            case PRECISION.APPROXIMATE:
+
+                return 'Data aproximada';
+
+
+            case PRECISION.RANGE:
+
+                return 'Intervalo de anos';
+
+
+            case PRECISION.DECADE:
+
+                return 'Década';
+
+
+            case PRECISION.DECADE_PART:
+
+                return 'Parte da década';
+
+
+            case PRECISION.BEFORE:
+
+                return 'Antes de';
+
+
+            case PRECISION.AFTER:
+
+                return 'Depois de';
+
+
+            case PRECISION.UNKNOWN:
+
+                return (
+                    timeline.original
+                        ? 'Período sem data definida'
+                        : 'Período não informado'
+                );
+
+
+            default:
+
+                return '';
+
+        }
 
     }
 
@@ -496,13 +1080,16 @@
     // ENRIQUECIMENTO
     // ======================================================
 
-    function enrichMemoryWithTimeline(memory) {
+    function enrichMemoryWithTimeline(
+        memory
+    ) {
 
         const safe =
             memory &&
             typeof memory === 'object'
                 ? memory
                 : {};
+
 
         return {
 
@@ -518,11 +1105,20 @@
     }
 
 
-    function enrichMemoriesWithTimeline(memories) {
+    function enrichMemoriesWithTimeline(
+        memories
+    ) {
 
-        if (!Array.isArray(memories)) {
+        if (
+            !Array.isArray(
+                memories
+            )
+        ) {
+
             return [];
+
         }
+
 
         return memories.map(
             enrichMemoryWithTimeline
@@ -551,22 +1147,31 @@
             first.sortable &&
             !second.sortable
         ) {
+
             return -1;
+
         }
+
 
         if (
             !first.sortable &&
             second.sortable
         ) {
+
             return 1;
+
         }
+
 
         if (
             !first.sortable &&
             !second.sortable
         ) {
+
             return 0;
+
         }
+
 
         if (
             first.sortKey !==
@@ -579,6 +1184,13 @@
             );
 
         }
+
+
+        /*
+         * Se duas memórias compartilham a mesma
+         * âncora temporal, usamos o fim do intervalo
+         * apenas como critério secundário.
+         */
 
         return (
             (
@@ -594,36 +1206,45 @@
     }
 
 
-    function sortMemoriesByTimeline(memories) {
+    function sortMemoriesByTimeline(
+        memories
+    ) {
 
-        return enrichMemoriesWithTimeline(
-            memories
-        ).sort(
-            compareTimelineAscending
+        return (
+            enrichMemoriesWithTimeline(
+                memories
+            ).sort(
+                compareTimelineAscending
+            )
         );
 
     }
 
 
-    function groupMemoriesByTimeline(memories) {
+    function groupMemoriesByTimeline(
+        memories
+    ) {
 
         const sorted =
             sortMemoriesByTimeline(
                 memories
             );
 
+
         return {
 
             chronological:
                 sorted.filter(
                     memory =>
-                        memory.timeline.sortable
+                        memory.timeline
+                            .sortable
                 ),
 
             undetermined:
                 sorted.filter(
                     memory =>
-                        !memory.timeline.sortable
+                        !memory.timeline
+                            .sortable
                 )
 
         };
@@ -637,21 +1258,31 @@
 
     function getArchive() {
 
-        return document.getElementById(
-            MEMORY_ARCHIVE_ID
-        );
+        return document
+            .getElementById(
+                MEMORY_ARCHIVE_ID
+            );
 
     }
 
 
-    function findArchiveMemoryCard(memoryId) {
+    function findArchiveMemoryCard(
+        memoryId
+    ) {
 
         const archive =
             getArchive();
 
-        if (!archive || !memoryId) {
+
+        if (
+            !archive ||
+            !memoryId
+        ) {
+
             return null;
+
         }
+
 
         return (
             Array.from(
@@ -661,7 +1292,9 @@
             ).find(
                 card =>
                     String(
-                        card.dataset.memoryId || ''
+                        card.dataset
+                            .memoryId ||
+                        ''
                     ) ===
                     String(memoryId)
             ) ||
@@ -681,14 +1314,18 @@
     // .memory-person        = apenas texto/local
     // ======================================================
 
-    function readPersonFromCard(card) {
+    function readPersonFromCard(
+        card
+    ) {
 
         if (!card) {
 
             return {
 
                 name: '',
+
                 personId: null,
+
                 navigable: false
 
             };
@@ -700,6 +1337,7 @@
             card.querySelector(
                 '.memory-person-button'
             );
+
 
         if (button) {
 
@@ -730,6 +1368,7 @@
                 '.memory-person'
             );
 
+
         return {
 
             name:
@@ -755,24 +1394,31 @@
         const archive =
             getArchive();
 
+
         if (!archive) {
             return [];
         }
+
 
         const cards =
             archive.querySelectorAll(
                 '.memory-card'
             );
 
+
         return Array
             .from(cards)
             .map(
-                function (card, index) {
+                function (
+                    card,
+                    index
+                ) {
 
                     const person =
                         readPersonFromCard(
                             card
                         );
+
 
                     let period =
                         cleanElementText(
@@ -781,17 +1427,22 @@
                             )
                         );
 
+
                     if (
                         period ===
-                        'Período não informado'
+                        NOT_INFORMED_LABEL
                     ) {
+
                         period = '';
+
                     }
+
 
                     return {
 
                         id:
-                            card.dataset.memoryId ||
+                            card.dataset
+                                .memoryId ||
                             `memory-${index}`,
 
                         title:
@@ -872,10 +1523,12 @@
 
         if (
             category &&
-            category.value !== 'all'
+            category.value !==
+                'all'
         ) {
 
-            category.value = 'all';
+            category.value =
+                'all';
 
             category.dispatchEvent(
                 new Event(
@@ -891,11 +1544,14 @@
     }
 
 
-    function highlightMemory(card) {
+    function highlightMemory(
+        card
+    ) {
 
         if (!card) {
             return;
         }
+
 
         document
             .querySelectorAll(
@@ -908,9 +1564,11 @@
                     )
             );
 
+
         card.classList.add(
             'mi-memory-highlight'
         );
+
 
         window.setTimeout(
             function () {
@@ -926,11 +1584,14 @@
     }
 
 
-    function openMemory(memoryId) {
+    function openMemory(
+        memoryId
+    ) {
 
         if (!memoryId) {
             return;
         }
+
 
         clearArchiveFilters();
 
@@ -943,34 +1604,48 @@
                         memoryId
                     );
 
+
                 if (!card) {
                     return false;
                 }
 
+
                 card.scrollIntoView({
 
-                    behavior: 'smooth',
+                    behavior:
+                        'smooth',
 
-                    block: 'center'
+                    block:
+                        'center'
 
                 });
 
-                highlightMemory(card);
+
+                highlightMemory(
+                    card
+                );
+
 
                 return true;
 
             };
 
 
-        if (locateAndOpen()) {
+        if (
+            locateAndOpen()
+        ) {
+
             return;
+
         }
 
 
         window.setTimeout(
             function () {
 
-                if (!locateAndOpen()) {
+                if (
+                    !locateAndOpen()
+                ) {
 
                     window.alert(
                         'Não foi possível localizar esta memória no Acervo.'
@@ -993,16 +1668,20 @@
     // original do Acervo.
     // ======================================================
 
-    function openPersonProfile(memoryId) {
+    function openPersonProfile(
+        memoryId
+    ) {
 
         if (!memoryId) {
             return;
         }
 
+
         const card =
             findArchiveMemoryCard(
                 memoryId
             );
+
 
         if (!card) {
 
@@ -1023,8 +1702,13 @@
 
         if (!personButton) {
 
-            // Modo local ou memória sem perfil vinculado.
-            // O chip é apenas informativo.
+            /*
+             * Modo local ou memória
+             * sem perfil vinculado.
+             *
+             * O chip é apenas informativo.
+             */
+
             return;
 
         }
@@ -1039,7 +1723,9 @@
     // FILTROS
     // ======================================================
 
-    function uniqueValues(property) {
+    function uniqueValues(
+        property
+    ) {
 
         return [
             ...new Set(
@@ -1048,20 +1734,25 @@
                     .map(
                         memory =>
                             String(
-                                memory[property] || ''
+                                memory[property] ||
+                                ''
                             ).trim()
                     )
                     .filter(Boolean)
 
             )
         ].sort(
-            function (first, second) {
+            function (
+                first,
+                second
+            ) {
 
                 return first.localeCompare(
                     second,
                     'pt-BR',
                     {
-                        sensitivity: 'base'
+                        sensitivity:
+                            'base'
                     }
                 );
 
@@ -1070,6 +1761,10 @@
 
     }
 
+
+    // ======================================================
+    // OPÇÕES DO FILTRO DE PERÍODO
+    // ======================================================
 
     function periodOptions() {
 
@@ -1085,12 +1780,27 @@
                 const timeline =
                     memory.timeline;
 
+
+                /*
+                 * Para períodos desconhecidos,
+                 * mantemos um único filtro:
+                 * "Período não determinado".
+                 *
+                 * Isso evita criar filtros separados
+                 * para "Infância", "Adolescência" etc.
+                 */
+
                 const label =
                     timeline.sortable
                         ? timeline.label
                         : UNKNOWN_LABEL;
 
-                if (!values.has(label)) {
+
+                if (
+                    !values.has(
+                        label
+                    )
+                ) {
 
                     values.set(
                         label,
@@ -1099,7 +1809,8 @@
 
                             key:
                                 timeline.sortable
-                                    ? timeline.sortKey
+                                    ? timeline
+                                        .sortKey
                                     : Number
                                         .MAX_SAFE_INTEGER
                         }
@@ -1116,9 +1827,33 @@
                 values.values()
             )
             .sort(
-                (first, second) =>
-                    first.key -
-                    second.key
+                function (
+                    first,
+                    second
+                ) {
+
+                    if (
+                        first.key ===
+                        second.key
+                    ) {
+
+                        return (
+                            first.label
+                                .localeCompare(
+                                    second.label,
+                                    'pt-BR'
+                                )
+                        );
+
+                    }
+
+
+                    return (
+                        first.key -
+                        second.key
+                    );
+
+                }
             )
             .map(
                 item =>
@@ -1139,12 +1874,15 @@
                 selectId
             );
 
+
         if (!select) {
             return;
         }
 
+
         const previous =
             select.value;
+
 
         select.innerHTML = '';
 
@@ -1154,10 +1892,13 @@
                 'option'
             );
 
-        defaultOption.value = 'all';
+
+        defaultOption.value =
+            'all';
 
         defaultOption.textContent =
             defaultLabel;
+
 
         select.appendChild(
             defaultOption
@@ -1172,11 +1913,13 @@
                         'option'
                     );
 
+
                 option.value =
                     value;
 
                 option.textContent =
                     value;
+
 
                 select.appendChild(
                     option
@@ -1209,14 +1952,20 @@
         fillSelect(
             PERSON_FILTER_ID,
             'Todas as pessoas',
-            uniqueValues('person')
+            uniqueValues(
+                'person'
+            )
         );
+
 
         fillSelect(
             CATEGORY_FILTER_ID,
             'Todas as categorias',
-            uniqueValues('category')
+            uniqueValues(
+                'category'
+            )
         );
+
 
         fillSelect(
             PERIOD_FILTER_ID,
@@ -1265,39 +2014,49 @@
         const filters =
             getFilters();
 
-        return enrichMemoriesWithTimeline(
-            timelineMemories
-        ).filter(
-            function (memory) {
 
-                const period =
-                    memory.timeline.sortable
-                        ? memory.timeline.label
-                        : UNKNOWN_LABEL;
+        return (
+            enrichMemoriesWithTimeline(
+                timelineMemories
+            ).filter(
+                function (memory) {
 
-                return (
+                    const period =
+                        memory.timeline
+                            .sortable
+                            ? memory
+                                .timeline
+                                .label
+                            : UNKNOWN_LABEL;
 
-                    (
-                        filters.person === 'all' ||
-                        memory.person ===
-                            filters.person
-                    ) &&
 
-                    (
-                        filters.category === 'all' ||
-                        memory.category ===
-                            filters.category
-                    ) &&
+                    return (
 
-                    (
-                        filters.period === 'all' ||
-                        period ===
-                            filters.period
-                    )
+                        (
+                            filters.person ===
+                                'all' ||
+                            memory.person ===
+                                filters.person
+                        ) &&
 
-                );
+                        (
+                            filters.category ===
+                                'all' ||
+                            memory.category ===
+                                filters.category
+                        ) &&
 
-            }
+                        (
+                            filters.period ===
+                                'all' ||
+                            period ===
+                                filters.period
+                        )
+
+                    );
+
+                }
+            )
         );
 
     }
@@ -1314,6 +2073,7 @@
                 TIMELINE_SECTION_ID
             );
 
+
         if (section) {
             return section;
         }
@@ -1324,6 +2084,7 @@
                 'acervo'
             );
 
+
         if (!archiveSection) {
             return null;
         }
@@ -1333,6 +2094,7 @@
             document.createElement(
                 'section'
             );
+
 
         section.id =
             TIMELINE_SECTION_ID;
@@ -1447,10 +2209,12 @@
         `;
 
 
-        archiveSection.insertAdjacentElement(
-            'afterend',
-            section
-        );
+        archiveSection
+            .insertAdjacentElement(
+                'afterend',
+                section
+            );
+
 
         return section;
 
@@ -1461,19 +2225,26 @@
     // CHIP DA PESSOA
     // ======================================================
 
-    function createPersonMarkup(memory) {
+    function createPersonMarkup(
+        memory
+    ) {
 
         const personName =
             String(
-                memory.person || ''
+                memory.person ||
+                ''
             ).trim();
+
 
         if (!personName) {
             return '';
         }
 
 
-        if (!memory.personNavigable) {
+        if (
+            !memory
+                .personNavigable
+        ) {
 
             return `
 
@@ -1531,15 +2302,141 @@
 
 
     // ======================================================
+    // INDICADOR DA PRECISÃO TEMPORAL — FASE 8.6
+    // ======================================================
+
+    function createTemporalPrecisionMarkup(
+        timeline
+    ) {
+
+        if (
+            !timeline ||
+            timeline.precision ===
+                PRECISION.EXACT
+        ) {
+
+            return '';
+
+        }
+
+
+        const precisionLabel =
+            getPrecisionLabel(
+                timeline
+            );
+
+
+        if (!precisionLabel) {
+            return '';
+        }
+
+
+        let icon =
+            'fa-clock';
+
+
+        switch (
+            timeline.precision
+        ) {
+
+            case PRECISION.APPROXIMATE:
+
+                icon =
+                    'fa-circle-half-stroke';
+
+                break;
+
+
+            case PRECISION.RANGE:
+
+                icon =
+                    'fa-arrows-left-right';
+
+                break;
+
+
+            case PRECISION.DECADE:
+
+                icon =
+                    'fa-calendar';
+
+                break;
+
+
+            case PRECISION.DECADE_PART:
+
+                icon =
+                    'fa-calendar-week';
+
+                break;
+
+
+            case PRECISION.BEFORE:
+
+                icon =
+                    'fa-arrow-left';
+
+                break;
+
+
+            case PRECISION.AFTER:
+
+                icon =
+                    'fa-arrow-right';
+
+                break;
+
+
+            case PRECISION.UNKNOWN:
+
+                icon =
+                    'fa-circle-question';
+
+                break;
+
+        }
+
+
+        return `
+
+            <span
+                class="
+                    mi-timeline-precision
+                    mi-timeline-precision-${escapeHTML(
+                        timeline.precision
+                    )}
+                "
+                title="${escapeHTML(
+                    precisionLabel
+                )}"
+            >
+
+                <i class="fas ${icon}"></i>
+
+                ${escapeHTML(
+                    precisionLabel
+                )}
+
+            </span>
+
+        `;
+
+    }
+
+
+    // ======================================================
     // CARD CRONOLÓGICO
     // ======================================================
 
-    function createTimelineItem(memory) {
+    function createTimelineItem(
+        memory
+    ) {
 
         const article =
             document.createElement(
                 'article'
             );
+
 
         article.className =
             'mi-timeline-item';
@@ -1552,9 +2449,18 @@
 
             <div class="mi-timeline-date">
 
-                ${escapeHTML(
-                    memory.timeline?.label ||
-                    UNKNOWN_LABEL
+                <span class="mi-timeline-date-label">
+
+                    ${escapeHTML(
+                        memory.timeline
+                            ?.label ||
+                        UNKNOWN_LABEL
+                    )}
+
+                </span>
+
+                ${createTemporalPrecisionMarkup(
+                    memory.timeline
                 )}
 
             </div>
@@ -1566,7 +2472,9 @@
                     memory.category
                         ? `
                             <span class="mi-timeline-category">
-                                ${escapeHTML(memory.category)}
+                                ${escapeHTML(
+                                    memory.category
+                                )}
                             </span>
                         `
                         : ''
@@ -1583,14 +2491,18 @@
                 </h3>
 
 
-                ${createPersonMarkup(memory)}
+                ${createPersonMarkup(
+                    memory
+                )}
 
 
                 ${
                     memory.story
                         ? `
                             <p class="mi-timeline-story">
-                                ${escapeHTML(memory.story)}
+                                ${escapeHTML(
+                                    memory.story
+                                )}
                             </p>
                         `
                         : ''
@@ -1614,6 +2526,7 @@
 
         `;
 
+
         return article;
 
     }
@@ -1623,18 +2536,27 @@
     // CARD — PERÍODO NÃO DETERMINADO
     // ======================================================
 
-    function createUnknownCard(memory) {
+    function createUnknownCard(
+        memory
+    ) {
 
         const article =
             document.createElement(
                 'article'
             );
 
+
         article.className =
             'mi-timeline-undetermined-card';
 
         article.dataset.memoryId =
             memory.id || '';
+
+
+        const periodLabel =
+            memory.timeline
+                ?.original ||
+            NOT_INFORMED_LABEL;
 
 
         article.innerHTML = `
@@ -1646,14 +2568,27 @@
                 )}
             </h4>
 
+
             <p class="mi-timeline-undetermined-period">
+
+                <i class="fas fa-clock-rotate-left"></i>
+
                 ${escapeHTML(
-                    memory.period ||
-                    UNKNOWN_LABEL
+                    periodLabel
                 )}
+
             </p>
 
-            ${createPersonMarkup(memory)}
+
+            ${createTemporalPrecisionMarkup(
+                memory.timeline
+            )}
+
+
+            ${createPersonMarkup(
+                memory
+            )}
+
 
             <div class="mi-timeline-actions">
 
@@ -1669,6 +2604,7 @@
             </div>
 
         `;
+
 
         return article;
 
@@ -1686,6 +2622,7 @@
                 TIMELINE_LIST_ID
             );
 
+
         if (!container) {
             return;
         }
@@ -1700,6 +2637,7 @@
                 RESULT_COUNT_ID
             );
 
+
         if (counter) {
 
             counter.textContent =
@@ -1713,7 +2651,9 @@
         container.innerHTML = '';
 
 
-        if (filtered.length === 0) {
+        if (
+            filtered.length === 0
+        ) {
 
             container.innerHTML = `
 
@@ -1734,6 +2674,7 @@
 
             `;
 
+
             return;
 
         }
@@ -1746,7 +2687,9 @@
 
 
         if (
-            groups.chronological.length
+            groups
+                .chronological
+                .length
         ) {
 
             const line =
@@ -1754,37 +2697,45 @@
                     'div'
                 );
 
+
             line.className =
                 'mi-timeline-line';
+
 
             container.appendChild(
                 line
             );
 
 
-            groups.chronological.forEach(
-                function (memory) {
+            groups
+                .chronological
+                .forEach(
+                    function (memory) {
 
-                    container.appendChild(
-                        createTimelineItem(
-                            memory
-                        )
-                    );
+                        container
+                            .appendChild(
+                                createTimelineItem(
+                                    memory
+                                )
+                            );
 
-                }
-            );
+                    }
+                );
 
         }
 
 
         if (
-            groups.undetermined.length
+            groups
+                .undetermined
+                .length
         ) {
 
             const section =
                 document.createElement(
                     'div'
                 );
+
 
             section.className =
                 'mi-timeline-undetermined';
@@ -1800,6 +2751,13 @@
 
                 </h3>
 
+                <p class="mi-timeline-undetermined-intro">
+                    Estas memórias preservam o período
+                    informado, mas não possuem uma data
+                    suficiente para posicionamento
+                    cronológico seguro.
+                </p>
+
                 <div class="mi-timeline-undetermined-list"></div>
 
             `;
@@ -1811,17 +2769,19 @@
                 );
 
 
-            groups.undetermined.forEach(
-                function (memory) {
+            groups
+                .undetermined
+                .forEach(
+                    function (memory) {
 
-                    list.appendChild(
-                        createUnknownCard(
-                            memory
-                        )
-                    );
+                        list.appendChild(
+                            createUnknownCard(
+                                memory
+                            )
+                        );
 
-                }
-            );
+                    }
+                );
 
 
             container.appendChild(
@@ -1848,6 +2808,7 @@
                 TIMELINE_LIST_ID
             );
 
+
         if (!container) {
             return;
         }
@@ -1858,11 +2819,14 @@
                 .navigationBound ===
             'true'
         ) {
+
             return;
+
         }
 
 
-        container.dataset.navigationBound =
+        container.dataset
+            .navigationBound =
             'true';
 
 
@@ -1884,16 +2848,21 @@
                 if (personButton) {
 
                     event.preventDefault();
+
                     event.stopPropagation();
+
 
                     const article =
                         personButton.closest(
                             '[data-memory-id]'
                         );
 
+
                     const memoryId =
-                        article?.dataset
+                        article
+                            ?.dataset
                             ?.memoryId;
+
 
                     if (memoryId) {
 
@@ -1903,6 +2872,7 @@
 
                     }
 
+
                     return;
 
                 }
@@ -1911,16 +2881,21 @@
                 if (memoryButton) {
 
                     event.preventDefault();
+
                     event.stopPropagation();
+
 
                     const article =
                         memoryButton.closest(
                             '[data-memory-id]'
                         );
 
+
                     const memoryId =
-                        article?.dataset
+                        article
+                            ?.dataset
                             ?.memoryId;
+
 
                     if (memoryId) {
 
@@ -1947,7 +2922,9 @@
         timelineMemories =
             readMemoriesFromArchive();
 
+
         populateFilters();
+
 
         renderTimeline();
 
@@ -1972,19 +2949,26 @@
                         id
                     );
 
+
                 if (!select) {
                     return;
                 }
 
+
                 if (
-                    select.dataset.bound ===
+                    select.dataset
+                        .bound ===
                     'true'
                 ) {
+
                     return;
+
                 }
+
 
                 select.dataset.bound =
                     'true';
+
 
                 select.addEventListener(
                     'change',
@@ -2000,14 +2984,17 @@
                 CLEAR_FILTERS_ID
             );
 
+
         if (
             clearButton &&
-            clearButton.dataset.bound !==
+            clearButton.dataset
+                .bound !==
                 'true'
         ) {
 
             clearButton.dataset.bound =
                 'true';
+
 
             clearButton.addEventListener(
                 'click',
@@ -2021,17 +3008,22 @@
                         function (id) {
 
                             const select =
-                                document.getElementById(
-                                    id
-                                );
+                                document
+                                    .getElementById(
+                                        id
+                                    );
+
 
                             if (select) {
+
                                 select.value =
                                     'all';
+
                             }
 
                         }
                     );
+
 
                     renderTimeline();
 
@@ -2052,6 +3044,7 @@
         const archive =
             getArchive();
 
+
         if (!archive) {
             return;
         }
@@ -2068,6 +3061,7 @@
                     window.clearTimeout(
                         syncTimer
                     );
+
 
                     syncTimer =
                         window.setTimeout(
@@ -2109,6 +3103,7 @@
                 'style'
             );
 
+
         style.id =
             TIMELINE_STYLE_ID;
 
@@ -2120,6 +3115,7 @@
                 position: relative;
                 overflow: hidden;
             }
+
 
             .mi-timeline-filters {
                 max-width: 1000px;
@@ -2139,11 +3135,13 @@
                     rgba(0,0,0,.05);
             }
 
+
             .mi-timeline-filter-group {
                 display: flex;
                 flex-direction: column;
                 gap: 7px;
             }
+
 
             .mi-timeline-filter-group label {
                 font-size: .82rem;
@@ -2151,10 +3149,12 @@
                 color: var(--primary, #28536b);
             }
 
+
             .mi-timeline-filter-group label i {
                 margin-right: 5px;
                 color: var(--accent, #c96f4a);
             }
+
 
             .mi-timeline-filter-control {
                 width: 100%;
@@ -2170,6 +3170,7 @@
                 cursor: pointer;
             }
 
+
             .mi-timeline-clear-button {
                 min-height: 44px;
                 padding: 0 16px;
@@ -2184,10 +3185,12 @@
                 cursor: pointer;
             }
 
+
             .mi-timeline-clear-button:hover {
                 background: var(--accent, #c96f4a);
                 color: white;
             }
+
 
             .mi-timeline-results-summary {
                 max-width: 900px;
@@ -2198,11 +3201,13 @@
                 font-weight: 600;
             }
 
+
             .mi-timeline-wrapper {
                 max-width: 900px;
                 margin: 28px auto 0;
                 position: relative;
             }
+
 
             .mi-timeline-line {
                 position: absolute;
@@ -2214,6 +3219,7 @@
                 border-radius: 999px;
             }
 
+
             .mi-timeline-item {
                 position: relative;
                 display: grid;
@@ -2222,6 +3228,7 @@
                 gap: 40px;
                 padding-bottom: 38px;
             }
+
 
             .mi-timeline-date {
                 padding-top: 18px;
@@ -2233,6 +3240,51 @@
                 color: var(--primary, #28536b);
             }
 
+
+            .mi-timeline-date-label {
+                display: block;
+            }
+
+
+            /*
+             * FASE 8.6
+             * Indicador de precisão temporal.
+             */
+
+            .mi-timeline-precision {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                margin-top: 7px;
+                padding: 4px 7px;
+                border-radius: 999px;
+                background: rgba(40,83,107,.07);
+                color: var(--gray, #66727a);
+                font-family: inherit;
+                font-size: .62rem;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+
+
+            .mi-timeline-precision i {
+                font-size: .58rem;
+                color: var(--accent, #c96f4a);
+            }
+
+
+            .mi-timeline-precision-approximate,
+            .mi-timeline-precision-before,
+            .mi-timeline-precision-after {
+                background: rgba(201,111,74,.09);
+            }
+
+
+            .mi-timeline-precision-unknown {
+                background: rgba(102,114,122,.10);
+            }
+
+
             .mi-timeline-content {
                 position: relative;
                 padding: 22px 25px;
@@ -2242,6 +3294,7 @@
                     0 10px 30px
                     rgba(0,0,0,.08);
             }
+
 
             .mi-timeline-content::before {
                 content: "";
@@ -2257,6 +3310,7 @@
                 background: var(--accent, #c96f4a);
             }
 
+
             .mi-timeline-category {
                 display: inline-block;
                 margin-bottom: 10px;
@@ -2268,6 +3322,7 @@
                 font-weight: 600;
             }
 
+
             .mi-timeline-title {
                 margin: 0 0 10px;
                 color: var(--primary, #28536b);
@@ -2276,11 +3331,13 @@
                     serif;
             }
 
+
             .mi-timeline-story {
                 margin: 0;
                 line-height: 1.7;
                 color: var(--gray, #66727a);
             }
+
 
             .mi-timeline-person {
                 display: inline-flex;
@@ -2299,16 +3356,19 @@
                 font-weight: 600;
             }
 
+
             .mi-timeline-person-button {
                 cursor: pointer;
                 transition: .2s ease;
             }
+
 
             .mi-timeline-person-button:hover {
                 background: rgba(201,111,74,.18);
                 border-color: var(--accent, #c96f4a);
                 transform: translateY(-1px);
             }
+
 
             .mi-timeline-person-icon {
                 display: inline-flex;
@@ -2322,10 +3382,12 @@
                 font-size: .72rem;
             }
 
+
             .mi-timeline-link-icon {
                 font-size: .68rem;
                 opacity: .7;
             }
+
 
             .mi-timeline-actions {
                 display: flex;
@@ -2336,6 +3398,7 @@
                     1px solid
                     rgba(40,83,107,.08);
             }
+
 
             .mi-timeline-memory-button {
                 display: inline-flex;
@@ -2353,10 +3416,12 @@
                 cursor: pointer;
             }
 
+
             .mi-timeline-memory-button:hover {
                 background: var(--primary, #28536b);
                 color: white;
             }
+
 
             .memory-card.mi-memory-highlight {
                 outline:
@@ -2369,6 +3434,7 @@
                     2;
             }
 
+
             @keyframes miMemoryPulse {
 
                 50% {
@@ -2379,6 +3445,7 @@
 
             }
 
+
             .mi-timeline-undetermined {
                 margin-top: 25px;
                 padding-top: 35px;
@@ -2387,10 +3454,23 @@
                     rgba(0,0,0,.08);
             }
 
+
             .mi-timeline-undetermined-title {
+                margin-bottom: 8px;
                 text-align: center;
                 color: var(--gray, #66727a);
             }
+
+
+            .mi-timeline-undetermined-intro {
+                max-width: 650px;
+                margin: 0 auto 24px;
+                text-align: center;
+                color: var(--gray, #66727a);
+                font-size: .86rem;
+                line-height: 1.6;
+            }
+
 
             .mi-timeline-undetermined-list {
                 display: grid;
@@ -2402,6 +3482,7 @@
                 gap: 20px;
             }
 
+
             .mi-timeline-undetermined-card {
                 padding: 20px;
                 border-radius: 14px;
@@ -2411,14 +3492,33 @@
                     rgba(0,0,0,.07);
             }
 
+
             .mi-timeline-undetermined-card h4 {
                 margin: 0 0 10px;
                 color: var(--primary, #28536b);
             }
 
+
             .mi-timeline-undetermined-period {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin: 0 0 8px;
                 color: var(--gray, #66727a);
             }
+
+
+            .mi-timeline-undetermined-period i {
+                color: var(--accent, #c96f4a);
+            }
+
+
+            .mi-timeline-undetermined-card
+            .mi-timeline-precision {
+                margin:
+                    0 0 14px;
+            }
+
 
             .mi-timeline-empty {
                 padding: 35px;
@@ -2429,6 +3529,7 @@
                     0 10px 30px
                     rgba(0,0,0,.08);
             }
+
 
             @media (max-width: 980px) {
 
@@ -2442,29 +3543,48 @@
 
             }
 
+
             @media (max-width: 768px) {
 
                 .mi-timeline-filters {
-                    grid-template-columns: 1fr;
+                    grid-template-columns:
+                        1fr;
                 }
+
 
                 .mi-timeline-line {
                     left: 14px;
                 }
+
 
                 .mi-timeline-item {
                     display: block;
                     padding-left: 45px;
                 }
 
+
                 .mi-timeline-date {
                     padding: 0 0 8px;
                     text-align: left;
                 }
 
+
+                .mi-timeline-date-label {
+                    display: inline-block;
+                    margin-right: 7px;
+                }
+
+
+                .mi-timeline-precision {
+                    margin-top: 0;
+                    vertical-align: middle;
+                }
+
+
                 .mi-timeline-content::before {
                     left: -37px;
                 }
+
 
                 .mi-timeline-memory-button {
                     width: 100%;
@@ -2484,48 +3604,266 @@
 
 
     // ======================================================
-    // AUTOTESTE DO MODELO TEMPORAL
+    // AUTOTESTE DO MODELO TEMPORAL — FASE 8.6
     // ======================================================
 
     function runSelfCheck() {
 
         const tests = [
 
-            [
-                '1978',
-                PRECISION.EXACT,
-                1978
-            ],
+            {
+                input:
+                    '1978',
 
-            [
-                '1985-1987',
-                PRECISION.RANGE,
-                1985
-            ],
+                precision:
+                    PRECISION.EXACT,
 
-            [
-                'Década de 80',
-                PRECISION.DECADE,
-                1980
-            ],
+                year:
+                    1978,
 
-            [
-                'Anos 90',
-                PRECISION.DECADE,
-                1990
-            ],
+                label:
+                    '1978'
+            },
 
-            [
-                '1998 aproximadamente',
-                PRECISION.APPROXIMATE,
-                1998
-            ],
 
-            [
-                'Infância',
-                PRECISION.UNKNOWN,
-                null
-            ]
+            {
+                input:
+                    '1985-1987',
+
+                precision:
+                    PRECISION.RANGE,
+
+                year:
+                    1985,
+
+                endYear:
+                    1987,
+
+                label:
+                    '1985–1987'
+            },
+
+
+            {
+                input:
+                    '1985 a 1987',
+
+                precision:
+                    PRECISION.RANGE,
+
+                year:
+                    1985,
+
+                endYear:
+                    1987,
+
+                label:
+                    '1985–1987'
+            },
+
+
+            {
+                input:
+                    'Década de 80',
+
+                precision:
+                    PRECISION.DECADE,
+
+                year:
+                    1980,
+
+                endYear:
+                    1989,
+
+                label:
+                    'Década de 1980'
+            },
+
+
+            {
+                input:
+                    'Anos 90',
+
+                precision:
+                    PRECISION.DECADE,
+
+                year:
+                    1990,
+
+                endYear:
+                    1999,
+
+                label:
+                    'Década de 1990'
+            },
+
+
+            {
+                input:
+                    '1998 aproximadamente',
+
+                precision:
+                    PRECISION.APPROXIMATE,
+
+                year:
+                    1998,
+
+                label:
+                    '≈ 1998'
+            },
+
+
+            {
+                input:
+                    'por volta de 1995',
+
+                precision:
+                    PRECISION.APPROXIMATE,
+
+                year:
+                    1995,
+
+                label:
+                    '≈ 1995'
+            },
+
+
+            {
+                input:
+                    'Viagem realizada em 2004',
+
+                precision:
+                    PRECISION.APPROXIMATE,
+
+                year:
+                    2004,
+
+                label:
+                    'Viagem realizada em 2004'
+            },
+
+
+            {
+                input:
+                    'início dos anos 80',
+
+                precision:
+                    PRECISION.DECADE_PART,
+
+                year:
+                    1980,
+
+                endYear:
+                    1989,
+
+                qualifier:
+                    DECADE_PART.EARLY,
+
+                label:
+                    'Início da década de 1980'
+            },
+
+
+            {
+                input:
+                    'meados dos anos 90',
+
+                precision:
+                    PRECISION.DECADE_PART,
+
+                year:
+                    1990,
+
+                endYear:
+                    1999,
+
+                qualifier:
+                    DECADE_PART.MID,
+
+                label:
+                    'Meados da década de 1990'
+            },
+
+
+            {
+                input:
+                    'final dos anos 60',
+
+                precision:
+                    PRECISION.DECADE_PART,
+
+                year:
+                    1960,
+
+                endYear:
+                    1969,
+
+                qualifier:
+                    DECADE_PART.LATE,
+
+                label:
+                    'Final da década de 1960'
+            },
+
+
+            {
+                input:
+                    'antes de 1980',
+
+                precision:
+                    PRECISION.BEFORE,
+
+                year:
+                    1980,
+
+                label:
+                    'Antes de 1980'
+            },
+
+
+            {
+                input:
+                    'depois de 2005',
+
+                precision:
+                    PRECISION.AFTER,
+
+                year:
+                    2005,
+
+                label:
+                    'Depois de 2005'
+            },
+
+
+            {
+                input:
+                    'Infância',
+
+                precision:
+                    PRECISION.UNKNOWN,
+
+                year:
+                    null,
+
+                label:
+                    'Infância'
+            },
+
+
+            {
+                input:
+                    '',
+
+                precision:
+                    PRECISION.UNKNOWN,
+
+                year:
+                    null,
+
+                label:
+                    NOT_INFORMED_LABEL
+            }
 
         ];
 
@@ -2535,21 +3873,70 @@
 
                 const result =
                     parseMemoryPeriod(
-                        test[0]
+                        test.input
                     );
+
+
+                const checks = [
+
+                    result.precision ===
+                        test.precision,
+
+                    result.year ===
+                        test.year,
+
+                    result.label ===
+                        test.label
+
+                ];
+
+
+                if (
+                    Object.prototype
+                        .hasOwnProperty
+                        .call(
+                            test,
+                            'endYear'
+                        )
+                ) {
+
+                    checks.push(
+                        result.endYear ===
+                            test.endYear
+                    );
+
+                }
+
+
+                if (
+                    Object.prototype
+                        .hasOwnProperty
+                        .call(
+                            test,
+                            'qualifier'
+                        )
+                ) {
+
+                    checks.push(
+                        result.qualifier ===
+                            test.qualifier
+                    );
+
+                }
+
 
                 return {
 
                     input:
-                        test[0],
+                        test.input,
 
                     passed:
-                        (
-                            result.precision ===
-                                test[1] &&
-                            result.year ===
-                                test[2]
+                        checks.every(
+                            Boolean
                         ),
+
+                    expected:
+                        test,
 
                     result
 
@@ -2562,6 +3949,45 @@
 
 
     // ======================================================
+    // RESUMO DO AUTOTESTE
+    // ======================================================
+
+    function getSelfCheckSummary() {
+
+        const results =
+            runSelfCheck();
+
+
+        const passed =
+            results.filter(
+                result =>
+                    result.passed
+            ).length;
+
+
+        return {
+
+            total:
+                results.length,
+
+            passed,
+
+            failed:
+                results.length -
+                passed,
+
+            success:
+                passed ===
+                results.length,
+
+            results
+
+        };
+
+    }
+
+
+    // ======================================================
     // API PÚBLICA
     // ======================================================
 
@@ -2569,7 +3995,11 @@
 
         PRECISION,
 
+        DECADE_PART,
+
         parseMemoryPeriod,
+
+        getPrecisionLabel,
 
         enrichMemoryWithTimeline,
 
@@ -2591,7 +4021,9 @@
 
         openPersonProfile,
 
-        runSelfCheck
+        runSelfCheck,
+
+        getSelfCheckSummary
 
     };
 
@@ -2604,18 +4036,25 @@
 
         injectStyles();
 
+
         ensureTimelineSection();
+
 
         timelineMemories =
             readMemoriesFromArchive();
 
+
         populateFilters();
+
 
         bindFilterEvents();
 
+
         bindTimelineNavigation();
 
+
         renderTimeline();
+
 
         observeArchive();
 
@@ -2643,7 +4082,7 @@
 
 
     // ======================================================
-    // FIM DA FASE 8.5
+    // FIM DA FASE 8.6
     // ======================================================
 
 })();
