@@ -8,10 +8,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL =
     'https://mtqjsmcfsouxhfxrjrkx.supabase.co';
 
-
 const SUPABASE_PUBLISHABLE_KEY =
     'sb_publishable_YA8jN2YWu30ofygmwnzEDg_4z1eZcOT';
 
+const APP_URL =
+    'https://memorias-invisiveis.vercel.app/';
 
 const supabase =
     createClient(
@@ -33,6 +34,7 @@ const supabase =
 
 let currentUser = null;
 let activeFamily = null;
+let authMode = 'login';
 
 
 // ==========================================================
@@ -49,16 +51,13 @@ function injectAuthStyles() {
         return;
     }
 
-
     const style =
         document.createElement(
             'style'
         );
 
-
     style.id =
         'mi-auth-styles';
-
 
     style.textContent = `
 
@@ -66,9 +65,7 @@ function injectAuthStyles() {
         .mi-auth-logout {
 
             border: 0;
-
             cursor: pointer;
-
             font: inherit;
 
         }
@@ -77,11 +74,8 @@ function injectAuthStyles() {
         .mi-auth-trigger {
 
             display: inline-flex;
-
             align-items: center;
-
             justify-content: center;
-
             gap: 8px;
 
             padding: 10px 16px;
@@ -115,9 +109,7 @@ function injectAuthStyles() {
         .mi-auth-user {
 
             display: inline-flex;
-
             align-items: center;
-
             gap: 8px;
 
             color:
@@ -129,15 +121,12 @@ function injectAuthStyles() {
         .mi-auth-user-icon {
 
             width: 34px;
-
             height: 34px;
 
             flex: 0 0 34px;
 
             display: inline-flex;
-
             align-items: center;
-
             justify-content: center;
 
             border-radius: 50%;
@@ -154,7 +143,6 @@ function injectAuthStyles() {
         .mi-auth-user-text {
 
             display: flex;
-
             flex-direction: column;
 
             line-height: 1.15;
@@ -250,7 +238,6 @@ function injectAuthStyles() {
         .mi-auth-backdrop {
 
             position: fixed;
-
             inset: 0;
 
             z-index: 9999;
@@ -258,7 +245,6 @@ function injectAuthStyles() {
             display: none;
 
             align-items: center;
-
             justify-content: center;
 
             padding: 20px;
@@ -334,32 +320,21 @@ function injectAuthStyles() {
 
         .mi-auth-close {
 
-            position:
-                absolute;
+            position: absolute;
 
-            top:
-                14px;
+            top: 14px;
+            right: 14px;
 
-            right:
-                14px;
+            width: 38px;
+            height: 38px;
 
-            width:
-                38px;
-
-            height:
-                38px;
-
-            border:
-                0;
-
-            border-radius:
-                50%;
+            border: 0;
+            border-radius: 50%;
 
             background:
                 var(--secondary);
 
-            cursor:
-                pointer;
+            cursor: pointer;
 
             font-size:
                 1rem;
@@ -372,17 +347,22 @@ function injectAuthStyles() {
 
         .mi-auth-tabs {
 
-            display:
-                grid;
+            display: grid;
 
             grid-template-columns:
                 1fr 1fr;
 
-            gap:
-                8px;
+            gap: 8px;
 
             margin-bottom:
                 20px;
+
+        }
+
+
+        .mi-auth-tabs[hidden] {
+
+            display: none;
 
         }
 
@@ -430,22 +410,25 @@ function injectAuthStyles() {
 
         .mi-auth-form {
 
-            display:
-                grid;
+            display: grid;
 
-            gap:
-                14px;
+            gap: 14px;
 
         }
 
 
         .mi-auth-field {
 
-            display:
-                grid;
+            display: grid;
 
-            gap:
-                6px;
+            gap: 6px;
+
+        }
+
+
+        .mi-auth-field[hidden] {
+
+            display: none;
 
         }
 
@@ -466,8 +449,7 @@ function injectAuthStyles() {
 
         .mi-auth-field input {
 
-            width:
-                100%;
+            width: 100%;
 
             border:
                 1px solid
@@ -482,6 +464,100 @@ function injectAuthStyles() {
             font:
                 inherit;
 
+            box-sizing:
+                border-box;
+
+        }
+
+
+        .mi-auth-field input:focus {
+
+            outline:
+                2px solid
+                rgba(0, 0, 0, 0.08);
+
+            border-color:
+                var(--accent);
+
+        }
+
+
+        .mi-auth-forgot {
+
+            justify-self: end;
+
+            margin-top:
+                -6px;
+
+            padding: 0;
+
+            border: 0;
+
+            background:
+                transparent;
+
+            color:
+                var(--accent);
+
+            font: inherit;
+
+            font-size:
+                0.84rem;
+
+            font-weight:
+                600;
+
+            cursor:
+                pointer;
+
+        }
+
+
+        .mi-auth-forgot:hover {
+
+            text-decoration:
+                underline;
+
+        }
+
+
+        .mi-auth-secondary {
+
+            justify-self: center;
+
+            border: 0;
+
+            background:
+                transparent;
+
+            color:
+                var(--primary);
+
+            font: inherit;
+
+            font-size:
+                0.86rem;
+
+            font-weight:
+                600;
+
+            cursor:
+                pointer;
+
+            padding:
+                4px 8px;
+
+        }
+
+
+        .mi-auth-secondary:hover {
+
+            color:
+                var(--accent);
+
+            text-decoration:
+                underline;
+
         }
 
 
@@ -490,8 +566,7 @@ function injectAuthStyles() {
             margin-top:
                 4px;
 
-            border:
-                0;
+            border: 0;
 
             border-radius:
                 10px;
@@ -582,8 +657,7 @@ function injectAuthStyles() {
 
             .mi-auth-user {
 
-                width:
-                    100%;
+                width: 100%;
 
                 align-items:
                     flex-start;
@@ -596,8 +670,7 @@ function injectAuthStyles() {
 
             .mi-auth-user-text {
 
-                flex:
-                    1;
+                flex: 1;
 
             }
 
@@ -622,7 +695,6 @@ function injectAuthStyles() {
 
     `;
 
-
     document.head.appendChild(
         style
     );
@@ -641,7 +713,6 @@ function injectAuthUI() {
             '.nav-links'
         );
 
-
     if (
         !nav ||
         document.getElementById(
@@ -653,16 +724,13 @@ function injectAuthUI() {
 
     }
 
-
     const slot =
         document.createElement(
             'div'
         );
 
-
     slot.id =
         'miAuthSlot';
-
 
     slot.innerHTML = `
 
@@ -680,12 +748,10 @@ function injectAuthUI() {
 
     `;
 
-
     const cta =
         nav.querySelector(
             '.cta-button'
         );
-
 
     if (cta) {
 
@@ -708,20 +774,16 @@ function injectAuthUI() {
             'div'
         );
 
-
     backdrop.className =
         'mi-auth-backdrop';
 
-
     backdrop.id =
         'miAuthBackdrop';
-
 
     backdrop.setAttribute(
         'aria-hidden',
         'true'
     );
-
 
     backdrop.innerHTML = `
 
@@ -759,7 +821,10 @@ function injectAuthUI() {
             </p>
 
 
-            <div class="mi-auth-tabs">
+            <div
+                class="mi-auth-tabs"
+                id="miAuthTabs"
+            >
 
                 <button
                     type="button"
@@ -813,7 +878,10 @@ function injectAuthUI() {
                 </div>
 
 
-                <div class="mi-auth-field">
+                <div
+                    class="mi-auth-field"
+                    id="miEmailField"
+                >
 
                     <label for="miAuthEmail">
 
@@ -832,9 +900,15 @@ function injectAuthUI() {
                 </div>
 
 
-                <div class="mi-auth-field">
+                <div
+                    class="mi-auth-field"
+                    id="miPasswordField"
+                >
 
-                    <label for="miAuthPassword">
+                    <label
+                        for="miAuthPassword"
+                        id="miPasswordLabel"
+                    >
 
                         Senha
 
@@ -853,9 +927,44 @@ function injectAuthUI() {
 
 
                 <div
+                    class="mi-auth-field"
+                    id="miPasswordConfirmField"
+                    hidden
+                >
+
+                    <label for="miAuthPasswordConfirm">
+
+                        Confirmar nova senha
+
+                    </label>
+
+
+                    <input
+                        id="miAuthPasswordConfirm"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="6"
+                    >
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="mi-auth-forgot"
+                    id="miAuthForgot"
+                >
+
+                    Esqueci minha senha
+
+                </button>
+
+
+                <div
                     class="mi-auth-message"
                     id="miAuthMessage"
                     role="status"
+                    aria-live="polite"
                 ></div>
 
 
@@ -870,12 +979,23 @@ function injectAuthUI() {
 
                 </button>
 
+
+                <button
+                    type="button"
+                    class="mi-auth-secondary"
+                    id="miAuthBackToLogin"
+                    hidden
+                >
+
+                    Voltar para o login
+
+                </button>
+
             </form>
 
         </div>
 
     `;
-
 
     document.body.appendChild(
         backdrop
@@ -917,6 +1037,16 @@ function getAuthElements() {
                 'miAuthForm'
             ),
 
+        title:
+            document.getElementById(
+                'miAuthTitle'
+            ),
+
+        tabsContainer:
+            document.getElementById(
+                'miAuthTabs'
+            ),
+
         nameField:
             document.getElementById(
                 'miNameField'
@@ -927,14 +1057,49 @@ function getAuthElements() {
                 'miAuthName'
             ),
 
+        emailField:
+            document.getElementById(
+                'miEmailField'
+            ),
+
         email:
             document.getElementById(
                 'miAuthEmail'
             ),
 
+        passwordField:
+            document.getElementById(
+                'miPasswordField'
+            ),
+
+        passwordLabel:
+            document.getElementById(
+                'miPasswordLabel'
+            ),
+
         password:
             document.getElementById(
                 'miAuthPassword'
+            ),
+
+        passwordConfirmField:
+            document.getElementById(
+                'miPasswordConfirmField'
+            ),
+
+        passwordConfirm:
+            document.getElementById(
+                'miAuthPasswordConfirm'
+            ),
+
+        forgot:
+            document.getElementById(
+                'miAuthForgot'
+            ),
+
+        backToLogin:
+            document.getElementById(
+                'miAuthBackToLogin'
             ),
 
         message:
@@ -965,88 +1130,28 @@ function getAuthElements() {
 
 
 // ==========================================================
-// MODAL
+// MENSAGENS
 // ==========================================================
 
-function openAuthModal() {
+function clearAuthMessage() {
 
     const {
-        backdrop,
-        email
-    } =
-        getAuthElements();
-
-
-    if (!backdrop) {
-        return;
-    }
-
-
-    backdrop.classList.add(
-        'is-open'
-    );
-
-
-    backdrop.setAttribute(
-        'aria-hidden',
-        'false'
-    );
-
-
-    setTimeout(
-        function () {
-
-            email?.focus();
-
-        },
-        50
-    );
-
-}
-
-
-function closeAuthModal() {
-
-    const {
-        backdrop,
         message
     } =
         getAuthElements();
 
-
-    if (!backdrop) {
+    if (!message) {
         return;
     }
 
+    message.textContent =
+        '';
 
-    backdrop.classList.remove(
-        'is-open'
-    );
-
-
-    backdrop.setAttribute(
-        'aria-hidden',
-        'true'
-    );
-
-
-    if (message) {
-
-        message.textContent =
-            '';
-
-
-        message.className =
-            'mi-auth-message';
-
-    }
+    message.className =
+        'mi-auth-message';
 
 }
 
-
-// ==========================================================
-// MENSAGENS
-// ==========================================================
 
 function showAuthMessage(
     text,
@@ -1058,15 +1163,12 @@ function showAuthMessage(
     } =
         getAuthElements();
 
-
     if (!message) {
         return;
     }
 
-
     message.textContent =
         text;
-
 
     message.className =
         `mi-auth-message is-visible ${type}`;
@@ -1075,26 +1177,148 @@ function showAuthMessage(
 
 
 // ==========================================================
-// LOGIN / CADASTRO
+// MODAL
+// ==========================================================
+
+function openAuthModal(
+    mode = null
+) {
+
+    const {
+        backdrop,
+        email,
+        password
+    } =
+        getAuthElements();
+
+    if (!backdrop) {
+        return;
+    }
+
+    if (mode) {
+
+        setAuthMode(
+            mode
+        );
+
+    }
+
+    backdrop.classList.add(
+        'is-open'
+    );
+
+    backdrop.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+
+    setTimeout(
+        function () {
+
+            if (
+                authMode ===
+                'recovery_update'
+            ) {
+
+                password?.focus();
+
+            } else {
+
+                email?.focus();
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+function closeAuthModal() {
+
+    const {
+        backdrop
+    } =
+        getAuthElements();
+
+    if (!backdrop) {
+        return;
+    }
+
+    backdrop.classList.remove(
+        'is-open'
+    );
+
+    backdrop.setAttribute(
+        'aria-hidden',
+        'true'
+    );
+
+    clearAuthMessage();
+
+}
+
+
+// ==========================================================
+// MODO DA AUTENTICAÇÃO
 // ==========================================================
 
 function setAuthMode(
     mode
 ) {
 
+    const validModes = [
+        'login',
+        'signup',
+        'recovery_request',
+        'recovery_update'
+    ];
+
+    authMode =
+        validModes.includes(
+            mode
+        )
+            ? mode
+            : 'login';
+
     const {
         tabs,
+        tabsContainer,
+        title,
+        intro,
         nameField,
+        name,
+        emailField,
+        email,
+        passwordField,
+        passwordLabel,
         password,
-        submit,
-        intro
+        passwordConfirmField,
+        passwordConfirm,
+        forgot,
+        backToLogin,
+        submit
     } =
         getAuthElements();
 
+    clearAuthMessage();
 
     const signup =
-        mode ===
+        authMode ===
         'signup';
+
+    const login =
+        authMode ===
+        'login';
+
+    const recoveryRequest =
+        authMode ===
+        'recovery_request';
+
+    const recoveryUpdate =
+        authMode ===
+        'recovery_update';
 
 
     tabs.forEach(
@@ -1103,11 +1327,20 @@ function setAuthMode(
             tab.classList.toggle(
                 'is-active',
                 tab.dataset.authMode ===
-                    mode
+                    authMode
             );
 
         }
     );
+
+
+    if (tabsContainer) {
+
+        tabsContainer.hidden =
+            recoveryRequest ||
+            recoveryUpdate;
+
+    }
 
 
     if (nameField) {
@@ -1118,36 +1351,175 @@ function setAuthMode(
     }
 
 
+    if (name) {
+
+        name.required =
+            signup;
+
+    }
+
+
+    if (emailField) {
+
+        emailField.hidden =
+            recoveryUpdate;
+
+    }
+
+
+    if (email) {
+
+        email.required =
+            !recoveryUpdate;
+
+    }
+
+
+    if (passwordField) {
+
+        passwordField.hidden =
+            recoveryRequest;
+
+    }
+
+
     if (password) {
 
+        password.required =
+            !recoveryRequest;
+
+        password.value =
+            '';
+
         password.autocomplete =
-            signup
+            signup ||
+            recoveryUpdate
                 ? 'new-password'
                 : 'current-password';
 
     }
 
 
-    if (submit) {
+    if (passwordLabel) {
 
-        submit.textContent =
-            signup
-                ? 'Criar conta'
-                : 'Entrar';
+        passwordLabel.textContent =
+            recoveryUpdate
+                ? 'Nova senha'
+                : 'Senha';
+
+    }
 
 
-        submit.dataset.mode =
-            mode;
+    if (passwordConfirmField) {
+
+        passwordConfirmField.hidden =
+            !recoveryUpdate;
+
+    }
+
+
+    if (passwordConfirm) {
+
+        passwordConfirm.required =
+            recoveryUpdate;
+
+        passwordConfirm.value =
+            '';
+
+    }
+
+
+    if (forgot) {
+
+        forgot.hidden =
+            !login;
+
+    }
+
+
+    if (backToLogin) {
+
+        backToLogin.hidden =
+            !recoveryRequest;
+
+    }
+
+
+    if (title) {
+
+        if (recoveryRequest) {
+
+            title.textContent =
+                'Recuperar acesso';
+
+        } else if (recoveryUpdate) {
+
+            title.textContent =
+                'Defina sua nova senha';
+
+        } else {
+
+            title.textContent =
+                'Acesse seu acervo';
+
+        }
 
     }
 
 
     if (intro) {
 
-        intro.textContent =
-            signup
-                ? 'Crie sua conta para começar a construir um acervo familiar.'
-                : 'Entre com seu e-mail e senha para acessar seu acervo familiar.';
+        if (signup) {
+
+            intro.textContent =
+                'Crie sua conta para começar a construir um acervo familiar.';
+
+        } else if (recoveryRequest) {
+
+            intro.textContent =
+                'Informe o e-mail da sua conta. Enviaremos um link para você definir uma nova senha.';
+
+        } else if (recoveryUpdate) {
+
+            intro.textContent =
+                'Crie uma nova senha para voltar a acessar seu acervo familiar.';
+
+        } else {
+
+            intro.textContent =
+                'Entre com seu e-mail e senha para acessar seu acervo familiar.';
+
+        }
+
+    }
+
+
+    if (submit) {
+
+        submit.dataset.mode =
+            authMode;
+
+        if (signup) {
+
+            submit.textContent =
+                'Criar conta';
+
+        } else if (recoveryRequest) {
+
+            submit.textContent =
+                'Enviar link de recuperação';
+
+        } else if (recoveryUpdate) {
+
+            submit.textContent =
+                'Salvar nova senha';
+
+        } else {
+
+            submit.textContent =
+                'Entrar';
+
+        }
 
     }
 
@@ -1168,7 +1540,6 @@ async function loadActiveFamily() {
         return null;
 
     }
-
 
     const {
         data,
@@ -1217,10 +1588,8 @@ async function loadActiveFamily() {
             error
         );
 
-
         activeFamily =
             null;
-
 
         return null;
 
@@ -1229,7 +1598,6 @@ async function loadActiveFamily() {
 
     activeFamily =
         data || null;
-
 
     return activeFamily;
 
@@ -1249,10 +1617,8 @@ function escapeForAuth(
             'div'
         );
 
-
     div.textContent =
         value ?? '';
-
 
     return div.innerHTML;
 
@@ -1300,13 +1666,6 @@ function getCurrentUserDisplayName() {
     }
 
 
-    /*
-     * Fallback de privacidade:
-     *
-     * Não exibimos o endereço completo de e-mail
-     * no cabeçalho.
-     */
-
     const email =
         String(
             currentUser.email || ''
@@ -1319,7 +1678,6 @@ function getCurrentUserDisplayName() {
             email
                 .split('@')[0]
                 .trim();
-
 
         if (firstPart) {
 
@@ -1377,7 +1735,13 @@ function renderAuthState() {
             )
             ?.addEventListener(
                 'click',
-                openAuthModal
+                function () {
+
+                    openAuthModal(
+                        'login'
+                    );
+
+                }
             );
 
 
@@ -1535,6 +1899,35 @@ function authErrorMessage(
 
     if (
         message.includes(
+            'same password'
+        )
+    ) {
+
+        return (
+            'A nova senha precisa ser diferente da senha atual.'
+        );
+
+    }
+
+
+    if (
+        message.includes(
+            'rate limit'
+        ) ||
+        message.includes(
+            'security purposes'
+        )
+    ) {
+
+        return (
+            'Aguarde um pouco antes de solicitar outro e-mail de recuperação.'
+        );
+
+    }
+
+
+    if (
+        message.includes(
             'password'
         )
     ) {
@@ -1554,6 +1947,121 @@ function authErrorMessage(
 
 
 // ==========================================================
+// RECUPERAÇÃO DE SENHA
+// ==========================================================
+
+async function requestPasswordRecovery(
+    emailValue
+) {
+
+    const {
+        error
+    } =
+        await supabase
+            .auth
+            .resetPasswordForEmail(
+                emailValue,
+                {
+                    redirectTo:
+                        APP_URL
+                }
+            );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    /*
+     * A mensagem é propositalmente neutra.
+     *
+     * Não informamos se o e-mail existe ou não,
+     * evitando enumeração de usuários.
+     */
+
+    showAuthMessage(
+        'Se existir uma conta associada a este e-mail, você receberá um link para redefinir sua senha.',
+        'success'
+    );
+
+}
+
+
+async function updateRecoveredPassword(
+    passwordValue,
+    passwordConfirmValue
+) {
+
+    if (
+        !passwordValue ||
+        !passwordConfirmValue
+    ) {
+
+        showAuthMessage(
+            'Informe e confirme a nova senha.'
+        );
+
+        return false;
+
+    }
+
+
+    if (
+        passwordValue.length < 6
+    ) {
+
+        showAuthMessage(
+            'A nova senha deve ter pelo menos 6 caracteres.'
+        );
+
+        return false;
+
+    }
+
+
+    if (
+        passwordValue !==
+        passwordConfirmValue
+    ) {
+
+        showAuthMessage(
+            'As senhas informadas não coincidem.'
+        );
+
+        return false;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .auth
+            .updateUser({
+                password:
+                    passwordValue
+            });
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    showAuthMessage(
+        'Senha atualizada com sucesso. Seu acesso foi recuperado.',
+        'success'
+    );
+
+
+    return true;
+
+}
+
+
+// ==========================================================
 // SUBMIT
 // ==========================================================
 
@@ -1568,6 +2076,7 @@ async function handleAuthSubmit(
         name,
         email,
         password,
+        passwordConfirm,
         submit
     } =
         getAuthElements();
@@ -1595,6 +2104,151 @@ async function handleAuthSubmit(
         ||
         '';
 
+
+    const passwordConfirmValue =
+        passwordConfirm
+            ?.value
+        ||
+        '';
+
+
+    clearAuthMessage();
+
+
+    // ======================================================
+    // RECUPERAÇÃO — SOLICITAR LINK
+    // ======================================================
+
+    if (
+        mode ===
+        'recovery_request'
+    ) {
+
+        if (!emailValue) {
+
+            showAuthMessage(
+                'Informe seu e-mail.'
+            );
+
+            return;
+
+        }
+
+
+        if (submit) {
+
+            submit.disabled =
+                true;
+
+        }
+
+
+        try {
+
+            await requestPasswordRecovery(
+                emailValue
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Erro ao solicitar recuperação de senha:',
+                error
+            );
+
+
+            showAuthMessage(
+                authErrorMessage(
+                    error
+                )
+            );
+
+        } finally {
+
+            if (submit) {
+
+                submit.disabled =
+                    false;
+
+            }
+
+        }
+
+
+        return;
+
+    }
+
+
+    // ======================================================
+    // RECUPERAÇÃO — DEFINIR NOVA SENHA
+    // ======================================================
+
+    if (
+        mode ===
+        'recovery_update'
+    ) {
+
+        if (submit) {
+
+            submit.disabled =
+                true;
+
+        }
+
+
+        try {
+
+            const updated =
+                await updateRecoveredPassword(
+                    passwordValue,
+                    passwordConfirmValue
+                );
+
+
+            if (updated) {
+
+                setTimeout(
+                    closeAuthModal,
+                    1400
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                'Erro ao atualizar senha:',
+                error
+            );
+
+
+            showAuthMessage(
+                authErrorMessage(
+                    error
+                )
+            );
+
+        } finally {
+
+            if (submit) {
+
+                submit.disabled =
+                    false;
+
+            }
+
+        }
+
+
+        return;
+
+    }
+
+
+    // ======================================================
+    // LOGIN / CADASTRO
+    // ======================================================
 
     if (
         !emailValue ||
@@ -1672,7 +2326,7 @@ async function handleAuthSubmit(
                             },
 
                             emailRedirectTo:
-                                'https://memorias-invisiveis.vercel.app/'
+                                APP_URL
 
                         }
 
@@ -1750,6 +2404,7 @@ async function handleAuthSubmit(
             500
         );
 
+
     } catch (error) {
 
         console.error(
@@ -1763,6 +2418,7 @@ async function handleAuthSubmit(
                 error
             )
         );
+
 
     } finally {
 
@@ -1789,14 +2445,22 @@ function bindAuthEvents() {
         close,
         backdrop,
         form,
-        tabs
+        tabs,
+        forgot,
+        backToLogin
     } =
         getAuthElements();
 
 
     open?.addEventListener(
         'click',
-        openAuthModal
+        function () {
+
+            openAuthModal(
+                'login'
+            );
+
+        }
     );
 
 
@@ -1809,6 +2473,30 @@ function bindAuthEvents() {
     form?.addEventListener(
         'submit',
         handleAuthSubmit
+    );
+
+
+    forgot?.addEventListener(
+        'click',
+        function () {
+
+            setAuthMode(
+                'recovery_request'
+            );
+
+        }
+    );
+
+
+    backToLogin?.addEventListener(
+        'click',
+        function () {
+
+            setAuthMode(
+                'login'
+            );
+
+        }
     );
 
 
@@ -1875,6 +2563,81 @@ function bindAuthEvents() {
 
 
 // ==========================================================
+// EVENTO DE ALTERAÇÃO DE AUTENTICAÇÃO
+// ==========================================================
+
+async function processAuthStateChange(
+    event,
+    session
+) {
+
+    currentUser =
+        session
+            ?.user
+        ||
+        null;
+
+
+    if (
+        currentUser
+    ) {
+
+        await loadActiveFamily();
+
+    } else {
+
+        activeFamily =
+            null;
+
+    }
+
+
+    renderAuthState();
+
+
+    /*
+     * PASSWORD_RECOVERY é disparado quando o usuário
+     * retorna ao aplicativo pelo link enviado pelo Supabase.
+     *
+     * Nesse momento existe uma sessão temporária válida
+     * para permitir a alteração da senha.
+     */
+
+    if (
+        event ===
+        'PASSWORD_RECOVERY'
+    ) {
+
+        openAuthModal(
+            'recovery_update'
+        );
+
+    }
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            'memorias-invisiveis:auth-change',
+            {
+                detail: {
+
+                    event,
+
+                    user:
+                        currentUser,
+
+                    family:
+                        activeFamily
+
+                }
+            }
+        )
+    );
+
+}
+
+
+// ==========================================================
 // INICIALIZAÇÃO
 // ==========================================================
 
@@ -1885,6 +2648,53 @@ async function initializeAuth() {
     injectAuthUI();
 
     bindAuthEvents();
+
+
+    /*
+     * Registramos o listener antes da leitura inicial
+     * da sessão para não perder eventos de retorno
+     * provenientes de links de autenticação.
+     */
+
+    supabase
+        .auth
+        .onAuthStateChange(
+            function (
+                event,
+                session
+            ) {
+
+                /*
+                 * O processamento é deslocado para a próxima
+                 * tarefa para evitar chamadas assíncronas
+                 * adicionais dentro do callback interno
+                 * do cliente de autenticação.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        processAuthStateChange(
+                            event,
+                            session
+                        )
+                            .catch(
+                                function (error) {
+
+                                    console.error(
+                                        'Erro ao processar mudança de autenticação:',
+                                        error
+                                    );
+
+                                }
+                            );
+
+                    },
+                    0
+                );
+
+            }
+        );
 
 
     const {
@@ -1915,61 +2725,6 @@ async function initializeAuth() {
     renderAuthState();
 
 
-    supabase
-        .auth
-        .onAuthStateChange(
-            async function (
-                event,
-                session
-            ) {
-
-                currentUser =
-                    session
-                        ?.user
-                    ||
-                    null;
-
-
-                if (
-                    currentUser
-                ) {
-
-                    await loadActiveFamily();
-
-                } else {
-
-                    activeFamily =
-                        null;
-
-                }
-
-
-                renderAuthState();
-
-
-                window.dispatchEvent(
-                    new CustomEvent(
-                        'memorias-invisiveis:auth-change',
-                        {
-                            detail: {
-
-                                event,
-
-                                user:
-                                    currentUser,
-
-                                family:
-                                    activeFamily
-
-                            }
-                        }
-                    )
-                );
-
-            }
-        );
-
-
     window.MemoriasInvisiveisAuth = {
 
         supabase,
@@ -1992,7 +2747,22 @@ async function initializeAuth() {
             loadActiveFamily,
 
         openLogin:
-            openAuthModal
+            function () {
+
+                openAuthModal(
+                    'login'
+                );
+
+            },
+
+        openPasswordRecovery:
+            function () {
+
+                openAuthModal(
+                    'recovery_request'
+                );
+
+            }
 
     };
 
